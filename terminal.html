@@ -2759,5 +2759,40 @@
             console.error('Unhandled rejection:', event.reason);
         });
     </script>
+
+    <!-- Mobile Wallet Helper -->
+    <script src="mobile-wallet-helper.js"></script>
+    
+    <script>
+        // Enhanced mobile wallet connection for terminal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Override the original connectWallet function for mobile
+            const originalConnectWallet = window.connectWallet;
+            
+            window.connectWallet = async function() {
+                if (window.mobileWalletHelper && window.mobileWalletHelper.isMobile && !window.ethereum) {
+                    addLog('> MOBILE DEVICE DETECTED - WALLET REQUIRED', 'warning');
+                    window.mobileWalletHelper.showMobileWalletOptions();
+                    return;
+                }
+                
+                // Use mobile-optimized connection
+                if (window.MobileWalletHelper) {
+                    const account = await window.MobileWalletHelper.connectMobileWallet();
+                    if (account) {
+                        userAccount = account;
+                        addLog(`> WALLET CONNECTED: ${account}`, 'success');
+                        updateConnectionStatus();
+                        return;
+                    }
+                }
+                
+                // Fallback to original method
+                if (originalConnectWallet) {
+                    return originalConnectWallet();
+                }
+            };
+        });
+    </script>
 </body>
 </html>
