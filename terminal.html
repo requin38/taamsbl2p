@@ -919,6 +919,12 @@
                 <div class="nav-description">Manage your BL2P tokens</div>
             </div>
             
+            <div class="nav-item locked" id="nav-delegation">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">DELEGATION HUB</div>
+                <div class="nav-description">Delegate voting power & earn rewards</div>
+            </div>
+            
             <div class="nav-item locked" id="nav-ads">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">ADVERTISEMENT HUB</div>
@@ -2832,6 +2838,9 @@
                             case 'BL2P MANAGER':
                                 openBL2PManager();
                                 break;
+                            case 'DELEGATION HUB':
+                                openDelegationHub();
+                                break;
                             case 'ADVERTISEMENT HUB':
                                 openAdvertisementHub();
                                 break;
@@ -2992,6 +3001,24 @@
             
             addLog('> LAUNCHING BL2P MANAGER...', 'success');
             window.open('bl2p.html', '_blank');
+        }
+        
+        function openDelegationHub() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> LAUNCHING DELEGATION HUB...', 'success');
+            window.open('delegation.html', '_blank');
         }
         
         function openAdvertisementHub() {
