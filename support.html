@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAAMS Protocol - Support & Expériences</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid #00ff88;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .tab.active, .tab:hover {
+            background: #00ff88;
+            color: black;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .experience-form {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .experiences-list {
+            margin-top: 30px;
+        }
+
+        .experience-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .experience-card:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .experience-type {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .type-problem {
+            background: rgba(255, 102, 0, 0.2);
+            border: 1px solid #ff6600;
+            color: #ff6600;
+        }
+
+        .type-success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .type-suggestion {
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid #8a2be2;
+            color: #8a2be2;
+        }
+
+        .experience-date {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .experience-content h4 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .experience-content p {
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .experience-wallet {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .common-issues {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff6600;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .issue-item {
+            background: rgba(255, 102, 0, 0.1);
+            border-left: 4px solid #ff6600;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .issue-item h4 {
+            color: #ff6600;
+            margin-bottom: 10px;
+        }
+
+        .issue-item .solution {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .solution h5 {
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+
+        .contact-info {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #8a2be2;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .contact-info h3 {
+            color: #8a2be2;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            background: rgba(138, 43, 226, 0.2);
+            border: 2px solid #8a2be2;
+            color: #8a2be2;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .social-link:hover {
+            background: #8a2be2;
+            color: white;
+        }
+
+        .back-to-dapp {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-dapp:hover {
+            background: #00ff88;
+            color: black;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .experience-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="terminal.html" class="back-to-dapp">← Retour à la dApp</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ TAAMS Support Center</h1>
+            <p>Partagez vos expériences, résolvez vos problèmes, aidez la communauté</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showTab('share')">📝 Partager une Expérience</div>
+            <div class="tab" onclick="showTab('issues')">❌ Problèmes Courants</div>
+            <div class="tab" onclick="showTab('experiences')">💬 Expériences Locales</div>
+            <div class="tab" onclick="showTab('community')">🐦 Communauté Twitter</div>
+            <div class="tab" onclick="showTab('contact')">📞 Contact</div>
+        </div>
+
+        <!-- Onglet Partager une Expérience -->
+        <div id="share" class="tab-content active">
+            <div class="experience-form">
+                <h2>📝 Partagez votre expérience</h2>
+                <p style="margin-bottom: 20px; color: #888;">
+                    🌟 <strong>Nouvelle fonctionnalité :</strong> Partagez publiquement sur Twitter/X pour une transparence totale !<br>
+                    📍 Votre expérience aidera toute la communauté TAAMS Protocol.
+                </p>
+                
+                <div style="background: rgba(29, 161, 242, 0.1); border-left: 4px solid #1da1f2; padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
+                    <h4 style="color: #1da1f2; margin-bottom: 10px;">🐦 Partage Twitter Automatique</h4>
+                    <p style="color: #ccc; margin: 0; line-height: 1.5;">
+                        ✅ Après soumission, option de tweet automatique<br>
+                        🎯 Tweet pré-formaté avec hashtags officiels<br>
+                        🔧 Texte modifiable avant publication<br>
+                        👥 Visibilité maximale pour la communauté
+                    </p>
+                </div>
+
+                <form id="experienceForm">
+                    <div class="form-group">
+                        <label for="experienceType">Type d'expérience</label>
+                        <select id="experienceType" required>
+                            <option value="">Sélectionnez...</option>
+                            <option value="problem">🔴 Problème rencontré</option>
+                            <option value="success">🟢 Expérience réussie</option>
+                            <option value="suggestion">🟣 Suggestion d'amélioration</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experienceTitle">Titre de votre expérience</label>
+                        <input type="text" id="experienceTitle" placeholder="Ex: Problème de connexion MetaMask mobile" maxlength="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experienceDescription">Description détaillée</label>
+                        <textarea id="experienceDescription" 
+                                placeholder="Décrivez votre expérience en détail: étapes effectuées, erreurs rencontrées, solutions trouvées, etc." 
+                                maxlength="2000" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userWallet">Votre adresse wallet (optionnel)</label>
+                        <input type="text" id="userWallet" placeholder="0x..." maxlength="42">
+                        <small style="color: #888; font-size: 0.9em;">
+                            Permet aux développeurs de vous contacter si nécessaire
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="twitterHandle">Votre Twitter/X (optionnel)</label>
+                        <input type="text" id="twitterHandle" placeholder="@votre_twitter" maxlength="50">
+                    </div>
+
+                    <button type="submit" class="btn">📤 Partager l'Expérience</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Onglet Problèmes Courants -->
+        <div id="issues" class="tab-content">
+            <div class="common-issues">
+                <h2>❌ Problèmes Courants & Solutions</h2>
+                
+                <div class="issue-item">
+                    <h4>🔌 Problème de connexion MetaMask</h4>
+                    <p>Le wallet ne se connecte pas ou la connexion échoue.</p>
+                    <div class="solution">
+                        <h5>✅ Solutions:</h5>
+                        <ul>
+                            <li>Vérifiez que vous êtes sur le navigateur MetaMask mobile</li>
+                            <li>Actualisez la page et reconnectez</li>
+                            <li>Vérifiez que MetaMask est déverrouillé</li>
+                            <li>Assurez-vous d'être sur le réseau Polygon</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="issue-item">
+                    <h4>⛽ Transactions qui échouent - Manque de MATIC</h4>
+                    <p>Les transactions n'aboutissent pas et affichent une erreur de gas.</p>
+                    <div class="solution">
+                        <h5>✅ Solutions:</h5>
+                        <ul>
+                            <li>Achetez du MATIC (minimum 0.001 MATIC pour les transactions)</li>
+                            <li>Utilisez le Polygon Bridge: <a href="https://wallet.polygon.technology/polygon/bridge/" target="_blank" style="color: #8a2be2;">Bridge Officiel</a></li>
+                            <li>Achetez sur Binance: <a href="https://www.binance.com/activity/referral-entry/CPA?ref=CPA_00JBV531IG" target="_blank" style="color: #f3ba2f;">Binance (avec bonus)</a></li>
+                            <li>Swapez sur Uniswap Polygon</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="issue-item">
+                    <h4>📱 Interface non responsive sur mobile</h4>
+                    <p>L'interface ne s'affiche pas correctement sur smartphone.</p>
+                    <div class="solution">
+                        <h5>✅ Solutions:</h5>
+                        <ul>
+                            <li>Utilisez le navigateur intégré de MetaMask</li>
+                            <li>Orientez votre téléphone en mode portrait</li>
+                            <li>Zoomez/dézoomez pour ajuster l'affichage</li>
+                            <li>Fermez les autres onglets pour libérer la mémoire</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="issue-item">
+                    <h4>🔄 Données qui ne se chargent pas</h4>
+                    <p>Les balances ou informations du contrat ne s'affichent pas.</p>
+                    <div class="solution">
+                        <h5>✅ Solutions:</h5>
+                        <ul>
+                            <li>Cliquez sur le bouton "🔄 REFRESH BLOCKCHAIN DATA"</li>
+                            <li>Vérifiez votre connexion internet</li>
+                            <li>Reconnectez votre wallet</li>
+                            <li>Attendez quelques secondes (réseau parfois lent)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="issue-item">
+                    <h4>📝 Inscription à l'airdrop impossible</h4>
+                    <p>Le bouton d'inscription ne fonctionne pas ou reste grisé.</p>
+                    <div class="solution">
+                        <h5>✅ Solutions:</h5>
+                        <ul>
+                            <li>Vérifiez que l'inscription est ouverte</li>
+                            <li>Assurez-vous d'avoir suffisamment de MATIC</li>
+                            <li>Vérifiez que vous n'êtes pas déjà inscrit</li>
+                            <li>Attendez que le contrat se charge complètement</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Expériences Partagées -->
+        <div id="experiences" class="tab-content">
+            <div class="experiences-list">
+                <h2>💬 Expériences Locales</h2>
+                <p style="margin-bottom: 30px; color: #888;">
+                    Vos expériences sauvegardées localement dans ce navigateur.
+                </p>
+                
+                <div id="experiencesList">
+                    <!-- Les expériences seront chargées ici via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Communauté Twitter -->
+        <div id="community" class="tab-content">
+            <div class="experiences-list">
+                <h2>🐦 Communauté Twitter/X</h2>
+                <p style="margin-bottom: 30px; color: #888;">
+                    Suivez les discussions publiques et transparentes de la communauté TAAMS Protocol.
+                </p>
+                
+                <div style="background: rgba(0, 0, 0, 0.7); border: 2px solid #1da1f2; border-radius: 15px; padding: 30px; margin-bottom: 30px;">
+                    <h3 style="color: #1da1f2; margin-bottom: 20px; text-align: center;">📱 Flux Twitter en Direct</h3>
+                    
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <a href="https://twitter.com/search?q=%23TAAMSProtocol%20OR%20%23TAAMSSupport&src=typed_query&f=live" 
+                           target="_blank" 
+                           style="background: #1da1f2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin: 5px;">
+                            🔍 Rechercher #TAAMSProtocol
+                        </a>
+                        
+                        <a href="https://twitter.com/intent/tweet?text=%F0%9F%94%B4%20PROBL%C3%88ME%20TAAMS%20PROTOCOL%0A%0A%F0%9F%93%8B%20%5BTitre%20du%20probl%C3%A8me%5D%0A%0A%F0%9F%92%AC%20%5BDescription%5D%0A%0A%23TAAMSProtocol%20%23TAAMSSupport%20%23DeFi%20%23Polygon%20%40satoshi_earn" 
+                           target="_blank"
+                           style="background: #ff6600; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin: 5px;">
+                            🆘 Signaler un Problème
+                        </a>
+                    </div>
+                    
+                    <div style="background: rgba(29, 161, 242, 0.1); border-left: 4px solid #1da1f2; padding: 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #1da1f2; margin-bottom: 15px;">🎯 Hashtags Officiels</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <span style="background: rgba(29, 161, 242, 0.2); color: #1da1f2; padding: 5px 12px; border-radius: 15px; font-size: 0.9em;">#TAAMSProtocol</span>
+                            <span style="background: rgba(255, 102, 0, 0.2); color: #ff6600; padding: 5px 12px; border-radius: 15px; font-size: 0.9em;">#TAAMSSupport</span>
+                            <span style="background: rgba(0, 255, 136, 0.2); color: #00ff88; padding: 5px 12px; border-radius: 15px; font-size: 0.9em;">#TAAMSSuccess</span>
+                            <span style="background: rgba(138, 43, 226, 0.2); color: #8a2be2; padding: 5px 12px; border-radius: 15px; font-size: 0.9em;">#TAAMSSuggestion</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 136, 0.1); border-radius: 8px;">
+                        <h5 style="color: #00ff88; margin-bottom: 10px;">💡 Pourquoi Twitter ?</h5>
+                        <ul style="color: #ccc; line-height: 1.6;">
+                            <li>✅ <strong>Transparence totale</strong> - Tous les retours sont publics</li>
+                            <li>🚀 <strong>Visibilité communauté</strong> - Votre expérience aide les autres</li>
+                            <li>⚡ <strong>Support en temps réel</strong> - L'équipe répond rapidement</li>
+                            <li>🎉 <strong>Reconnaissance</strong> - Vos contributions sont valorisées</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0, 0, 0, 0.7); border: 2px solid #00ff88; border-radius: 15px; padding: 25px;">
+                    <h3 style="color: #00ff88; margin-bottom: 15px;">📝 Templates de Tweet</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #ff6600; margin-bottom: 10px;">🔴 Pour un Problème :</h4>
+                        <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9em; border-left: 4px solid #ff6600;">
+                            🔴 PROBLÈME TAAMS PROTOCOL<br><br>
+                            📋 [Titre du problème]<br><br>
+                            💬 [Description détaillée]<br><br>
+                            👛 [Votre wallet si souhaité]<br><br>
+                            #TAAMSProtocol #TAAMSSupport #DeFi #Polygon @satoshi_earn
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #00ff88; margin-bottom: 10px;">🟢 Pour un Succès :</h4>
+                        <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9em; border-left: 4px solid #00ff88;">
+                            🟢 SUCCÈS TAAMS PROTOCOL<br><br>
+                            📋 [Ce qui a bien fonctionné]<br><br>
+                            💬 [Votre expérience positive]<br><br>
+                            🎉 Merci TAAMS Protocol !<br><br>
+                            #TAAMSProtocol #TAAMSSuccess #DeFi #Polygon @satoshi_earn
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Contact -->
+        <div id="contact" class="tab-content">
+            <div class="contact-info">
+                <h3>📞 Besoin d'aide directe ?</h3>
+                <p style="margin-bottom: 30px; color: #888;">
+                    Contactez l'équipe TAAMS Protocol sur nos réseaux sociaux
+                </p>
+                
+                <div class="social-links">
+                    <a href="https://x.com/satoshi_earn/status/1949908688472355106" target="_blank" class="social-link">
+                        🐦 Twitter/X Support
+                    </a>
+                    <a href="https://t.me/taams_protocol" target="_blank" class="social-link">
+                        💬 Telegram
+                    </a>
+                    <a href="https://discord.gg/taams" target="_blank" class="social-link">
+                        🎮 Discord
+                    </a>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                    <p style="color: #888; font-size: 0.9em;">
+                        ⏰ Temps de réponse moyen: 2-6 heures<br>
+                        📧 Pour les problèmes complexes, contactez-nous avec votre adresse wallet
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Système de navigation par onglets
+        function showTab(tabName) {
+            // Masquer tous les contenus
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Désactiver tous les onglets
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher le contenu sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer l'onglet sélectionné
+            event.target.classList.add('active');
+            
+            // Charger les expériences si on va sur cet onglet
+            if (tabName === 'experiences') {
+                loadExperiences();
+            }
+        }
+
+        // Système de stockage local des expériences
+        function saveExperience(experience) {
+            let experiences = JSON.parse(localStorage.getItem('taams_experiences') || '[]');
+            
+            // Ajouter un ID et timestamp
+            experience.id = Date.now();
+            experience.date = new Date().toLocaleDateString('fr-FR');
+            experience.timestamp = Date.now();
+            
+            experiences.unshift(experience); // Ajouter au début
+            
+            // Garder seulement les 50 dernières expériences
+            if (experiences.length > 50) {
+                experiences = experiences.slice(0, 50);
+            }
+            
+            localStorage.setItem('taams_experiences', JSON.stringify(experiences));
+            return experience;
+        }
+
+        // Charger et afficher les expériences
+        function loadExperiences() {
+            const experiences = JSON.parse(localStorage.getItem('taams_experiences') || '[]');
+            const container = document.getElementById('experiencesList');
+            
+            if (experiences.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        <h3>Aucune expérience partagée pour le moment</h3>
+                        <p>Soyez le premier à partager votre expérience !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = experiences.map(exp => `
+                <div class="experience-card">
+                    <div class="experience-header">
+                        <div class="experience-type type-${exp.type}">
+                            ${exp.type === 'problem' ? '🔴 Problème' : 
+                              exp.type === 'success' ? '🟢 Succès' : '🟣 Suggestion'}
+                        </div>
+                        <div class="experience-date">${exp.date}</div>
+                    </div>
+                    <div class="experience-content">
+                        <h4>${exp.title}</h4>
+                        <p>${exp.description}</p>
+                        ${exp.wallet ? `<div class="experience-wallet">👛 Wallet: ${exp.wallet.slice(0, 6)}...${exp.wallet.slice(-4)}</div>` : ''}
+                        ${exp.twitter ? `<div style="margin-top: 10px;"><strong>📱 Contact:</strong> ${exp.twitter}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fonction pour créer un tweet automatique
+        function createTweetForExperience(experience) {
+            const typeEmojis = {
+                'problem': '🔴',
+                'success': '🟢', 
+                'suggestion': '🟣'
+            };
+            
+            const typeTexts = {
+                'problem': 'PROBLÈME',
+                'success': 'SUCCÈS',
+                'suggestion': 'SUGGESTION'
+            };
+            
+            const emoji = typeEmojis[experience.type] || '📝';
+            const typeText = typeTexts[experience.type] || 'RETOUR';
+            
+            // Construire le tweet
+            let tweet = `${emoji} ${typeText} TAAMS PROTOCOL\n\n`;
+            tweet += `📋 ${experience.title}\n\n`;
+            
+            // Tronquer la description si nécessaire (limite Twitter)
+            let description = experience.description;
+            if (description.length > 120) {
+                description = description.substring(0, 120) + '...';
+            }
+            tweet += `💬 ${description}\n\n`;
+            
+            // Ajouter wallet si fourni
+            if (experience.wallet) {
+                tweet += `👛 ${experience.wallet.slice(0,6)}...${experience.wallet.slice(-4)}\n\n`;
+            }
+            
+            // Hashtags et mention
+            tweet += `#TAAMSProtocol #TAAMSSupport #DeFi #Polygon @satoshi_earn`;
+            
+            return tweet;
+        }
+        
+        // Fonction pour ouvrir Twitter avec le tweet pré-rempli
+        function shareOnTwitter(tweetText) {
+            const encodedTweet = encodeURIComponent(tweetText);
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedTweet}`;
+            
+            // Ouvrir Twitter dans un nouvel onglet
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+
+        // Gestion du formulaire
+        document.getElementById('experienceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const experience = {
+                type: document.getElementById('experienceType').value,
+                title: document.getElementById('experienceTitle').value,
+                description: document.getElementById('experienceDescription').value,
+                wallet: document.getElementById('userWallet').value,
+                twitter: document.getElementById('twitterHandle').value
+            };
+            
+            // Validation
+            if (!experience.type || !experience.title || !experience.description) {
+                alert('❌ Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+            
+            // Sauvegarder l'expérience localement
+            const savedExp = saveExperience(experience);
+            
+            // Créer le tweet
+            const tweetText = createTweetForExperience(experience);
+            
+            // Proposer de partager sur Twitter
+            const shareChoice = confirm(
+                '✅ Expérience enregistrée !\n\n' +
+                '🐦 Voulez-vous partager cette expérience publiquement sur Twitter/X ?\n\n' +
+                'Cela aidera toute la communauté TAAMS Protocol et vous donner de la visibilité.'
+            );
+            
+            if (shareChoice) {
+                // Ouvrir Twitter avec le tweet pré-rempli
+                shareOnTwitter(tweetText);
+                
+                alert('🎉 Merci ! Votre tweet est prêt.\n\n📝 Vous pouvez modifier le texte avant de publier.\n\n🔄 L\'équipe TAAMS pourra répondre et aider la communauté !');
+            } else {
+                alert('✅ Expérience sauvegardée localement !\n\nVous pouvez toujours la partager plus tard.');
+            }
+            
+            // Réinitialiser le formulaire
+            this.reset();
+            
+            // Passer à l'onglet des expériences pour voir le résultat
+            showTab('experiences');
+            document.querySelector('.tab[onclick="showTab(\'experiences\')"]').classList.add('active');
+            document.querySelector('.tab[onclick="showTab(\'share\')"]').classList.remove('active');
+            document.getElementById('share').classList.remove('active');
+            document.getElementById('experiences').classList.add('active');
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Charger les expériences au démarrage si on est sur cet onglet
+            if (document.getElementById('experiences').classList.contains('active')) {
+                loadExperiences();
+            }
+        });
+
+        // Auto-resize des textarea
+        document.getElementById('experienceDescription').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    </script>
+</body>
+</html>
