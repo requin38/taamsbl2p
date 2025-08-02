@@ -1527,11 +1527,16 @@
         function showMobileGuidance() {
             if (isMobileDevice()) {
                 if (!window.ethereum) {
-                    addLog('> 📱 POUR UTILISER TAAMS SUR MOBILE:', 'info');
-                    addLog('> 1️⃣ Téléchargez MetaMask mobile app', 'info');
-                    addLog('> 2️⃣ Ouvrez MetaMask → onglet "Navigateur"', 'info');
-                    addLog('> 3️⃣ Allez sur votre site TAAMS', 'info');
-                    addLog('> 4️⃣ MetaMask sera automatiquement détecté', 'success');
+                    addLog('> ❌ METAMASK NON DÉTECTÉ SUR MOBILE', 'error');
+                    addLog('> 📱 VOUS DEVEZ OUVRIR CETTE PAGE DANS METAMASK MOBILE:', 'warning');
+                    addLog('> ', 'info');
+                    addLog('> 🔸 ÉTAPE 1: Téléchargez MetaMask Mobile', 'info');
+                    addLog('> 🔸 ÉTAPE 2: Ouvrez MetaMask → onglet "Navigateur"', 'info');
+                    addLog('> 🔸 ÉTAPE 3: Tapez cette URL dans MetaMask:', 'info');
+                    addLog(`> ${window.location.href}`, 'success');
+                    addLog('> ', 'info');
+                    addLog('> ⚠️  IMPORTANT: N\'utilisez PAS Chrome/Safari/Firefox sur mobile', 'warning');
+                    addLog('> ✅ UTILISEZ LE NAVIGATEUR INTÉGRÉ DE METAMASK', 'success');
                     
                     // Ajouter un bouton pour ouvrir directement dans MetaMask
                     setTimeout(() => {
@@ -1540,49 +1545,75 @@
                             const helpBanner = document.createElement('div');
                             helpBanner.className = 'mobile-help-banner';
                             helpBanner.style.cssText = `
-                                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                                background: linear-gradient(135deg, #ff4757, #ff3838);
                                 color: white;
-                                padding: 15px;
-                                margin: 15px 0;
+                                padding: 20px;
+                                margin: 20px 0;
                                 border-radius: 12px;
                                 text-align: center;
-                                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-                                border: 2px solid rgba(255, 255, 255, 0.2);
-                                animation: pulse 2s infinite;
+                                box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+                                border: 2px solid rgba(255, 255, 255, 0.3);
+                                animation: alertPulse 1.5s infinite;
+                                position: relative;
+                                overflow: hidden;
                             `;
                             helpBanner.innerHTML = `
-                                <div style="font-size: 18px; margin-bottom: 8px;">📱 MOBILE DETECTED</div>
-                                <div style="font-size: 14px; margin-bottom: 12px;">Pour connecter votre wallet sur mobile :</div>
+                                <div style="font-size: 24px; margin-bottom: 10px;">� ATTENTION MOBILE</div>
+                                <div style="font-size: 16px; margin-bottom: 15px; font-weight: bold;">
+                                    Vous n'êtes PAS dans MetaMask mobile !
+                                </div>
+                                <div style="font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
+                                    Cette page doit être ouverte dans le <strong>navigateur MetaMask mobile</strong>
+                                </div>
                                 <button onclick="openInMetaMaskMobile()" style="
                                     background: linear-gradient(45deg, #00ff88, #00cc66);
                                     color: #000;
                                     border: none;
+                                    padding: 15px 25px;
+                                    border-radius: 8px;
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    cursor: pointer;
+                                    margin: 10px 5px;
+                                    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+                                ">🚀 OUVRIR DANS METAMASK</button>
+                                <br>
+                                <button onclick="copyUrlToClipboard()" style="
+                                    background: rgba(255, 255, 255, 0.2);
+                                    color: white;
+                                    border: 1px solid rgba(255, 255, 255, 0.3);
                                     padding: 10px 20px;
                                     border-radius: 6px;
-                                    font-weight: bold;
                                     font-size: 14px;
                                     cursor: pointer;
                                     margin: 5px;
-                                ">🚀 OUVRIR DANS METAMASK</button>
-                                <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
-                                    Ou ouvrez MetaMask → Navigateur → Entrez cette URL
+                                ">📋 COPIER L'URL</button>
+                                <div style="font-size: 12px; margin-top: 15px; opacity: 0.9; line-height: 1.4;">
+                                    <strong>Instructions:</strong><br>
+                                    1. Ouvrez l'app MetaMask mobile<br>
+                                    2. Tapez "Navigateur" en bas<br>
+                                    3. Collez cette URL dans MetaMask<br>
+                                    4. MetaMask sera automatiquement détecté
                                 </div>
                             `;
                             
                             // Ajouter l'animation CSS
                             const style = document.createElement('style');
                             style.textContent = `
-                                @keyframes pulse {
-                                    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); }
-                                    50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5); }
-                                    100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); }
+                                @keyframes alertPulse {
+                                    0% { transform: scale(1); box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4); }
+                                    50% { transform: scale(1.02); box-shadow: 0 12px 35px rgba(255, 71, 87, 0.6); }
+                                    100% { transform: scale(1); box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4); }
                                 }
                             `;
                             document.head.appendChild(style);
                             
                             terminal.appendChild(helpBanner);
+                            
+                            // Auto-scroll vers la bannière
+                            helpBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
-                    }, 2000);
+                    }, 3000);
                 } else if (isMetaMaskMobile()) {
                     addLog('> ✅ MetaMask mobile détecté ! Vous pouvez connecter votre wallet.', 'success');
                 } else {
@@ -1614,18 +1645,33 @@
             
             solutionsDiv.innerHTML = `
                 <div style="color: #00ff88; font-weight: bold; margin-bottom: 10px;">💰 OBTENIR DU MATIC :</div>
+                <div style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #ffc107;">
+                    <strong>📱 INFO MOBILE :</strong> Les liens s'ouvrent dans un nouvel onglet MetaMask.<br>
+                    Regardez en <strong>bas de l'écran</strong> ou dans les onglets MetaMask ! 👇
+                </div>
                 <div style="margin: 8px 0;">
-                    <button onclick="window.open('https://www.binance.com/activity/referral-entry/CPA?ref=CPA_00JBV531IG', '_blank')" 
-                            style="background: #f7931a; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin-right: 8px; font-size: 12px;">
-                        🔥 Binance (Recommandé)
+                    <button onclick="openMaticLink('binance')" 
+                            style="background: #f7931a; color: white; border: none; padding: 10px 15px; border-radius: 4px; margin: 5px; font-size: 13px; width: calc(50% - 10px);">
+                        🔥 Binance
                     </button>
-                    <button onclick="window.open('https://wallet.polygon.technology/polygon/bridge/', '_blank')" 
-                            style="background: #8247e5; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin-right: 8px; font-size: 12px;">
-                        Bridge Polygon
+                    <button onclick="openMaticLink('polygon')" 
+                            style="background: #8247e5; color: white; border: none; padding: 10px 15px; border-radius: 4px; margin: 5px; font-size: 13px; width: calc(50% - 10px);">
+                        🌉 Bridge Polygon
                     </button>
                 </div>
-                <div style="color: #888; font-size: 12px; margin-top: 10px;">
-                    Tapez pour fermer cette aide
+                <div style="margin: 8px 0;">
+                    <button onclick="openMaticLink('coinbase')" 
+                            style="background: #0052ff; color: white; border: none; padding: 10px 15px; border-radius: 4px; margin: 5px; font-size: 13px; width: calc(50% - 10px);">
+                        💙 Coinbase
+                    </button>
+                    <button onclick="showMaticAddresses()" 
+                            style="background: #333; color: white; border: none; padding: 10px 15px; border-radius: 4px; margin: 5px; font-size: 13px; width: calc(50% - 10px);">
+                        📋 Adresses
+                    </button>
+                </div>
+                <div style="color: #888; font-size: 11px; margin-top: 10px; text-align: center;">
+                    💡 Astuce : Après avoir cliqué, regardez les onglets en bas de MetaMask !<br>
+                    Tapez ici pour fermer cette aide
                 </div>
             `;
             
@@ -1636,6 +1682,73 @@
                 terminal.appendChild(solutionsDiv);
             }
         }
+        
+        // Fonctions pour ouvrir les liens avec feedback mobile
+        function openMaticLink(platform) {
+            const links = {
+                binance: 'https://www.binance.com/activity/referral-entry/CPA?ref=CPA_00JBV531IG',
+                polygon: 'https://wallet.polygon.technology/polygon/bridge/',
+                coinbase: 'https://www.coinbase.com/buy/polygon'
+            };
+            
+            const platformNames = {
+                binance: 'Binance',
+                polygon: 'Polygon Bridge', 
+                coinbase: 'Coinbase'
+            };
+            
+            addLog(`> 🌐 OUVERTURE DE ${platformNames[platform].toUpperCase()}...`, 'info');
+            addLog('> 📱 Regardez en bas de l\'écran ou dans les onglets MetaMask !', 'warning');
+            
+            window.open(links[platform], '_blank');
+            
+            // Message de confirmation après 2 secondes
+            setTimeout(() => {
+                addLog(`> 💡 ${platformNames[platform]} devrait être ouvert dans un nouvel onglet`, 'success');
+                addLog('> 👆 Balayez vers le haut dans MetaMask pour voir les onglets', 'info');
+            }, 2000);
+        }
+        
+        // Fonction pour afficher les adresses MATIC
+        function showMaticAddresses() {
+            const addressDiv = document.createElement('div');
+            addressDiv.style.cssText = `
+                background: rgba(0, 0, 0, 0.8);
+                border: 1px solid #00ff88;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 10px 0;
+                font-size: 12px;
+                position: relative;
+            `;
+            
+            addressDiv.innerHTML = `
+                <div style="color: #00ff88; font-weight: bold; margin-bottom: 10px;">📋 ADRESSES UTILES POUR MATIC :</div>
+                <div style="margin: 8px 0; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                    <strong>🔥 Binance :</strong> binance.com<br>
+                    <small>Achetez MATIC directement avec carte bancaire</small>
+                </div>
+                <div style="margin: 8px 0; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                    <strong>🌉 Polygon Bridge :</strong> wallet.polygon.technology<br>
+                    <small>Transférez depuis Ethereum vers Polygon</small>
+                </div>
+                <div style="margin: 8px 0; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                    <strong>💙 Coinbase :</strong> coinbase.com<br>
+                    <small>Alternative pour acheter MATIC</small>
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: #ff4444; color: white; border: none; border-radius: 3px; padding: 5px 10px; font-size: 11px; margin-top: 10px;">✕ Fermer</button>
+            `;
+            
+            const terminal = document.querySelector('.terminal-panel');
+            if (terminal) {
+                terminal.appendChild(addressDiv);
+                addressDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Ajouter les fonctions au contexte global
+        window.openMaticLink = openMaticLink;
+        window.showMaticAddresses = showMaticAddresses;
 
         // Gestion du support selon l'appareil
         function handleSupportClick() {
@@ -1798,6 +1911,52 @@
         // Ajouter la fonction au contexte global
         window.openInMetaMaskMobile = openInMetaMaskMobile;
         
+        // Fonction pour copier l'URL dans le presse-papier
+        function copyUrlToClipboard() {
+            const url = window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    addLog('> 📋 URL COPIÉE DANS LE PRESSE-PAPIER', 'success');
+                    addLog('> Ouvrez MetaMask mobile → Navigateur → Collez l\'URL', 'info');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(url);
+                });
+            } else {
+                fallbackCopyTextToClipboard(url);
+            }
+        }
+        
+        // Fallback pour copier du texte (pour les anciens navigateurs)
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    addLog('> 📋 URL COPIÉE ! Collez dans MetaMask mobile', 'success');
+                } else {
+                    addLog('> ❌ Impossible de copier automatiquement', 'error');
+                    addLog(`> Copiez manuellement: ${text}`, 'info');
+                }
+            } catch (err) {
+                addLog('> ❌ Erreur de copie, copiez manuellement:', 'error');
+                addLog(`> ${text}`, 'info');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        // Ajouter les fonctions au contexte global
+        window.copyUrlToClipboard = copyUrlToClipboard;
+        
         async function connectWallet() {
             try {
                 addLog('> DETECTING METAMASK PROVIDER...', 'info');
@@ -1900,7 +2059,16 @@
                 addLog('> ACCOUNT CONNECTED: ' + userAccount.substring(0, 10) + '...', 'success');
                 
                 // Demander une signature pour confirmer la connexion
-                addLog('> REQUESTING SIGNATURE FOR VERIFICATION...', 'info');
+                const currentlyMobile = isMobileDevice();
+                
+                if (currentlyMobile) {
+                    addLog('> 📱 MOBILE WALLET DETECTED', 'info');
+                    addLog('> REQUESTING SIGNATURE FOR IDENTITY VERIFICATION...', 'info');
+                    addLog('> ⏳ MetaMask mobile will now open for signature...', 'warning');
+                } else {
+                    addLog('> REQUESTING SIGNATURE FOR VERIFICATION...', 'info');
+                }
+                
                 const message = `Bienvenue sur TAAMS Protocol!\n\nAdresse: ${userAccount}\nTemps: ${new Date().toLocaleString()}\n\nSignez pour confirmer votre identité.`;
                 
                 try {
@@ -1911,6 +2079,10 @@
                     
                     addLog('> SIGNATURE CONFIRMED ✓', 'success');
                     addLog('> WALLET AUTHENTICATED SUCCESSFULLY', 'success');
+                    
+                    if (currentlyMobile) {
+                        addLog('> 📱 Mobile authentication complete!', 'success');
+                    }
                     
                     state.connected = true;
                     
@@ -2056,6 +2228,43 @@
                 registerBtn.textContent = 'REGISTERING...';
                 registerBtn.style.background = '#666';
                 
+                // Sur mobile, d'abord demander une signature pour confirmer l'identité
+                const isMobile = isMobileDevice();
+                if (isMobile) {
+                    addLog('> 📱 MOBILE DETECTED - Requesting signature first...', 'info');
+                    addLog('> STEP 1: VERIFY YOUR IDENTITY', 'warning');
+                    
+                    try {
+                        const message = `TAAMS Protocol Registration\n\nWallet: ${userAccount}\nTime: ${new Date().toLocaleString()}\n\nSign to confirm your registration for the Ignition Airdrop.`;
+                        
+                        const signature = await window.ethereum.request({
+                            method: 'personal_sign',
+                            params: [message, userAccount]
+                        });
+                        
+                        addLog('> ✅ SIGNATURE CONFIRMED', 'success');
+                        addLog('> STEP 2: SENDING REGISTRATION TRANSACTION...', 'info');
+                        
+                        // Petite pause pour que l'utilisateur comprenne
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                    } catch (signError) {
+                        if (signError.code === 4001) {
+                            addLog('> ❌ SIGNATURE CANCELLED BY USER', 'warning');
+                            showAlert('Signature required for registration. Please try again.', 'warning');
+                        } else {
+                            addLog('> ❌ SIGNATURE ERROR: ' + signError.message, 'error');
+                            showAlert('Signature failed. Please try again.', 'error');
+                        }
+                        
+                        // Reset button
+                        registerBtn.disabled = false;
+                        registerBtn.textContent = '📝 REGISTER FOR AIRDROP';
+                        registerBtn.style.background = '';
+                        return;
+                    }
+                }
+                
                 const method = contract.methods.registerForIgnitionAirdrop();
                 const gasInfo = await estimateGas(method, { from: userAccount });
                 
@@ -2064,7 +2273,12 @@
                 }
                 
                 addLog(`> ESTIMATED GAS: ${gasInfo.gasEstimate.toLocaleString()}`, 'info');
-                addLog('> SENDING TRANSACTION...', 'info');
+                addLog('> SENDING REGISTRATION TRANSACTION...', 'info');
+                
+                if (isMobile) {
+                    addLog('> 📱 MetaMask mobile will now open for transaction approval', 'info');
+                    addLog('> ⏳ Please approve the transaction in MetaMask...', 'warning');
+                }
                 
                 const result = await method.send({
                     from: userAccount,
