@@ -939,6 +939,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.10.0/web3.min.js"></script>
+    <script src="https://unpkg.com/@metamask/detect-provider/dist/detect-provider.min.js"></script>
     <script>
         // Configuration du contrat avec ABI complet
         const CONTRACT_ADDRESS = "0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef";
@@ -1505,6 +1506,20 @@
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
         }
 
+        // Détection MetaMask mobile browser
+        function isMetaMaskMobile() {
+            return /MetaMaskMobile/i.test(navigator.userAgent) || 
+                   (window.ethereum && window.ethereum.isMetaMask && isMobileDevice());
+        }
+
+        // Fonction d'aide pour guider les utilisateurs mobiles
+        function showMobileGuidance() {
+            if (isMobileDevice() && !isMetaMaskMobile()) {
+                addLog('> 📱 MOBILE DETECTED - Use MetaMask mobile browser for best experience', 'info');
+                addLog('> Open MetaMask app → Browser → Enter this URL', 'info');
+            }
+        }
+
         // Version mobile simplifiée des solutions MATIC
         function showMaticSolutionsMobile() {
             // Supprime les anciennes solutions s'il y en a
@@ -1695,21 +1710,40 @@
         
         async function connectWallet() {
             try {
-                addLog('> CONNECTING TO METAMASK...', 'info');
+                addLog('> DETECTING METAMASK PROVIDER...', 'info');
                 
-                // Vérification simple
-                if (!window.ethereum) {
-                    showAlert('❌ MetaMask non détecté.\n\nDans MetaMask mobile:\n1. Ouvrez MetaMask\n2. Menu → Navigateur\n3. Tapez cette URL\n4. Cliquez CONNECT WALLET', 'error');
+                // Utilise le détecteur officiel MetaMask pour mobile et desktop
+                const provider = await detectEthereumProvider({
+                    mustBeMetaMask: true,
+                    silent: false,
+                    timeout: 3000
+                });
+                
+                if (!provider) {
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    
+                    if (isMobile) {
+                        showAlert('❌ MetaMask non détecté.\n\n📱 SOLUTION MOBILE:\n1. Téléchargez MetaMask mobile\n2. Ouvrez MetaMask\n3. Menu → Navigateur\n4. Tapez cette URL\n5. Cliquez CONNECT WALLET', 'error');
+                    } else {
+                        showAlert('❌ MetaMask non détecté.\n\n💻 SOLUTION DESKTOP:\n1. Installez MetaMask extension\n2. Actualisez cette page\n3. Cliquez CONNECT WALLET', 'error');
+                    }
                     return;
+                }
+                
+                addLog('> METAMASK PROVIDER DETECTED ✓', 'success');
+                
+                // Vérifie que c'est bien MetaMask
+                if (provider !== window.ethereum) {
+                    addLog('> WARNING: Multiple wallets detected', 'warning');
                 }
                 
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECTING...';
                 connectBtn.disabled = true;
 
-                // Connexion simple et directe
+                // Connexion avec le provider détecté
                 addLog('> REQUESTING ACCOUNT ACCESS...', 'info');
-                const accounts = await window.ethereum.request({
+                const accounts = await provider.request({
                     method: 'eth_requestAccounts'
                 });
                 
@@ -1786,15 +1820,24 @@
         }
 
         async function initializeWeb3() {
-            if (window.ethereum && !web3) {
+            // Utilise le détecteur MetaMask pour s'assurer d'avoir le bon provider
+            const provider = await detectEthereumProvider({
+                mustBeMetaMask: true,
+                silent: true,
+                timeout: 1000
+            });
+            
+            if (provider && !web3) {
                 try {
-                    addLog('> INITIALIZING WEB3...', 'info');
-                    web3 = new Web3(window.ethereum);
-                    addLog('> WEB3 INITIALIZED', 'success');
+                    addLog('> INITIALIZING WEB3 WITH DETECTED PROVIDER...', 'info');
+                    web3 = new Web3(provider);
+                    addLog('> WEB3 INITIALIZED ✓', 'success');
                 } catch (error) {
                     addLog('> WEB3 INITIALIZATION FAILED', 'error');
                     throw error;
                 }
+            } else if (!provider) {
+                addLog('> NO METAMASK PROVIDER AVAILABLE', 'warning');
             }
         }
 
@@ -2305,10 +2348,17 @@
         }
         
         async function checkWalletConnection() {
-            if (!window.ethereum) return false;
+            // Utilise le détecteur pour s'assurer qu'on a MetaMask
+            const provider = await detectEthereumProvider({
+                mustBeMetaMask: true,
+                silent: true,
+                timeout: 1000
+            });
+            
+            if (!provider) return false;
             
             try {
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const accounts = await provider.request({ method: 'eth_accounts' });
                 
                 // Vérifier si le wallet est toujours connecté et correspond à userAccount
                 if (accounts.length === 0) {
@@ -3269,14 +3319,33 @@
             console.error('Unhandled rejection:', event.reason);
         });
     </script>
-
-    <!-- Mobile Wallet Helper -->
-    <script src="mobile-wallet-helper-simple.js"></script>
     
     <script>
         // Enhanced mobile detection and user guidance for terminal
         document.addEventListener('DOMContentLoaded', function() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // Écoute pour l'injection asynchrone MetaMask mobile
+            if (isMobile) {
+                addLog('> MOBILE DEVICE DETECTED - Listening for MetaMask injection...', 'info');
+                
+                // Guide l'utilisateur vers MetaMask mobile browser
+                showMobileGuidance();
+                
+                // Écoute l'événement ethereum#initialized pour MetaMask mobile
+                window.addEventListener('ethereum#initialized', () => {
+                    addLog('> METAMASK MOBILE PROVIDER INJECTED ✓', 'success');
+                    addLog('> Ready to connect wallet', 'info');
+                }, { once: true });
+                
+                // Timeout si MetaMask n'est pas détecté après 5 secondes
+                setTimeout(() => {
+                    if (!window.ethereum) {
+                        addLog('> MetaMask mobile not detected after 5s', 'warning');
+                        addLog('> Please open this page in MetaMask mobile browser', 'info');
+                    }
+                }, 5000);
+            }
             
             if (isMobile && window.mobileWalletHelper) {
                 // Add mobile-specific UI enhancements
