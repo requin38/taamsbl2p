@@ -9,7 +9,7 @@
 
 TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on the Polygon blockchain. Our innovative protocol combines strategic token burning mechanisms with community governance and staking rewards to create a sustainable and rewarding DeFi experience.
 
-### 🚀 Live Demo
+### 🌐 Live Application
 - **Main Site**: [https://requin38.github.io/taamsbl2p/](https://requin38.github.io/taamsbl2p/)
 - **Terminal Interface**: [https://requin38.github.io/taamsbl2p/terminal.html](https://requin38.github.io/taamsbl2p/terminal.html)
 
