@@ -1300,70 +1300,106 @@
         
         async function connectWallet() {
             try {
-                addLog('> INITIALIZING WALLET CONNECTION...', 'info');
+                addLog('> CONNECTING TO METAMASK...', 'info');
                 
-                // Vérification immédiate
+                // Vérification simple
                 if (!window.ethereum) {
-                    addLog('> NO WALLET DETECTED - LAUNCHING MOBILE SETUP...', 'warning');
-                    
-                    // Utiliser la méthode simplifiée
-                    if (window.MobileWalletHelper) {
-                        const result = await window.MobileWalletHelper.autoConnectWallet();
-                        if (result) {
-                            // Succès via le helper mobile
-                            userAccount = result;
-                            state.connected = true;
-                            addLog('> WALLET CONNECTED SUCCESSFULLY: ' + result.substring(0, 10) + '...', 'success');
-                            updateUI();
-                            await loadRealBalances();
-                            return;
-                        } else {
-                            addLog('> FOLLOW THE MOBILE SETUP GUIDE', 'info');
-                            return;
-                        }
-                    } else {
-                        showAlert('Wallet non détecté.\nUtilisez le navigateur de votre app wallet (MetaMask, Trust, etc.)', 'error');
-                        return;
-                    }
+                    showAlert('❌ MetaMask non détecté.\n\nDans MetaMask mobile:\n1. Ouvrez MetaMask\n2. Menu → Navigateur\n3. Tapez cette URL\n4. Cliquez CONNECT WALLET', 'error');
+                    return;
                 }
-                
-                // Wallet détecté - connexion directe
-                addLog('> WALLET DETECTED - REQUESTING CONNECTION...', 'info');
                 
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECTING...';
                 connectBtn.disabled = true;
 
-                // Demande de connexion avec timeout
-                const accounts = await Promise.race([
-                    window.ethereum.request({ method: 'eth_requestAccounts' }),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), 8000)
-                    )
-                ]);
+                // Connexion simple et directe
+                addLog('> REQUESTING ACCOUNT ACCESS...', 'info');
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
                 
-                if (accounts && accounts.length > 0) {
-                    userAccount = accounts[0];
-                    state.connected = true;
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('No accounts returned');
+                }
+                
+                userAccount = accounts[0];
+                addLog('> ACCOUNT CONNECTED: ' + userAccount.substring(0, 10) + '...', 'success');
+                
+                // Demander une signature pour confirmer la connexion
+                addLog('> REQUESTING SIGNATURE FOR VERIFICATION...', 'info');
+                const message = `Bienvenue sur TAAMS Protocol!\n\nAdresse: ${userAccount}\nTemps: ${new Date().toLocaleString()}\n\nSignez pour confirmer votre identité.`;
+                
+                try {
+                    const signature = await window.ethereum.request({
+                        method: 'personal_sign',
+                        params: [message, userAccount]
+                    });
                     
-                    addLog('> CONNECTION SUCCESSFUL: ' + userAccount.substring(0, 10) + '...', 'success');
+                    addLog('> SIGNATURE CONFIRMED ✓', 'success');
+                    addLog('> WALLET AUTHENTICATED SUCCESSFULLY', 'success');
+                    
+                    state.connected = true;
                     
                     // Vérifier/changer réseau Polygon
                     await ensurePolygonNetwork();
                     
+                    // Initialiser Web3 et contrat
+                    await initializeWeb3();
+                    await initializeContract();
+                    
+                    // Charger les données
+                    updateConnectedUI();
+                    await loadUserBalances();
+                    await checkRegistrationStatus();
+                    
                     updateUI();
-                    await loadRealBalances();
-                } else {
-                    throw new Error('No accounts returned');
+                    showAlert('✅ Connexion réussie ! Wallet authentifié.', 'success');
+                    
+                } catch (signError) {
+                    if (signError.code === 4001) {
+                        addLog('> SIGNATURE CANCELLED BY USER', 'warning');
+                        showAlert('❌ Signature annulée. La signature est requise pour s\'authentifier.', 'warning');
+                        
+                        // Reset connection
+                        userAccount = null;
+                        state.connected = false;
+                        connectBtn.textContent = 'CONNECT WALLET';
+                        connectBtn.disabled = false;
+                    } else {
+                        throw signError;
+                    }
                 }
                 
             } catch (error) {
                 addLog('> WALLET CONNECTION FAILED: ' + error.message, 'error');
-                showAlert('Erreur connexion: ' + error.message, 'error');
+                
+                let errorMsg = 'Erreur de connexion';
+                if (error.code === 4001) {
+                    errorMsg = 'Connexion refusée par l\'utilisateur';
+                } else if (error.message.includes('User rejected')) {
+                    errorMsg = 'Connexion refusée dans MetaMask';
+                } else {
+                    errorMsg = 'Erreur: ' + error.message;
+                }
+                
+                showAlert('❌ ' + errorMsg, 'error');
                 
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECT WALLET';
                 connectBtn.disabled = false;
+            }
+        }
+
+        async function initializeWeb3() {
+            if (window.ethereum && !web3) {
+                try {
+                    addLog('> INITIALIZING WEB3...', 'info');
+                    web3 = new Web3(window.ethereum);
+                    addLog('> WEB3 INITIALIZED', 'success');
+                } catch (error) {
+                    addLog('> WEB3 INITIALIZATION FAILED', 'error');
+                    throw error;
+                }
             }
         }
 
@@ -1596,57 +1632,18 @@
             }
             
             try {
-                const networkId = await web3.eth.net.getId();
-                if (networkId !== POLYGON_CHAIN_ID) {
-                    addLog(`> WRONG NETWORK: PLEASE SWITCH TO POLYGON (Current: ${networkId})`, 'error');
-                    showAlert(`Please switch to Polygon network. Current: ${networkId}, Required: ${POLYGON_CHAIN_ID}`, 'error');
-                    
-                    // Proposer de changer de réseau automatiquement
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: web3.utils.toHex(POLYGON_CHAIN_ID) }],
-                        });
-                        addLog('> NETWORK SWITCHED TO POLYGON', 'success');
-                    } catch (switchError) {
-                        // Si le réseau n'est pas ajouté, l'ajouter
-                        if (switchError.code === 4902) {
-                            try {
-                                await window.ethereum.request({
-                                    method: 'wallet_addEthereumChain',
-                                    params: [{
-                                        chainId: web3.utils.toHex(POLYGON_CHAIN_ID),
-                                        chainName: 'Polygon Mainnet',
-                                        nativeCurrency: {
-                                            name: 'MATIC',
-                                            symbol: 'MATIC',
-                                            decimals: 18
-                                        },
-                                        rpcUrls: ['https://polygon-rpc.com/'],
-                                        blockExplorerUrls: ['https://polygonscan.com/']
-                                    }]
-                                });
-                                addLog('> POLYGON NETWORK ADDED AND SELECTED', 'success');
-                            } catch (addError) {
-                                addLog('> FAILED TO ADD POLYGON NETWORK', 'error');
-                                return;
-                            }
-                        } else {
-                            addLog('> FAILED TO SWITCH NETWORK', 'error');
-                            return;
-                        }
-                    }
-                }
+                addLog('> INITIALIZING TAAMS CONTRACT...', 'info');
                 
+                // Créer le contrat directement
                 contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                addLog('> CONTRACT INITIALIZED ON POLYGON', 'success');
+                addLog('> CONTRACT INITIALIZED: ' + CONTRACT_ADDRESS.substring(0, 10) + '...', 'success');
                 
+                // Charger les données du contrat
                 await loadContractData();
-                state.connectionStable = true;
                 
             } catch (error) {
-                addLog('> CONTRACT INITIALIZATION FAILED', 'error');
-                console.error('Contract init error:', error);
+                addLog('> CONTRACT INITIALIZATION FAILED: ' + error.message, 'error');
+                console.error('Contract initialization error:', error);
             }
         }
         
@@ -2826,7 +2823,7 @@
     </script>
 
     <!-- Mobile Wallet Helper -->
-    <script src="mobile-wallet-helper.js"></script>
+    <script src="mobile-wallet-helper-simple.js"></script>
     
     <script>
         // Enhanced mobile detection and user guidance for terminal
