@@ -103,6 +103,40 @@ Currency Symbol: MATIC
 Block Explorer: https://polygonscan.com/
 ```
 
+### 📱 Mobile Wallet Connection Issues
+
+**Important Note**: If you're using a mobile device and experiencing wallet connection issues:
+
+#### Common Mobile Issues:
+- **Wallet installed but not connecting**: This is a known limitation with mobile browsers
+- **DApps not detecting wallet**: Mobile wallets often require specific browser integration
+- **Connection timeouts**: Mobile networks can cause connection delays
+
+#### Mobile Solutions:
+1. **Use Wallet's Built-in Browser**:
+   - Open MetaMask app → Browser tab → Navigate to the dApp URL
+   - Open Trust Wallet app → DApps tab → Enter the website URL
+   - Use the wallet's internal browser instead of external browsers
+
+2. **Alternative Mobile Wallets**:
+   - **Trust Wallet**: Better mobile DApp integration
+   - **Coinbase Wallet**: Good mobile browser support
+   - **Rainbow Wallet**: Optimized for mobile DeFi
+
+3. **Desktop Recommended**:
+   - For the best experience, use desktop with MetaMask extension
+   - Mobile support is limited due to browser constraints
+   - Desktop provides full functionality and better security
+
+#### Mobile Troubleshooting:
+```
+1. Clear browser cache and cookies
+2. Disable ad blockers
+3. Try incognito/private browsing mode
+4. Ensure wallet app is updated to latest version
+5. Switch to wallet's built-in browser
+```
+
 ## 🎨 Design Philosophy
 
 TAAMS Protocol features a **cyberpunk-inspired design** with:
@@ -163,6 +197,8 @@ TAAMS Protocol features a **cyberpunk-inspired design** with:
 - [ ] Advanced analytics dashboard
 - [ ] Cross-chain integration
 - [ ] NFT marketplace
+- [ ] **Improved mobile wallet integration**
+- [ ] **Native mobile app with built-in wallet**
 
 ### Phase 4: Expansion 🔮
 - [ ] Layer 2 scaling solutions
@@ -217,6 +253,12 @@ TAAMS Protocol is an experimental DeFi project. Please understand the risks:
 - Cryptocurrency investments are highly volatile
 - Only invest what you can afford to lose
 - Do your own research (DYOR)
+
+### 📱 Mobile Compatibility Notice
+- **Mobile wallet connections may be limited** due to browser restrictions
+- **Desktop experience recommended** for full functionality
+- Use wallet's built-in browser on mobile for better compatibility
+- Some features may not work properly on mobile browsers
 
 ## 📞 Support & Community
 
