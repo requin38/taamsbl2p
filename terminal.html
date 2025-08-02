@@ -1204,14 +1204,28 @@
                 const balance = await web3.eth.getBalance(userAccount);
                 const balanceInEther = parseFloat(web3.utils.fromWei(balance, 'ether'));
                 
+                addLog(`> MATIC BALANCE: ${balanceInEther.toFixed(6)} MATIC`, 'info');
+                
                 if (balanceInEther < 0.001) {
-                    showAlert('Insufficient MATIC for gas fees. Please add MATIC to your wallet.', 'warning');
+                    addLog('> INSUFFICIENT MATIC FOR TRANSACTION', 'error');
+                    showAlert(
+                        `❌ MATIC insuffisant pour la transaction\n\n` +
+                        `Balance actuelle: ${balanceInEther.toFixed(6)} MATIC\n` +
+                        `Minimum requis: 0.001 MATIC\n\n` +
+                        `SOLUTION:\n` +
+                        `1. Achetez du MATIC sur un exchange\n` +
+                        `2. Envoyez-le sur votre wallet Polygon\n` +
+                        `3. Ou utilisez un bridge depuis Ethereum\n\n` +
+                        `Adresse de votre wallet:\n${userAccount}`, 
+                        'error'
+                    );
                     return false;
                 }
                 
+                addLog('> MATIC BALANCE SUFFICIENT FOR TRANSACTION', 'success');
                 return true;
             } catch (error) {
-                addLog('> ERROR CHECKING GAS BALANCE', 'error');
+                addLog('> ERROR CHECKING GAS BALANCE: ' + error.message, 'error');
                 return false;
             }
         }
@@ -1239,6 +1253,12 @@
                 // Charger le solde MATIC réel
                 const maticBalance = await web3.eth.getBalance(userAccount);
                 state.maticBalance = parseFloat(web3.utils.fromWei(maticBalance, 'ether'));
+                
+                // Vérifier si le solde MATIC est suffisant
+                if (state.maticBalance < 0.001) {
+                    addLog(`> WARNING: LOW MATIC BALANCE (${state.maticBalance.toFixed(6)} MATIC)`, 'warning');
+                    setTimeout(() => showMaticWarning(), 1000); // Délai pour éviter spam
+                }
                 
                 if (contract) {
                     try {
@@ -1297,6 +1317,111 @@
                 console.error('Balance loading error:', error);
             }
         }
+
+        function showMaticWarning() {
+            // Supprimer les alertes MATIC existantes
+            document.querySelectorAll('.matic-warning').forEach(el => el.remove());
+            
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'alert error matic-warning';
+            warningDiv.style.cssText = `
+                background: rgba(255, 102, 0, 0.9);
+                border: 2px solid #ff6600;
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+            `;
+            warningDiv.innerHTML = `
+                ⚠️ MATIC INSUFFISANT POUR LES TRANSACTIONS<br>
+                <small>Balance actuelle: ${state.maticBalance.toFixed(6)} MATIC | Minimum requis: ~0.001 MATIC</small><br><br>
+                <button onclick="showMaticSolutions()" style="
+                    background: #00ff88; 
+                    color: black; 
+                    border: none; 
+                    padding: 8px 16px; 
+                    border-radius: 4px; 
+                    font-weight: bold; 
+                    cursor: pointer;
+                    margin-right: 10px;
+                ">💰 OBTENIR DU MATIC</button>
+                <button onclick="this.parentElement.remove()" style="
+                    background: #666; 
+                    color: white; 
+                    border: none; 
+                    padding: 8px 16px; 
+                    border-radius: 4px; 
+                    cursor: pointer;
+                ">Fermer</button>
+            `;
+            
+            const container = document.querySelector('.container');
+            const mainContent = document.querySelector('.main-content');
+            if (container && mainContent) {
+                container.insertBefore(warningDiv, mainContent);
+            }
+        }
+
+        function showMaticSolutions() {
+            const solutionsDiv = document.createElement('div');
+            solutionsDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.95);
+                color: white;
+                padding: 25px;
+                border-radius: 15px;
+                z-index: 10000;
+                max-width: 400px;
+                border: 2px solid #00ff88;
+                box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            `;
+            
+            solutionsDiv.innerHTML = `
+                <h3 style="color: #00ff88; margin-bottom: 20px; text-align: center;">💰 OBTENIR DU MATIC</h3>
+                
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,255,136,0.1); border-radius: 8px;">
+                    <strong>📍 Votre adresse Polygon:</strong><br>
+                    <code style="font-size: 12px; word-break: break-all; color: #00ff88;">${userAccount}</code>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #00ff88;">🔥 SOLUTIONS RAPIDES:</strong>
+                </div>
+                
+                <button onclick="window.open('https://wallet.polygon.technology/polygon/bridge/', '_blank')" 
+                    style="width: 100%; margin: 5px 0; padding: 12px; background: #8247e5; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    🌉 Bridge Polygon Officiel
+                </button>
+                
+                <button onclick="window.open('https://app.uniswap.org/#/swap?outputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&chain=polygon', '_blank')" 
+                    style="width: 100%; margin: 5px 0; padding: 12px; background: #ff007a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    🦄 Acheter sur Uniswap
+                </button>
+                
+                <button onclick="window.open('https://www.binance.com/fr/trade/MATIC_USDT', '_blank')" 
+                    style="width: 100%; margin: 5px 0; padding: 12px; background: #f3ba2f; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    💱 Acheter sur Binance
+                </button>
+                
+                <div style="margin: 15px 0; font-size: 12px; color: #888; text-align: center;">
+                    💡 Après achat, envoyez le MATIC vers votre adresse Polygon ci-dessus
+                </div>
+                
+                <button onclick="this.parentElement.remove()" 
+                    style="width: 100%; margin-top: 10px; padding: 10px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Fermer
+                </button>
+            `;
+            
+            document.body.appendChild(solutionsDiv);
+        }
+
+        // Fonctions globales pour les boutons
+        window.showMaticSolutions = showMaticSolutions;
         
         async function connectWallet() {
             try {
@@ -1505,22 +1630,24 @@
                 }, 3000);
                 
             } catch (error) {
-                addLog('> REGISTRATION FAILED', 'error');
+                addLog('> REGISTRATION FAILED: ' + error.message, 'error');
                 console.error('Registration error:', error);
                 
-                let errorMessage = 'Registration failed. Please try again.';
+                let errorMessage = 'Échec de l\'enregistrement';
                 
                 if (error.code === 4001) {
-                    errorMessage = 'Transaction cancelled by user';
-                } else if (error.message.includes('RegistrationClosed')) {
-                    errorMessage = 'Registration is currently closed';
-                } else if (error.message.includes('AlreadyRegistered')) {
-                    errorMessage = 'You are already registered';
-                    await checkRegistrationStatus(); // Refresh status
-                } else if (error.message.includes('MaxParticipantsReached')) {
-                    errorMessage = 'Maximum participants reached';
+                    errorMessage = 'Transaction annulée par l\'utilisateur';
                 } else if (error.message.includes('insufficient funds')) {
-                    errorMessage = 'Insufficient MATIC for gas fees';
+                    errorMessage = `❌ MATIC insuffisant pour les frais de transaction\n\nVous devez ajouter du MATIC à votre wallet:\n\n📍 Votre adresse: ${userAccount}\n\n💡 Solutions:\n• Achetez du MATIC sur Binance/Coinbase\n• Utilisez un bridge depuis Ethereum\n• Transférez depuis un autre wallet\n\nMinimum requis: ~0.001 MATIC`;
+                } else if (error.message.includes('RegistrationClosed')) {
+                    errorMessage = 'L\'enregistrement est fermé';
+                } else if (error.message.includes('AlreadyRegistered')) {
+                    errorMessage = 'Déjà enregistré ! Vérification...';
+                    await checkRegistrationStatus();
+                } else if (error.message.includes('MaxParticipantsReached')) {
+                    errorMessage = 'Nombre maximum de participants atteint';
+                } else if (error.message.includes('gas')) {
+                    errorMessage = '❌ Problème de frais (gas)\n\nVérifiez votre solde MATIC';
                 }
                 
                 showAlert(errorMessage, error.code === 4001 ? 'warning' : 'error');
