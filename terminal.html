@@ -1300,82 +1300,113 @@
         
         async function connectWallet() {
             try {
-                // Check for mobile device first
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                addLog('> INITIALIZING WALLET CONNECTION...', 'info');
                 
+                // Vérification immédiate
                 if (!window.ethereum) {
-                    if (isMobile) {
-                        addLog('> MOBILE DEVICE DETECTED - SETUP REQUIRED', 'warning');
-                        addLog('> LAUNCHING SMART WALLET SETUP...', 'info');
-                        
-                        // Utiliser la nouvelle méthode smart setup
-                        if (window.MobileWalletHelper) {
-                            setTimeout(async () => {
-                                const result = await window.MobileWalletHelper.autoConnectWallet();
-                                if (!result) {
-                                    addLog('> FOLLOW THE SETUP GUIDE ABOVE', 'info');
-                                }
-                            }, 1000);
+                    addLog('> NO WALLET DETECTED - LAUNCHING MOBILE SETUP...', 'warning');
+                    
+                    // Utiliser la méthode simplifiée
+                    if (window.MobileWalletHelper) {
+                        const result = await window.MobileWalletHelper.autoConnectWallet();
+                        if (result) {
+                            // Succès via le helper mobile
+                            userAccount = result;
+                            state.connected = true;
+                            addLog('> WALLET CONNECTED SUCCESSFULLY: ' + result.substring(0, 10) + '...', 'success');
+                            updateUI();
+                            await loadRealBalances();
+                            return;
+                        } else {
+                            addLog('> FOLLOW THE MOBILE SETUP GUIDE', 'info');
+                            return;
                         }
-                        
-                        showAlert('🚀 Configuration Wallet Mobile\n\nUn guide de configuration va s\'afficher.\nSuivez les étapes simples pour vous connecter !', 'info');
-                        return;
                     } else {
-                        showAlert('MetaMask is required to access the TAAMS Protocol', 'error');
+                        showAlert('Wallet non détecté.\nUtilisez le navigateur de votre app wallet (MetaMask, Trust, etc.)', 'error');
                         return;
                     }
                 }
                 
-                addLog('> REQUESTING WALLET CONNECTION...', 'info');
+                // Wallet détecté - connexion directe
+                addLog('> WALLET DETECTED - REQUESTING CONNECTION...', 'info');
                 
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECTING...';
                 connectBtn.disabled = true;
 
-                // Extended timeout for mobile connections
-                const connectionTimeout = isMobile ? 10000 : 5000;
-                
-                const connectPromise = window.ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-                
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Connection timeout')), connectionTimeout)
-                );
-                
-                const accounts = await Promise.race([connectPromise, timeoutPromise]);
-                
-                userAccount = accounts[0];
-                state.connected = true;
-                
-                updateConnectedUI();
-                addLog(`> WALLET CONNECTED: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
-                
-                if (isMobile) {
-                    addLog('> MOBILE CONNECTION SUCCESSFUL', 'success');
-                }
-                
-                await Promise.all([
-                    initializeContract(),
-                    loadUserBalances()
+                // Demande de connexion avec timeout
+                const accounts = await Promise.race([
+                    window.ethereum.request({ method: 'eth_requestAccounts' }),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout')), 8000)
+                    )
                 ]);
                 
-                await checkRegistrationStatus();
-                setupContractEvents();
-                startConnectionMonitoring();
-                savePersistedState();
-                updateUI();
+                if (accounts && accounts.length > 0) {
+                    userAccount = accounts[0];
+                    state.connected = true;
+                    
+                    addLog('> CONNECTION SUCCESSFUL: ' + userAccount.substring(0, 10) + '...', 'success');
+                    
+                    // Vérifier/changer réseau Polygon
+                    await ensurePolygonNetwork();
+                    
+                    updateUI();
+                    await loadRealBalances();
+                } else {
+                    throw new Error('No accounts returned');
+                }
                 
             } catch (error) {
-                addLog('> WALLET CONNECTION FAILED', 'error');
-                showAlert('Failed to connect wallet: ' + error.message, 'error');
+                addLog('> WALLET CONNECTION FAILED: ' + error.message, 'error');
+                showAlert('Erreur connexion: ' + error.message, 'error');
                 
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECT WALLET';
                 connectBtn.disabled = false;
-                connectBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+            }
+        }
+
+        async function ensurePolygonNetwork() {
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
                 
-                clearPersistedState();
+                if (chainId !== '0x89') {
+                    addLog('> SWITCHING TO POLYGON NETWORK...', 'info');
+                    
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x89' }],
+                        });
+                        addLog('> POLYGON NETWORK ACTIVATED', 'success');
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            addLog('> ADDING POLYGON NETWORK...', 'info');
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x89',
+                                    chainName: 'Polygon Mainnet',
+                                    nativeCurrency: {
+                                        name: 'MATIC',
+                                        symbol: 'MATIC',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['https://polygon-rpc.com/'],
+                                    blockExplorerUrls: ['https://polygonscan.com/']
+                                }]
+                            });
+                            addLog('> POLYGON NETWORK ADDED SUCCESSFULLY', 'success');
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                } else {
+                    addLog('> POLYGON NETWORK CONFIRMED', 'success');
+                }
+            } catch (error) {
+                addLog('> NETWORK ERROR: ' + error.message, 'error');
             }
         }
         

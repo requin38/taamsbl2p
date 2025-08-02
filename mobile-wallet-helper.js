@@ -10,16 +10,19 @@ class MobileWalletHelper {
             metamask: {
                 name: 'MetaMask',
                 deepLink: 'https://metamask.app.link/dapp/',
+                universalLink: 'metamask://dapp/',
                 downloadUrl: 'https://metamask.io/download/'
             },
             trustwallet: {
                 name: 'Trust Wallet',
                 deepLink: 'https://link.trustwallet.com/open_url?coin_id=60&url=',
+                universalLink: 'trust://open_url?coin_id=60&url=',
                 downloadUrl: 'https://trustwallet.com/download'
             },
             coinbase: {
                 name: 'Coinbase Wallet',
                 deepLink: 'https://go.cb-w.com/dapp?cb_url=',
+                universalLink: 'cbwallet://dapp?cb_url=',
                 downloadUrl: 'https://www.coinbase.com/wallet'
             }
         };
@@ -27,16 +30,17 @@ class MobileWalletHelper {
     }
 
     detectMobile() {
-        // Pour les tests, on peut forcer l'affichage
-        // return true; // Décommentez cette ligne pour forcer le mode mobile sur desktop
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Détection mobile simplifiée
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               window.ethereum?.isMetaMask;  // Considérer comme mobile si dans MetaMask
     }
 
     init() {
-        if (this.isMobile) {
+        // Mode simplifié - toujours actif si wallet détecté
+        if (this.isMobile || window.ethereum) {
             this.addMobileStyles();
-            this.addMobileNotification();
-            this.enhanceWalletConnection();
+            this.addSimpleNotification();
+            this.forceWalletDetection();
         }
     }
 
@@ -121,26 +125,262 @@ class MobileWalletHelper {
                 cursor: pointer;
                 font-weight: bold;
             }
+
+            .debug-button {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: rgba(255, 0, 0, 0.8);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+                cursor: pointer;
+                z-index: 10000;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+            }
+
+            .debug-panel {
+                position: fixed;
+                bottom: 90px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 15px;
+                border-radius: 8px;
+                z-index: 10000;
+                max-width: 300px;
+                border: 1px solid #ff0000;
+                font-size: 12px;
+                line-height: 1.4;
+            }
         `;
         document.head.appendChild(style);
     }
 
-    addMobileNotification() {
-        const notice = document.createElement('div');
-        notice.className = 'mobile-wallet-notice';
-        notice.innerHTML = `
-            <button class="close-button" onclick="this.parentElement.classList.add('hidden')">&times;</button>
-            📱 Appareil mobile détecté<br>
-            <small>Utilisez le navigateur intégré de votre wallet pour une meilleure connexion</small>
-        `;
-        document.body.appendChild(notice);
-
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            if (!notice.classList.contains('hidden')) {
-                notice.classList.add('hidden');
+    addDebugButton() {
+        const debugBtn = document.createElement('button');
+        debugBtn.className = 'debug-button';
+        debugBtn.innerHTML = '🐛';
+        debugBtn.title = 'Debug Mobile Wallet';
+        
+        let debugPanel = null;
+        
+        debugBtn.onclick = () => {
+            if (debugPanel) {
+                debugPanel.remove();
+                debugPanel = null;
+                return;
             }
-        }, 5000);
+            
+            const wallets = this.detectInstalledWallets();
+            
+            debugPanel = document.createElement('div');
+            debugPanel.className = 'debug-panel';
+            debugPanel.innerHTML = `
+                <h4 style="margin: 0 0 10px 0; color: #ff0000;">🐛 DEBUG INFO</h4>
+                <div><strong>Mobile:</strong> ${this.isMobile}</div>
+                <div><strong>User Agent:</strong> ${navigator.userAgent.substring(0, 50)}...</div>
+                <div><strong>window.ethereum:</strong> ${!!window.ethereum}</div>
+                <div><strong>Wallets détectés:</strong> ${wallets.join(', ') || 'Aucun'}</div>
+                <div><strong>URL actuelle:</strong> ${window.location.href}</div>
+                <br>
+                <button onclick="testDeepLinks()" style="width: 100%; padding: 5px; background: #ff0000; color: white; border: none; border-radius: 3px;">
+                    🔗 Tester Deep Links
+                </button>
+                <button onclick="this.parentElement.remove()" style="width: 100%; margin-top: 5px; padding: 5px; background: #333; color: white; border: none; border-radius: 3px;">
+                    Fermer
+                </button>
+            `;
+            
+            document.body.appendChild(debugPanel);
+            
+            window.testDeepLinks = () => {
+                const currentUrl = window.location.href;
+                Object.keys(this.supportedWallets).forEach((key, index) => {
+                    setTimeout(() => {
+                        console.log(`🧪 Test ${key}...`);
+                        this.openWalletApp(key, currentUrl);
+                    }, index * 2000);
+                });
+            };
+        };
+        
+        document.body.appendChild(debugBtn);
+    }
+
+    addSimpleNotification() {
+        // Notification simple seulement si wallet détecté
+        if (window.ethereum) {
+            const notice = document.createElement('div');
+            notice.className = 'mobile-wallet-notice';
+            notice.innerHTML = `
+                <button class="close-button" onclick="this.parentElement.classList.add('hidden')">&times;</button>
+                ✅ Wallet détecté - Prêt pour l'airdrop !<br>
+                <small>Cliquez sur "CONNECT WALLET" puis "S'enregistrer"</small>
+            `;
+            notice.style.background = 'rgba(0, 255, 136, 0.95)';
+            notice.style.color = 'black';
+            document.body.appendChild(notice);
+
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                if (!notice.classList.contains('hidden')) {
+                    notice.classList.add('hidden');
+                }
+            }, 4000);
+        } else {
+            // Pas de wallet - afficher guide simple
+            const notice = document.createElement('div');
+            notice.className = 'mobile-wallet-notice';
+            notice.innerHTML = `
+                <button class="close-button" onclick="this.parentElement.classList.add('hidden')">&times;</button>
+                📱 Utilisez le navigateur de votre app wallet<br>
+                <small>MetaMask → Menu → Navigateur → Tapez l'URL</small>
+            `;
+            document.body.appendChild(notice);
+        }
+    }
+
+    forceWalletDetection() {
+        // Force la détection immédiate
+        if (window.ethereum) {
+            console.log('✅ Wallet DÉTECTÉ dans le navigateur wallet');
+            
+            // Créer l'événement wallet connecté pour le site
+            window.dispatchEvent(new CustomEvent('walletDetected', {
+                detail: { 
+                    provider: window.ethereum,
+                    isMetaMask: window.ethereum.isMetaMask,
+                    isMobile: this.isMobile
+                }
+            }));
+
+            // Améliorer la connexion pour les transactions
+            this.enhanceTransactionFlow();
+            
+            return true;
+        } else {
+            // Attendre un peu plus sur mobile
+            let attempts = 0;
+            const checkWallet = () => {
+                attempts++;
+                if (window.ethereum) {
+                    console.log('✅ Wallet détecté après attente');
+                    this.forceWalletDetection();
+                    return;
+                }
+                
+                if (attempts < 5) {
+                    setTimeout(checkWallet, 1000);
+                } else {
+                    console.log('❌ Aucun wallet - affichage guide');
+                    this.showSimpleGuide();
+                }
+            };
+            
+            setTimeout(checkWallet, 500);
+            return false;
+        }
+    }
+
+    enhanceTransactionFlow() {
+        // Optimiser pour les transactions (airdrop)
+        if (window.ethereum) {
+            // Réduire les timeouts pour des transactions plus rapides
+            window.ethereum.timeout = 30000;
+            
+            // Assurer la network Polygon
+            this.ensurePolygonNetwork();
+            
+            console.log('🔧 Flow transactionnel optimisé pour l\'airdrop');
+        }
+    }
+
+    async ensurePolygonNetwork() {
+        try {
+            // Vérifier si on est sur Polygon
+            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+            
+            if (chainId !== '0x89') {
+                console.log('🔄 Changement vers Polygon...');
+                
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }],
+                    });
+                } catch (switchError) {
+                    // Ajouter Polygon si pas encore ajouté
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x89',
+                                chainName: 'Polygon Mainnet',
+                                nativeCurrency: {
+                                    name: 'MATIC',
+                                    symbol: 'MATIC',
+                                    decimals: 18
+                                },
+                                rpcUrls: ['https://polygon-rpc.com/'],
+                                blockExplorerUrls: ['https://polygonscan.com/']
+                            }]
+                        });
+                    }
+                }
+            }
+            
+            console.log('✅ Réseau Polygon configuré');
+        } catch (error) {
+            console.log('⚠️ Erreur réseau:', error);
+        }
+    }
+
+    showSimpleGuide() {
+        const guide = document.createElement('div');
+        guide.className = 'mobile-wallet-options';
+        guide.innerHTML = `
+            <button class="close-button" onclick="this.parentElement.remove()">&times;</button>
+            <h3 style="color: white; margin-bottom: 15px; font-size: 18px;">🦊 Comment se connecter</h3>
+            
+            <div style="background: rgba(255, 102, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="color: #ff6600; font-weight: bold; margin-bottom: 10px;">📱 Méthode SIMPLE :</p>
+                <ol style="color: white; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                    <li><strong>Ouvrez votre app MetaMask</strong></li>
+                    <li>Appuyez sur <strong>"Navigateur"</strong> (en bas)</li>
+                    <li>Tapez : <code style="background: #333; padding: 3px 6px; border-radius: 3px; font-size: 12px;">${window.location.href}</code></li>
+                    <li>Cliquez <strong>"CONNECT WALLET"</strong></li>
+                    <li>Cliquez <strong>"S'enregistrer pour l'airdrop"</strong></li>
+                </ol>
+            </div>
+            
+            <button onclick="copyUrl()" class="wallet-button" style="background: #00ff88; color: black; font-size: 16px;">
+                📋 Copier l'URL du site
+            </button>
+            
+            <button onclick="downloadMetaMask()" class="wallet-button" style="background: #f6851b; border-color: #f6851b;">
+                📥 Télécharger MetaMask
+            </button>
+            
+            <div style="margin-top: 15px; font-size: 13px; color: #00ff88; text-align: center; font-weight: bold;">
+                ⚡ Cette méthode fonctionne à 100% pour l'airdrop !
+            </div>
+        `;
+        
+        document.body.appendChild(guide);
+
+        window.copyUrl = () => {
+            navigator.clipboard.writeText(window.location.href);
+            this.showSuccessMessage('✅ URL copiée ! Collez dans MetaMask');
+        };
+
+        window.downloadMetaMask = () => {
+            window.open('https://metamask.io/download/', '_blank');
+        };
     }
 
     enhanceWalletConnection() {
@@ -187,15 +427,19 @@ class MobileWalletHelper {
             <p style="color: #ccc; font-size: 14px; margin-bottom: 15px;">Cliquez sur un bouton pour ouvrir directement l'app</p>
             
             <button onclick="openMetaMask()" class="wallet-button" style="background: #f6851b; border-color: #f6851b;">
-                🦊 Ouvrir MetaMask
+                🦊 Ouvrir MetaMask App
             </button>
             
             <button onclick="openTrustWallet()" class="wallet-button" style="background: #3375bb; border-color: #3375bb;">
-                🛡️ Ouvrir Trust Wallet
+                🛡️ Ouvrir Trust Wallet App
             </button>
             
             <button onclick="openCoinbaseWallet()" class="wallet-button" style="background: #0052ff; border-color: #0052ff;">
-                🔵 Ouvrir Coinbase Wallet
+                🔵 Ouvrir Coinbase Wallet App
+            </button>
+            
+            <button onclick="tryManualConnect()" class="wallet-button" style="background: #00ff88; color: black;">
+                🔗 Connexion Manuelle (si apps installées)
             </button>
             
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
@@ -217,30 +461,71 @@ class MobileWalletHelper {
         window.openTrustWallet = () => this.openWalletApp('trustwallet', currentUrl);
         window.openCoinbaseWallet = () => this.openWalletApp('coinbase', currentUrl);
         window.downloadWallet = () => this.downloadWalletApp();
+        window.tryManualConnect = () => this.tryManualConnection();
     }
 
     openWalletApp(walletType, url) {
         const wallet = this.supportedWallets[walletType];
         if (!wallet) return;
 
-        // Essayer d'ouvrir l'app directement
-        const deepLink = wallet.deepLink + encodeURIComponent(url);
+        // Nettoyer l'URL et s'assurer qu'elle est complète
+        const cleanUrl = url.startsWith('http') ? url : 'https://' + url.replace(/^\/+/, '');
         
-        // Créer un lien invisible et le cliquer
-        const link = document.createElement('a');
-        link.href = deepLink;
-        link.target = '_blank';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        console.log(`🔗 Tentative ouverture ${wallet.name} avec URL:`, cleanUrl);
 
+        // Méthode améliorée avec fallbacks multiples
+        const tryOpenWallet = () => {
+            // Essai 1: Deep link universel (protocole custom)
+            if (wallet.universalLink) {
+                const universalLink = wallet.universalLink + encodeURIComponent(cleanUrl);
+                console.log('🚀 Essai Universal Link:', universalLink);
+                
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = universalLink;
+                document.body.appendChild(iframe);
+                
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            }
+
+            // Essai 2: Deep link HTTPS (après délai)
+            setTimeout(() => {
+                const httpsLink = wallet.deepLink + encodeURIComponent(cleanUrl);
+                console.log('🌐 Essai HTTPS Link:', httpsLink);
+                
+                window.open(httpsLink, '_blank');
+            }, 500);
+
+            // Essai 3: Redirection directe pour certains wallets
+            setTimeout(() => {
+                if (walletType === 'metamask') {
+                    // Lien MetaMask alternatif
+                    const metamaskAlt = `https://metamask.app.link/dapp/${cleanUrl.replace(/^https?:\/\//, '')}`;
+                    console.log('🦊 Essai MetaMask alternatif:', metamaskAlt);
+                    window.open(metamaskAlt, '_blank');
+                }
+            }, 1000);
+        };
+
+        tryOpenWallet();
+        
         // Afficher un message de confirmation
         this.showSuccessMessage(`Ouverture de ${wallet.name}...`);
         
         // Fallback : si l'app ne s'ouvre pas, proposer le téléchargement
         setTimeout(() => {
-            if (confirm(`${wallet.name} ne s'est pas ouvert automatiquement.\n\nVoulez-vous télécharger l'application ?`)) {
+            const shouldDownload = confirm(
+                `${wallet.name} ne s'est pas ouvert automatiquement.\n\n` +
+                `💡 Astuce: Si l'app est installée, essayez de:\n` +
+                `1. Ouvrir manuellement ${wallet.name}\n` +
+                `2. Aller dans le navigateur intégré\n` +
+                `3. Taper: ${cleanUrl}\n\n` +
+                `Voulez-vous télécharger l'application ?`
+            );
+            
+            if (shouldDownload) {
                 window.open(wallet.downloadUrl, '_blank');
             }
         }, 3000);
@@ -250,6 +535,45 @@ class MobileWalletHelper {
         const metamask = this.supportedWallets.metamask;
         window.open(metamask.downloadUrl, '_blank');
         this.showSuccessMessage('Redirection vers le téléchargement MetaMask...');
+    }
+
+    tryManualConnection() {
+        // Essayer de se connecter directement si un wallet est déjà injecté
+        if (window.ethereum) {
+            console.log('🔗 Tentative connexion manuelle avec wallet détecté');
+            
+            window.ethereum.request({ method: 'eth_requestAccounts' })
+                .then(accounts => {
+                    if (accounts && accounts.length > 0) {
+                        this.showSuccessMessage('✅ Connexion réussie !');
+                        // Fermer les options
+                        document.querySelectorAll('.mobile-wallet-options').forEach(el => el.remove());
+                        
+                        // Déclencher l'événement de connexion pour le terminal
+                        if (window.connectWallet) {
+                            window.connectWallet();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur connexion manuelle:', error);
+                    this.showSuccessMessage('❌ Échec de la connexion. Utilisez le navigateur intégré de votre wallet.');
+                });
+        } else {
+            // Instructions pour connexion manuelle
+            const instructions = `
+📱 CONNEXION MANUELLE :
+
+1. Ouvrez votre app wallet (MetaMask, Trust, etc.)
+2. Trouvez le "Navigateur" ou "Browser" dans l'app
+3. Tapez cette URL : ${window.location.href}
+4. Cliquez sur "CONNECT WALLET"
+
+💡 Cette méthode fonctionne à 100% !
+            `;
+            
+            alert(instructions);
+        }
     }
 
     showSuccessMessage(message) {
@@ -279,106 +603,83 @@ class MobileWalletHelper {
         }, 2000);
     }
 
-    // Method to manually trigger wallet connection for mobile
+    // Méthode de connexion SIMPLIFIÉE pour mobile
     static async connectMobileWallet() {
-        const helper = new MobileWalletHelper();
+        console.log('🔗 Connexion wallet simplifiée...');
         
-        if (!window.ethereum && helper.isMobile) {
-            helper.showMobileWalletOptions();
+        // Attendre un peu si nécessaire
+        if (!window.ethereum) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        if (!window.ethereum) {
+            console.log('❌ Pas de wallet détecté');
+            const helper = new MobileWalletHelper();
+            helper.showSimpleGuide();
             return null;
         }
 
         try {
-            if (window.ethereum) {
-                const accounts = await window.ethereum.request({ 
-                    method: 'eth_requestAccounts' 
-                });
+            console.log('✅ Wallet trouvé - demande de connexion...');
+            
+            // Demande de connexion simple
+            const accounts = await window.ethereum.request({ 
+                method: 'eth_requestAccounts' 
+            });
+            
+            if (accounts && accounts.length > 0) {
+                console.log('🎉 Connexion réussie:', accounts[0]);
                 
-                // Ensure we're on Polygon network
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x89' }], // Polygon Mainnet
-                    });
-                } catch (switchError) {
-                    // Network not added, add it
-                    if (switchError.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x89',
-                                chainName: 'Polygon Mainnet',
-                                nativeCurrency: {
-                                    name: 'MATIC',
-                                    symbol: 'MATIC',
-                                    decimals: 18
-                                },
-                                rpcUrls: ['https://polygon-rpc.com/'],
-                                blockExplorerUrls: ['https://polygonscan.com/']
-                            }]
-                        });
-                    }
-                }
+                // Assurer Polygon network
+                const helper = new MobileWalletHelper();
+                await helper.ensurePolygonNetwork();
                 
                 return accounts[0];
+            } else {
+                console.log('❌ Aucun compte retourné');
+                return null;
             }
+                
         } catch (error) {
-            console.error('Mobile wallet connection error:', error);
+            console.error('❌ Erreur connexion wallet:', error);
+            
+            if (error.code === 4001) {
+                alert('❌ Connexion refusée. Veuillez accepter la connexion dans votre wallet.');
+            } else {
+                alert('❌ Erreur de connexion. Essayez de rafraîchir la page.');
+            }
+            
             return null;
         }
     }
 
-    // Nouvelle méthode : Auto-connect magique
+    // Auto-connect ULTRA-SIMPLIFIÉ
     static async autoConnectWallet() {
-        const helper = new MobileWalletHelper();
+        console.log('� Auto-connect simplifié...');
         
-        console.log('🔍 Démarrage auto-connect...');
-        console.log('📱 Mobile détecté:', helper.isMobile);
-        console.log('🔗 window.ethereum existe:', !!window.ethereum);
+        // Vérification immédiate
+        if (window.ethereum) {
+            console.log('✅ Wallet détecté immédiatement');
+            return await MobileWalletHelper.connectMobileWallet();
+        }
+        
+        // Attendre max 2 secondes pour mobile
+        let attempts = 0;
+        while (attempts < 4 && !window.ethereum) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            attempts++;
+            console.log(`⏳ Tentative ${attempts}/4...`);
+        }
         
         if (window.ethereum) {
-            console.log('✅ Ethereum provider trouvé');
-            console.log('🔍 Détails provider:', {
-                isMetaMask: window.ethereum.isMetaMask,
-                isTrust: window.ethereum.isTrust,
-                isCoinbaseWallet: window.ethereum.isCoinbaseWallet,
-                providers: window.ethereum.providers?.length || 0
-            });
-        }
-        
-        // Essayer de détecter les wallets installés
-        const wallets = helper.detectInstalledWallets();
-        console.log('💰 Wallets trouvés:', wallets);
-        
-        if (wallets.length === 0 && helper.isMobile) {
-            console.log('❌ Aucun wallet détecté - affichage guide');
-            helper.showSmartWalletGuide();
+            console.log('✅ Wallet détecté après attente');
+            return await MobileWalletHelper.connectMobileWallet();
+        } else {
+            console.log('❌ Aucun wallet - affichage guide');
+            const helper = new MobileWalletHelper();
+            helper.showSimpleGuide();
             return null;
         }
-        
-        if (wallets.length >= 1) {
-            console.log('✅ Wallet(s) détecté(s) - tentative connexion directe');
-            // Essayer la connexion directe
-            try {
-                const result = await MobileWalletHelper.connectMobileWallet();
-                if (result) {
-                    console.log('🎉 Connexion réussie:', result);
-                    return result;
-                } else {
-                    console.log('⚠️ Connexion échouée - affichage options');
-                    helper.showInstalledWalletsOnly(wallets);
-                    return null;
-                }
-            } catch (error) {
-                console.log('❌ Erreur connexion:', error);
-                helper.showInstalledWalletsOnly(wallets);
-                return null;
-            }
-        }
-        
-        // Fallback standard
-        console.log('🔄 Fallback connexion standard');
-        return await MobileWalletHelper.connectMobileWallet();
     }
 
     showInstalledWalletsOnly(wallets) {
@@ -548,6 +849,65 @@ class MobileWalletHelper {
         `;
         
         document.body.appendChild(instructions);
+    }
+
+    // Méthode spéciale pour les transactions d'airdrop
+    static async executeAirdropTransaction(contractAddress, abi, methodName, params = []) {
+        console.log('💰 Préparation transaction airdrop...');
+        
+        if (!window.ethereum) {
+            alert('❌ Wallet non détecté. Utilisez le navigateur de votre app wallet.');
+            return null;
+        }
+
+        try {
+            // S'assurer qu'on est connecté
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (!accounts || accounts.length === 0) {
+                console.log('🔗 Connexion requise...');
+                const connected = await MobileWalletHelper.connectMobileWallet();
+                if (!connected) return null;
+            }
+
+            // Préparer la transaction
+            const account = accounts[0] || (await window.ethereum.request({ method: 'eth_accounts' }))[0];
+            
+            console.log('📝 Envoi transaction depuis:', account);
+            console.log('📄 Contrat:', contractAddress);
+            console.log('⚙️ Méthode:', methodName);
+
+            // Transaction optimisée pour mobile
+            const txParams = {
+                from: account,
+                to: contractAddress,
+                data: '0x', // Sera encodée par le site principal
+                gas: '0x1C9C380', // Gas élevé pour éviter les échecs
+                gasPrice: '0x2540BE400' // Prix gas adapté
+            };
+
+            console.log('📡 Envoi transaction...');
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [txParams]
+            });
+
+            console.log('✅ Transaction envoyée:', txHash);
+            alert('✅ Transaction envoyée ! Hash: ' + txHash.substring(0, 10) + '...');
+            return txHash;
+
+        } catch (error) {
+            console.error('❌ Erreur transaction:', error);
+            
+            if (error.code === 4001) {
+                alert('❌ Transaction annulée par l\'utilisateur.');
+            } else if (error.code === -32603) {
+                alert('❌ Erreur de réseau. Vérifiez que vous êtes sur Polygon.');
+            } else {
+                alert('❌ Erreur transaction: ' + (error.message || 'Inconnue'));
+            }
+            
+            return null;
+        }
     }
 }
 
