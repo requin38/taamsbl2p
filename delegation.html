@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗳️ TAAMS Vote Delegation Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #9c88ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #9c88ff;
+            animation: delegationGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes delegationGlow {
+            0% { text-shadow: 0 0 20px #9c88ff, 0 0 30px #9c88ff, 0 0 40px #9c88ff; }
+            100% { text-shadow: 0 0 30px #9c88ff, 0 0 40px #9c88ff, 0 0 50px #9c88ff; }
+        }
+
+        .back-nav {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(156, 136, 255, 0.2);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            color: #9c88ff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(156, 136, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .wallet-section {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .delegation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .delegation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .delegation-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #9c88ff;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .delegation-panel h2 {
+            color: #9c88ff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9c88ff;
+            font-weight: bold;
+        }
+
+        .delegation-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            color: #9c88ff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .delegation-input:focus {
+            outline: none;
+            border-color: #9c88ff;
+            box-shadow: 0 0 15px rgba(156, 136, 255, 0.5);
+        }
+
+        .delegation-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #9c88ff, #7c68ff);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .delegation-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 136, 255, 0.4);
+        }
+
+        .delegation-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .top-delegates {
+            background: rgba(156, 136, 255, 0.1);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .delegate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(156, 136, 255, 0.3);
+        }
+
+        .delegate-address {
+            color: #9c88ff;
+            font-weight: bold;
+        }
+
+        .delegate-power {
+            color: #ffc107;
+        }
+
+        .delegation-status {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-active {
+            color: #00ff88;
+        }
+
+        .status-inactive {
+            color: #666;
+        }
+
+        .logs-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #9c88ff;
+            border-radius: 12px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-info { color: #9c88ff; }
+        .log-success { color: #28a745; background: rgba(40, 167, 69, 0.1); }
+        .log-warning { color: #ffc107; background: rgba(255, 193, 7, 0.1); }
+        .log-error { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+
+        .info-box {
+            background: rgba(156, 136, 255, 0.1);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h4 {
+            color: #9c88ff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🗳️ VOTE DELEGATION HUB</h1>
+            <p>Delegate your BL2P voting power to trusted representatives</p>
+            
+            <!-- Navigation Back -->
+            <div class="back-nav">
+                <button onclick="goBackToTerminal()" class="back-btn">
+                    ↩️ BACK TO TERMINAL
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallet Info -->
+        <div class="wallet-section">
+            <div id="wallet-info" class="wallet-info">
+                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
+                <p>💰 TAAMS: <span id="taams-balance">Loading...</span></p>
+                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
+                <p>🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+                <p>💪 Available for Delegation: <span id="delegatable-bl2p">Loading...</span></p>
+            </div>
+        </div>
+
+        <!-- Current Delegation Status -->
+        <div class="delegation-status">
+            <h3>📊 Current Delegation Status</h3>
+            <div id="delegation-info">
+                <p class="status-inactive">⭕ No active delegation</p>
+            </div>
+        </div>
+
+        <!-- Delegation Section -->
+        <div class="delegation-grid">
+            <!-- Delegate Vote -->
+            <div class="delegation-panel">
+                <h2>🤝 Delegate Your Vote</h2>
+                <div class="info-box">
+                    <h4>📋 How Delegation Works</h4>
+                    <p>Delegate your BL2P voting power to a trusted delegate. They can vote on proposals using your voting weight.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Delegate Address:</label>
+                    <input type="text" id="delegate-address" class="delegation-input" placeholder="0x...">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">BL2P Amount to Delegate:</label>
+                    <input type="number" id="delegate-amount" class="delegation-input" placeholder="Enter BL2P amount" min="0" step="0.01">
+                </div>
+                
+                <button id="delegate-btn" class="delegation-btn" disabled>🤝 DELEGATE VOTE</button>
+                <button id="revoke-delegation-btn" class="delegation-btn" disabled>❌ REVOKE DELEGATION</button>
+            </div>
+
+            <!-- Top Delegates -->
+            <div class="delegation-panel">
+                <h2>🏆 Top Delegates</h2>
+                <div class="info-box">
+                    <h4>⭐ Most Trusted Delegates</h4>
+                    <p>These are the most trusted delegates in the TAAMS ecosystem with the highest delegated voting power.</p>
+                </div>
+                
+                <div class="top-delegates" id="top-delegates-list">
+                    <div class="log-entry log-info">📊 Loading top delegates...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="logs-section">
+            <h3 class="logs-title">🔍 Delegation Portal Logs</h3>
+            <div id="logs-container">
+                <div class="log-entry log-info">🗳️ Vote Delegation Portal initialized</div>
+                <div class="log-entry log-info">📊 Loading delegation data...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let delegationState = {
+            connected: false,
+            userAccount: null,
+            web3: null,
+            contract: null,
+            bl2pBalance: 0,
+            delegatableBL2P: 0,
+            currentDelegation: null,
+            topDelegates: []
+        };
+
+        // Contract configuration
+        const TAAMS_CONTRACT = {
+            address: '0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef',
+            abi: null
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            addLog('🗳️ TAAMS Vote Delegation Portal loading...', 'info');
+            await loadContractABI();
+            setupEventListeners();
+            
+            // Auto-detect wallet from terminal
+            await initializeWalletFromTerminal();
+            
+            addLog('✅ Delegation Portal ready!', 'success');
+        });
+
+        // Load contract ABI
+        async function loadContractABI() {
+            try {
+                const response = await fetch('./TAAMS_ABI.json');
+                TAAMS_CONTRACT.abi = await response.json();
+                addLog('📋 Contract ABI loaded', 'success');
+            } catch (error) {
+                addLog('❌ Failed to load contract ABI: ' + error.message, 'error');
+            }
+        }
+
+        // Mobile device detection
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('delegate-btn').onclick = delegateVote;
+            document.getElementById('revoke-delegation-btn').onclick = revokeDelegation;
+            
+            // Input validation
+            document.getElementById('delegate-address').oninput = validateDelegationForm;
+            document.getElementById('delegate-amount').oninput = validateDelegationForm;
+            
+            // Setup wallet change detection
+            setupWalletChangeDetection();
+        }
+
+        // Setup wallet change detection
+        function setupWalletChangeDetection() {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length === 0) {
+                        addLog('🔌 Wallet disconnected', 'warning');
+                        delegationState.connected = false;
+                        delegationState.userAccount = null;
+                        document.getElementById('wallet-address').textContent = 'Disconnected';
+                        return;
+                    }
+
+                    const oldAccount = delegationState.userAccount;
+                    if (oldAccount && oldAccount.toLowerCase() !== accounts[0].toLowerCase()) {
+                        addLog(`🔄 Wallet changed to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
+                        
+                        delegationState.userAccount = accounts[0];
+                        
+                        try {
+                            await ensurePolygonNetwork();
+                            await initializeContract();
+                            updateConnectedUI();
+                            await loadDelegationData();
+                            
+                            addLog('✅ Wallet data updated for new account', 'success');
+                        } catch (error) {
+                            addLog('❌ Failed to update wallet data: ' + error.message, 'error');
+                        }
+                    }
+                });
+                
+                addLog('👂 Wallet change detection active', 'success');
+            }
+        }
+
+        // Auto-detect wallet from terminal
+        async function initializeWalletFromTerminal() {
+            try {
+                addLog('🔗 Auto-detecting wallet from terminal...', 'info');
+                
+                const provider = await detectEthereumProvider({ mustBeMetaMask: true });
+                if (!provider) {
+                    addLog('❌ MetaMask not found. Please install MetaMask extension.', 'error');
+                    return;
+                }
+
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                if (!accounts || accounts.length === 0) {
+                    addLog('⚠️ No wallet connected. Please connect via terminal first.', 'warning');
+                    return;
+                }
+
+                delegationState.userAccount = accounts[0];
+                addLog('✅ Wallet detected: ' + delegationState.userAccount.substring(0, 10) + '...', 'success');
+
+                if (!delegationState.web3) {
+                    delegationState.web3 = new Web3(provider);
+                }
+                
+                await ensurePolygonNetwork();
+                await initializeContract();
+                updateConnectedUI();
+                await loadDelegationData();
+
+            } catch (error) {
+                addLog('❌ Auto-detection failed: ' + error.message, 'error');
+            }
+        }
+
+        // Ensure Polygon network
+        async function ensurePolygonNetwork() {
+            const chainId = await delegationState.web3.eth.getChainId();
+            
+            if (chainId !== 137) {
+                addLog('⚠️ Wrong network. Switching to Polygon...', 'warning');
+                
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }]
+                    });
+                    addLog('✅ Switched to Polygon network', 'success');
+                } catch (error) {
+                    addLog('❌ Failed to switch network: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+        }
+
+        // Initialize contract
+        async function initializeContract() {
+            if (!TAAMS_CONTRACT.abi) {
+                throw new Error('Contract ABI not loaded');
+            }
+
+            delegationState.contract = new delegationState.web3.eth.Contract(TAAMS_CONTRACT.abi, TAAMS_CONTRACT.address);
+            addLog('📋 Contract initialized', 'success');
+        }
+
+        // Update UI for connected state
+        function updateConnectedUI() {
+            document.getElementById('wallet-address').textContent = delegationState.userAccount.substring(0, 10) + '...';
+            delegationState.connected = true;
+            loadWalletBalances();
+        }
+
+        // Load wallet balances
+        async function loadWalletBalances() {
+            try {
+                addLog('💰 Loading wallet balances...', 'info');
+                
+                const [
+                    tAAMSBalance,
+                    maticBalance,
+                    bl2pBalance
+                ] = await Promise.all([
+                    delegationState.contract.methods.balanceOf(delegationState.userAccount).call(),
+                    delegationState.web3.eth.getBalance(delegationState.userAccount),
+                    delegationState.contract.methods.getRemainingValidBL2P(delegationState.userAccount).call()
+                ]);
+                
+                const tAAMSFormatted = parseFloat(delegationState.web3.utils.fromWei(tAAMSBalance, 'ether')).toLocaleString();
+                const maticFormatted = parseFloat(delegationState.web3.utils.fromWei(maticBalance, 'ether')).toFixed(4);
+                const bl2pFormatted = parseFloat(delegationState.web3.utils.fromWei(bl2pBalance, 'ether')).toLocaleString();
+                
+                document.getElementById('taams-balance').textContent = tAAMSFormatted + ' TAAMS';
+                document.getElementById('matic-balance').textContent = maticFormatted + ' MATIC';
+                document.getElementById('bl2p-balance').textContent = bl2pFormatted + ' BL2P';
+                
+                delegationState.bl2pBalance = parseFloat(delegationState.web3.utils.fromWei(bl2pBalance, 'ether'));
+                delegationState.delegatableBL2P = delegationState.bl2pBalance; // Simplified - would need to check delegation status
+                
+                document.getElementById('delegatable-bl2p').textContent = delegationState.delegatableBL2P.toLocaleString() + ' BL2P';
+                
+                addLog(`💰 Balances loaded - BL2P: ${bl2pFormatted}`, 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load wallet balances: ' + error.message, 'error');
+            }
+        }
+
+        // Load delegation data
+        async function loadDelegationData() {
+            try {
+                addLog('📊 Loading delegation data...', 'info');
+                
+                // Check current delegation
+                const delegationInfo = await delegationState.contract.methods.activeDelegations(delegationState.userAccount).call();
+                
+                if (delegationInfo.delegate !== '0x0000000000000000000000000000000000000000') {
+                    delegationState.currentDelegation = {
+                        delegate: delegationInfo.delegate,
+                        amount: parseFloat(delegationState.web3.utils.fromWei(delegationInfo.bl2pAmount, 'ether')),
+                        block: delegationInfo.delegationBlock
+                    };
+                    
+                    updateDelegationStatus();
+                    document.getElementById('revoke-delegation-btn').disabled = false;
+                } else {
+                    delegationState.currentDelegation = null;
+                    document.getElementById('delegation-info').innerHTML = '<p class="status-inactive">⭕ No active delegation</p>';
+                }
+                
+                // Load top delegates
+                await loadTopDelegates();
+                
+            } catch (error) {
+                addLog('❌ Failed to load delegation data: ' + error.message, 'error');
+            }
+        }
+
+        // Load top delegates
+        async function loadTopDelegates() {
+            try {
+                const topDelegates = await delegationState.contract.methods.getTopDelegates().call();
+                
+                const delegatesList = document.getElementById('top-delegates-list');
+                delegatesList.innerHTML = '';
+                
+                if (topDelegates.length === 0) {
+                    delegatesList.innerHTML = '<div class="log-entry log-info">📝 No delegates found</div>';
+                    return;
+                }
+                
+                for (let i = 0; i < topDelegates.length; i++) {
+                    const delegateAddress = topDelegates[i];
+                    const delegatedAmount = await delegationState.contract.methods.delegatedBL2PReceived(delegateAddress).call();
+                    
+                    const delegateDiv = document.createElement('div');
+                    delegateDiv.className = 'delegate-item';
+                    delegateDiv.innerHTML = `
+                        <span class="delegate-address">${delegateAddress.slice(0, 6)}...${delegateAddress.slice(-4)}</span>
+                        <span class="delegate-power">${parseFloat(delegationState.web3.utils.fromWei(delegatedAmount, 'ether')).toLocaleString()} BL2P</span>
+                    `;
+                    
+                    // Make clickable to auto-fill
+                    delegateDiv.onclick = () => {
+                        document.getElementById('delegate-address').value = delegateAddress;
+                        validateDelegationForm();
+                        addLog(`📋 Selected delegate: ${delegateAddress.slice(0, 6)}...${delegateAddress.slice(-4)}`, 'info');
+                    };
+                    
+                    delegatesList.appendChild(delegateDiv);
+                }
+                
+                addLog(`🏆 Loaded ${topDelegates.length} top delegates`, 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load top delegates: ' + error.message, 'error');
+            }
+        }
+
+        // Update delegation status display
+        function updateDelegationStatus() {
+            const delegationInfo = document.getElementById('delegation-info');
+            if (delegationState.currentDelegation) {
+                delegationInfo.innerHTML = `
+                    <p class="status-active">✅ Active delegation to ${delegationState.currentDelegation.delegate.slice(0, 6)}...${delegationState.currentDelegation.delegate.slice(-4)}</p>
+                    <p>💰 Delegated Amount: ${delegationState.currentDelegation.amount.toLocaleString()} BL2P</p>
+                    <p>📅 Delegation Block: ${delegationState.currentDelegation.block}</p>
+                `;
+            } else {
+                delegationInfo.innerHTML = '<p class="status-inactive">⭕ No active delegation</p>';
+            }
+        }
+
+        // Validate delegation form
+        function validateDelegationForm() {
+            const address = document.getElementById('delegate-address').value;
+            const amount = parseFloat(document.getElementById('delegate-amount').value);
+            const delegateBtn = document.getElementById('delegate-btn');
+            
+            if (!address || !delegationState.web3?.utils.isAddress(address)) {
+                delegateBtn.disabled = true;
+                return;
+            }
+            
+            if (!amount || amount <= 0 || amount > delegationState.delegatableBL2P) {
+                delegateBtn.disabled = true;
+                return;
+            }
+            
+            if (!delegationState.connected || delegationState.currentDelegation) {
+                delegateBtn.disabled = true;
+                return;
+            }
+            
+            delegateBtn.disabled = false;
+        }
+
+        // Delegate vote
+        async function delegateVote() {
+            if (!delegationState.connected || !delegationState.userAccount) {
+                addLog('⚠️ Wallet not detected. Please access via terminal.', 'warning');
+                return;
+            }
+
+            const address = document.getElementById('delegate-address').value;
+            const amount = parseFloat(document.getElementById('delegate-amount').value);
+            
+            if (!delegationState.web3.utils.isAddress(address)) {
+                addLog('⚠️ Invalid delegate address', 'warning');
+                return;
+            }
+
+            if (amount <= 0 || amount > delegationState.delegatableBL2P) {
+                addLog('⚠️ Invalid delegation amount', 'warning');
+                return;
+            }
+
+            try {
+                addLog('🤝 Delegating voting power...', 'info');
+                
+                const delegateBtn = document.getElementById('delegate-btn');
+                delegateBtn.disabled = true;
+                delegateBtn.textContent = 'DELEGATING...';
+
+                const amountWei = delegationState.web3.utils.toWei(amount.toString(), 'ether');
+                
+                const gasEstimate = await delegationState.contract.methods.delegateVote(address, amountWei)
+                    .estimateGas({ from: delegationState.userAccount });
+                
+                addLog('⛽ Gas estimated: ' + gasEstimate.toLocaleString(), 'info');
+                
+                if (isMobileDevice()) {
+                    addLog('📱 MetaMask mobile will open for transaction approval', 'info');
+                }
+
+                const result = await delegationState.contract.methods.delegateVote(address, amountWei).send({
+                    from: delegationState.userAccount,
+                    gas: Math.floor(gasEstimate * 1.2)
+                });
+
+                addLog('🤝 VOTE DELEGATION SUCCESSFUL! Hash: ' + result.transactionHash, 'success');
+                addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
+                
+                // Update delegation data
+                await loadDelegationData();
+                
+                // Reset form
+                document.getElementById('delegate-address').value = '';
+                document.getElementById('delegate-amount').value = '';
+                validateDelegationForm();
+
+            } catch (error) {
+                addLog('❌ Vote delegation failed: ' + error.message, 'error');
+            } finally {
+                const delegateBtn = document.getElementById('delegate-btn');
+                delegateBtn.disabled = false;
+                delegateBtn.textContent = '🤝 DELEGATE VOTE';
+            }
+        }
+
+        // Revoke delegation
+        async function revokeDelegation() {
+            if (!delegationState.connected || !delegationState.userAccount) {
+                addLog('⚠️ Wallet not detected. Please access via terminal.', 'warning');
+                return;
+            }
+
+            if (!delegationState.currentDelegation) {
+                addLog('⚠️ No active delegation to revoke', 'warning');
+                return;
+            }
+
+            try {
+                addLog('❌ Revoking vote delegation...', 'info');
+                
+                const revokeBtn = document.getElementById('revoke-delegation-btn');
+                revokeBtn.disabled = true;
+                revokeBtn.textContent = 'REVOKING...';
+
+                const gasEstimate = await delegationState.contract.methods.revokeDelegation()
+                    .estimateGas({ from: delegationState.userAccount });
+                
+                addLog('⛽ Gas estimated: ' + gasEstimate.toLocaleString(), 'info');
+
+                const result = await delegationState.contract.methods.revokeDelegation().send({
+                    from: delegationState.userAccount,
+                    gas: Math.floor(gasEstimate * 1.2)
+                });
+
+                addLog('❌ DELEGATION REVOKED SUCCESSFULLY! Hash: ' + result.transactionHash, 'success');
+                addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
+                
+                // Update delegation data
+                await loadDelegationData();
+
+            } catch (error) {
+                addLog('❌ Delegation revocation failed: ' + error.message, 'error');
+            } finally {
+                const revokeBtn = document.getElementById('revoke-delegation-btn');
+                revokeBtn.disabled = false;
+                revokeBtn.textContent = '❌ REVOKE DELEGATION';
+            }
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logs-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            while (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+        }
+
+        // Navigation function
+        function goBackToTerminal() {
+            addLog('↩️ Returning to TAAMS Terminal...', 'info');
+            
+            if (isMobileDevice()) {
+                window.location.href = 'terminal.html';
+            } else {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'terminal.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
