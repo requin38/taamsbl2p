@@ -2807,6 +2807,26 @@
                 addLog('> MOBILE DEVICE DETECTED', 'info');
                 addLog('> FOR BEST EXPERIENCE, USE WALLET\'S BUILT-IN BROWSER', 'warning');
                 
+                // Debug button pour tester
+                setTimeout(() => {
+                    const debugBtn = document.createElement('button');
+                    debugBtn.textContent = 'DEBUG WALLET DETECTION';
+                    debugBtn.style.cssText = `
+                        position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+                        background: #ff6600; color: white; border: none; padding: 10px;
+                        border-radius: 5px; font-family: monospace; cursor: pointer;
+                    `;
+                    debugBtn.onclick = async () => {
+                        console.log('=== DEBUG WALLET DETECTION ===');
+                        if (window.MobileWalletHelper) {
+                            await window.MobileWalletHelper.autoConnectWallet();
+                        } else {
+                            console.log('❌ MobileWalletHelper non disponible');
+                        }
+                    };
+                    document.body.appendChild(debugBtn);
+                }, 1000);
+                
                 // Add mobile notice to the UI
                 setTimeout(() => {
                     const terminalContainer = document.querySelector('.container');
