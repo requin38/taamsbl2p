@@ -1000,7 +1000,7 @@
                         
                         if (state.connected) {
                             addLog(`> RESTORING SESSION FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
-                            updateConnectedUI();
+                            // Ne pas appeler updateConnectedUI() ici - laissons la restauration complète s'en charger
                             return true;
                         }
                     }
@@ -1132,10 +1132,17 @@
                 refreshBtn.textContent = '🔄 REFRESH BLOCKCHAIN DATA';
                 refreshBtn.style.marginTop = '10px';
                 refreshBtn.style.marginLeft = '10px';
-                refreshBtn.onclick = refreshConnection;
+                refreshBtn.onclick = async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addLog('> REFRESH BUTTON CLICKED', 'info');
+                    await refreshConnection();
+                };
                 
                 walletSection.appendChild(disconnectBtn);
                 walletSection.appendChild(refreshBtn);
+                
+                addLog('> DISCONNECT AND REFRESH BUTTONS ADDED', 'info');
             }
         }
         
@@ -1392,6 +1399,7 @@
                 }
                 
                 addLog('> REAL BALANCES LOADED FROM BLOCKCHAIN', 'success');
+                updateBalanceDisplay(); // 🔧 Forcer la mise à jour de l'affichage après chargement
                 
             } catch (error) {
                 addLog('> ERROR LOADING BLOCKCHAIN BALANCES', 'error');
@@ -2440,9 +2448,13 @@
                 // Charger les données du contrat
                 await loadContractData();
                 
+                // Marquer la connexion comme stable après initialisation réussie
+                state.connectionStable = true;
+                
             } catch (error) {
                 addLog('> CONTRACT INITIALIZATION FAILED: ' + error.message, 'error');
                 console.error('Contract initialization error:', error);
+                state.connectionStable = false;
             }
         }
         
@@ -2835,16 +2847,23 @@
         }
         
         async function refreshConnection() {
+            // Marquer le début du refresh pour éviter les fausses déconnexions
+            const refreshInProgress = true;
+            
             addLog('> REFRESHING BLOCKCHAIN CONNECTION...', 'info');
             const reloadBtn = document.getElementById('reload-button');
-            reloadBtn.style.transform = 'rotate(360deg)';
-            
-            setTimeout(() => {
-                reloadBtn.style.transform = 'rotate(0deg)';
-            }, 500);
+            if (reloadBtn) {
+                reloadBtn.style.transform = 'rotate(360deg)';
+                
+                setTimeout(() => {
+                    reloadBtn.style.transform = 'rotate(0deg)';
+                }, 500);
+            }
             
             if (state.connected && userAccount) {
                 try {
+                    addLog('> REFRESHING USER DATA...', 'info');
+                    
                     // Actualiser toutes les données blockchain en temps réel
                     await Promise.all([
                         loadUserBalances(),
@@ -2877,9 +2896,21 @@
                     }
                     
                     addLog('> BLOCKCHAIN DATA REFRESHED SUCCESSFULLY', 'success');
+                    
+                    // S'assurer que l'état de connexion reste stable après le refresh
+                    if (!state.connected) {
+                        state.connected = true;
+                        addLog('> CONNECTION STATE RESTORED', 'info');
+                    }
+                    
                 } catch (error) {
-                    addLog('> ERROR REFRESHING BLOCKCHAIN DATA', 'error');
+                    addLog('> ERROR REFRESHING BLOCKCHAIN DATA: ' + error.message, 'error');
                     console.error('Refresh error:', error);
+                    
+                    // Ne pas déconnecter en cas d'erreur de refresh
+                    if (state.connected) {
+                        addLog('> CONNECTION MAINTAINED DESPITE REFRESH ERROR', 'info');
+                    }
                 }
             } else {
                 addLog('> NO ACTIVE BLOCKCHAIN CONNECTION TO REFRESH', 'warning');
@@ -2902,31 +2933,11 @@
                 return;
             }
             
-            addLog('> INITIALIZING BURN PORTAL MODULE...', 'success');
-            createModuleInterface('BURN PORTAL', `
-                <div class="module-content">
-                    <h2 class="module-title">🔥 BURN PORTAL</h2>
-                    <div class="burn-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Burned:</span>
-                            <span class="stat-value" id="total-burned">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Your Burned Tokens:</span>
-                            <span class="stat-value" id="user-burned">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Current Burn Cycle:</span>
-                            <span class="stat-value" id="burn-cycle">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="burn-interface">
-                        <input type="number" id="burn-amount" placeholder="Amount to burn" min="0" step="0.001">
-                        <button id="burn-tokens-btn" class="action-btn">🔥 BURN TOKENS</button>
-                    </div>
-                </div>
-            `);
-            loadBurnPortalData();
+            addLog('> REDIRECTING TO BURN PORTAL...', 'success');
+            addLog('> Opening burn.html in new tab', 'info');
+            
+            // Rediriger vers la page burn complète
+            window.open('burn.html', '_blank');
         }
         
         function openStakingChamber() {
@@ -2943,32 +2954,8 @@
                 return;
             }
             
-            addLog('> ACCESSING STAKING CHAMBER...', 'success');
-            createModuleInterface('STAKING CHAMBER', `
-                <div class="module-content">
-                    <h2 class="module-title">⚡ STAKING CHAMBER</h2>
-                    <div class="staking-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Staked:</span>
-                            <span class="stat-value" id="total-staked">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Your Stake:</span>
-                            <span class="stat-value" id="user-staked">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">APY:</span>
-                            <span class="stat-value" id="staking-apy">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="staking-interface">
-                        <input type="number" id="stake-amount" placeholder="Amount to stake" min="0" step="0.001">
-                        <button id="stake-tokens-btn" class="action-btn">⚡ STAKE TOKENS</button>
-                        <button id="unstake-tokens-btn" class="action-btn">📤 UNSTAKE</button>
-                    </div>
-                </div>
-            `);
-            loadStakingChamberData();
+            addLog('> LAUNCHING STAKING CHAMBER...', 'success');
+            window.open('staking.html', '_blank');
         }
         
         function openGovernanceHub() {
@@ -2985,26 +2972,8 @@
                 return;
             }
             
-            addLog('> ENTERING GOVERNANCE HUB...', 'success');
-            createModuleInterface('GOVERNANCE HUB', `
-                <div class="module-content">
-                    <h2 class="module-title">🏛️ GOVERNANCE HUB</h2>
-                    <div class="governance-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Active Proposals:</span>
-                            <span class="stat-value" id="active-proposals">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Your Voting Power:</span>
-                            <span class="stat-value" id="voting-power">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="proposals-list" id="proposals-list">
-                        <div class="loading">Loading proposals...</div>
-                    </div>
-                </div>
-            `);
-            loadGovernanceData();
+            addLog('> LAUNCHING GOVERNANCE HUB...', 'success');
+            window.open('governance.html', '_blank');
         }
         
         function openBL2PManager() {
@@ -3022,29 +2991,7 @@
             }
             
             addLog('> LAUNCHING BL2P MANAGER...', 'success');
-            createModuleInterface('BL2P MANAGER', `
-                <div class="module-content">
-                    <h2 class="module-title">🌊 BL2P MANAGER</h2>
-                    <div class="bl2p-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Pool Liquidity:</span>
-                            <span class="stat-value" id="pool-liquidity">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Your LP Tokens:</span>
-                            <span class="stat-value" id="user-lp">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="bl2p-interface">
-                        <div class="liquidity-controls">
-                            <input type="number" id="add-liquidity-amount" placeholder="Amount" min="0" step="0.001">
-                            <button id="add-liquidity-btn" class="action-btn">➕ ADD LIQUIDITY</button>
-                            <button id="remove-liquidity-btn" class="action-btn">➖ REMOVE LIQUIDITY</button>
-                        </div>
-                    </div>
-                </div>
-            `);
-            loadBL2PData();
+            window.open('bl2p.html', '_blank');
         }
         
         function openAdvertisementHub() {
@@ -3062,40 +3009,7 @@
             }
             
             addLog('> LAUNCHING ADVERTISEMENT HUB...', 'success');
-            createModuleInterface('ADVERTISEMENT HUB', `
-                <div class="module-content">
-                    <h2 class="module-title">📢 ADVERTISEMENT HUB</h2>
-                    <div class="ad-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Ads:</span>
-                            <span class="stat-value" id="total-ads">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Your Ads:</span>
-                            <span class="stat-value" id="user-ads">Loading...</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Last Posted:</span>
-                            <span class="stat-value" id="last-ad-time">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="ad-interface">
-                        <h3>📝 Post New Advertisement</h3>
-                        <textarea id="ad-message" placeholder="Enter your advertisement message..." rows="4" maxlength="280"></textarea>
-                        <div class="ad-controls">
-                            <button id="post-ad-btn" class="action-btn">📢 POST ADVERTISEMENT</button>
-                            <span class="char-counter" id="char-counter">0/280</span>
-                        </div>
-                    </div>
-                    <div class="ads-list">
-                        <h3>📰 Recent Advertisements</h3>
-                        <div id="advertisements-container">
-                            <div class="loading">Loading advertisements...</div>
-                        </div>
-                    </div>
-                </div>
-            `);
-            loadAdvertisementData();
+            window.open('ads.html', '_blank');
         }
         
         function createModuleInterface(moduleTitle, content) {
@@ -3187,40 +3101,6 @@
         }
         
         // ====== FONCTIONS DE CHARGEMENT DES DONNÉES ======
-        
-        async function loadBurnPortalData() {
-            if (!contract || !userAccount) {
-                document.getElementById('total-burned').textContent = 'Not Connected';
-                document.getElementById('user-burned').textContent = 'Not Connected';
-                document.getElementById('burn-cycle').textContent = 'Not Connected';
-                return;
-            }
-            
-            try {
-                // Simuler le chargement des données de burn (adapt selon votre contrat)
-                document.getElementById('total-burned').textContent = formatNumber(state.totalBurned || 0) + ' TAAMS';
-                document.getElementById('user-burned').textContent = '0 TAAMS'; // À adapter
-                document.getElementById('burn-cycle').textContent = '1'; // À adapter
-                
-                // Ajouter l'event listener pour le bouton burn
-                const burnBtn = document.getElementById('burn-tokens-btn');
-                if (burnBtn) {
-                    burnBtn.addEventListener('click', async () => {
-                        const amount = document.getElementById('burn-amount').value;
-                        if (amount && amount > 0) {
-                            addLog(`> BURN FEATURE: ${amount} TAAMS`, 'info');
-                            showAlert('Burn feature will be implemented soon!', 'info');
-                        } else {
-                            showAlert('Please enter a valid amount to burn', 'warning');
-                        }
-                    });
-                }
-                
-            } catch (error) {
-                addLog('> BURN PORTAL: ERROR LOADING DATA', 'error');
-                console.error('Burn portal data error:', error);
-            }
-        }
         
         async function loadStakingChamberData() {
             if (!contract || !userAccount) {
@@ -3521,8 +3401,14 @@
                 const isStillConnected = await checkWalletConnection();
                 if (isStillConnected) {
                     addLog('> SESSION RESTORED SUCCESSFULLY', 'success');
+                    updateConnectedUI();        // 🔧 Afficher l'UI connecté AVANT de charger les balances
                     await initializeContract();
                     if (state.connectionStable) {
+                        await loadUserBalances();  // 🔧 Charger automatiquement les balances après restoration
+                        setTimeout(() => {
+                            updateBalanceDisplay();    // 🔧 Mettre à jour l'affichage avec un petit délai
+                            addLog('> BALANCES AUTOMATICALLY REFRESHED AFTER PAGE RELOAD', 'success');
+                        }, 500);
                         await checkRegistrationStatus();
                         setupContractEvents();
                         startConnectionMonitoring();
@@ -3539,10 +3425,29 @@
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', function(accounts) {
                 if (accounts.length === 0) {
-                    addLog('> WALLET DISCONNECTED BY USER', 'warning');
-                    clearPersistedState();
-                    resetConnectionState();
-                    showAlert('Wallet disconnected. Please reconnect to continue.', 'warning');
+                    // Vérifier si c'est une vraie déconnexion ou juste un appel de contrat temporaire
+                    setTimeout(async () => {
+                        try {
+                            // Re-vérifier les comptes après un délai
+                            const currentAccounts = await window.ethereum.request({ method: 'eth_accounts' });
+                            if (currentAccounts.length === 0) {
+                                // Vraie déconnexion confirmée
+                                addLog('> WALLET DISCONNECTED BY USER', 'warning');
+                                clearPersistedState();
+                                resetConnectionState();
+                                showAlert('Wallet disconnected. Please reconnect to continue.', 'warning');
+                            } else {
+                                // Fausse alerte, wallet toujours connecté
+                                addLog('> TEMPORARY ACCOUNTS CHANGE DETECTED (IGNORED)', 'info');
+                            }
+                        } catch (error) {
+                            // Si erreur lors de la vérification, considérer comme déconnecté
+                            addLog('> WALLET DISCONNECTED BY USER', 'warning');
+                            clearPersistedState();
+                            resetConnectionState();
+                            showAlert('Wallet disconnected. Please reconnect to continue.', 'warning');
+                        }
+                    }, 500); // Délai de 500ms pour éviter les fausses déconnexions
                 } else if (accounts[0] !== userAccount) {
                     addLog(`> WALLET CHANGED: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
                     addLog('> LOADING NEW WALLET DATA...', 'info');

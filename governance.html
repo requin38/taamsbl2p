@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ TAAMS Governance Hub - Protocol Democracy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #9c88ff;
+            animation: governanceGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes governanceGlow {
+            0% { text-shadow: 0 0 20px #9c88ff, 0 0 30px #9c88ff, 0 0 40px #9c88ff; }
+            100% { text-shadow: 0 0 30px #9c88ff, 0 0 40px #9c88ff, 0 0 50px #9c88ff; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(156, 136, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #9c88ff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .governance-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .governance-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .governance-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #9c88ff;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .governance-panel h2 {
+            color: #9c88ff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9c88ff;
+            font-weight: bold;
+        }
+
+        .governance-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            color: #9c88ff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .governance-input:focus {
+            outline: none;
+            border-color: #9c88ff;
+            box-shadow: 0 0 15px rgba(156, 136, 255, 0.5);
+        }
+
+        .governance-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #9c88ff, #7c68ff);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .governance-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 136, 255, 0.4);
+        }
+
+        .governance-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .proposal-item {
+            background: rgba(156, 136, 255, 0.1);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .proposal-item:hover {
+            background: rgba(156, 136, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .proposal-id {
+            color: #9c88ff;
+            font-weight: bold;
+        }
+
+        .proposal-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-ended {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-executed {
+            background: rgba(156, 136, 255, 0.2);
+            color: #9c88ff;
+        }
+
+        .proposal-description {
+            color: #ccc;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .proposal-votes {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .vote-for {
+            color: #00ff88;
+        }
+
+        .vote-against {
+            color: #ff4757;
+        }
+
+        .vote-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .vote-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .vote-btn.for {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .vote-btn.against {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+
+        .vote-btn:hover {
+            opacity: 0.8;
+        }
+
+        .wallet-section {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #9c88ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .wallet-info {
+            color: #9c88ff;
+            margin-top: 15px;
+        }
+
+        .info-box {
+            background: rgba(156, 136, 255, 0.1);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h4 {
+            color: #9c88ff;
+            margin-bottom: 10px;
+        }
+
+        .network-stats-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .network-stats-panel h4 {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .network-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            color: #00ff88;
+            font-weight: normal;
+        }
+
+        .stat-value {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .logs-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #9c88ff;
+            border-radius: 12px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-info { color: #9c88ff; }
+        .log-success { color: #28a745; background: rgba(40, 167, 69, 0.1); }
+        .log-warning { color: #ffc107; background: rgba(255, 193, 7, 0.1); }
+        .log-error { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+
+        .back-nav {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(156, 136, 255, 0.2);
+            border: 1px solid #9c88ff;
+            border-radius: 8px;
+            color: #9c88ff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(156, 136, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .proposals-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .network-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .governance-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏛️ TAAMS GOVERNANCE HUB</h1>
+            <p>Participate in protocol democracy and shape the future</p>
+            
+            <!-- Navigation Back -->
+            <div class="back-nav">
+                <button onclick="goBackToTerminal()" class="back-btn">
+                    ↩️ BACK TO TERMINAL
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallet Info (Auto-detected from terminal) -->
+        <div class="wallet-section">
+            <div id="wallet-info" class="wallet-info">
+                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
+                <p>� TAAMS: <span id="taams-balance">Loading...</span></p>
+                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
+                <p>�🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+                <p>💪 Voting Power: <span id="voting-power">Loading...</span></p>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="proposal-count">Loading...</div>
+                <div class="stat-label">Total Proposals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="quorum">Loading...</div>
+                <div class="stat-label">Quorum Threshold</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="vote-threshold">Loading...</div>
+                <div class="stat-label">Vote Threshold</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="active-proposals">Loading...</div>
+                <div class="stat-label">Active Proposals</div>
+            </div>
+        </div>
+
+        <!-- Real-time Network Stats -->
+        <div class="network-stats-panel">
+            <h4>⚡ TAAMS Network Status</h4>
+            <div class="network-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Current Block:</span>
+                    <span class="stat-value" id="current-block">Loading...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Network:</span>
+                    <span class="stat-value">🔺 Polygon</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Gas Price:</span>
+                    <span class="stat-value" id="gas-price">Loading...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value" id="network-status">🟢 Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Governance Section -->
+        <div class="governance-section">
+            <!-- Submit Proposal -->
+            <div class="governance-panel">
+                <h2>📝 Submit Proposal</h2>
+                <div class="info-box">
+                    <h4>🎯 Proposal Guidelines</h4>
+                    <p>Submit proposals to change protocol parameters, add features, or modify governance rules. Requires minimum voting power.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Proposal Description:</label>
+                    <textarea id="proposal-description" class="governance-input" placeholder="Describe your proposal..." rows="3"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Proposal Type:</label>
+                    <select id="proposal-type" class="governance-input">
+                        <option value="0">Parameter Update</option>
+                        <option value="1">Contract Upgrade</option>
+                        <option value="2">Feature Addition</option>
+                        <option value="3">Emergency Action</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">New Value (if applicable):</label>
+                    <input type="number" id="proposal-value" class="governance-input" placeholder="Enter new value">
+                </div>
+                
+                <button id="submit-proposal-btn" class="governance-btn" disabled>📝 SUBMIT PROPOSAL</button>
+            </div>
+
+            <!-- Proposals List -->
+            <div class="governance-panel">
+                <h2>🗳️ Active Proposals</h2>
+                <div class="proposals-list" id="proposals-list">
+                    <div class="log-entry log-info">📊 Loading proposals from blockchain...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="logs-section">
+            <h3 class="logs-title">🔍 Governance Portal Logs</h3>
+            <div id="logs-container">
+                <div class="log-entry log-info">🏛️ Governance Portal initialized</div>
+                <div class="log-entry log-info">📊 Loading governance statistics...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let governanceState = {
+            connected: false,
+            userAccount: null,
+            web3: null,
+            contract: null,
+            votingPower: 0,
+            proposalCount: 0,
+            quorum: 0,
+            voteThreshold: 0,
+            activeProposals: 0,
+            currentBlock: 0,
+            proposals: []
+        };
+
+        // Contract configuration
+        const TAAMS_CONTRACT = {
+            address: '0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef',
+            abi: null // Will be loaded from TAAMS_ABI.json
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            addLog('🏛️ TAAMS Governance Portal loading...', 'info');
+            await loadContractABI();
+            initializeNetworkStats();
+            setupEventListeners();
+            
+            // Auto-detect wallet from terminal
+            await initializeWalletFromTerminal();
+            
+            addLog('✅ Governance Portal ready!', 'success');
+        });
+
+        // Load contract ABI
+        async function loadContractABI() {
+            try {
+                const response = await fetch('./TAAMS_ABI.json');
+                TAAMS_CONTRACT.abi = await response.json();
+                addLog('📋 Contract ABI loaded', 'success');
+            } catch (error) {
+                addLog('❌ Failed to load contract ABI: ' + error.message, 'error');
+            }
+        }
+
+        // Mobile device detection
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('submit-proposal-btn').onclick = submitProposal;
+            
+            // Input validation
+            document.getElementById('proposal-description').oninput = validateProposalForm;
+            document.getElementById('proposal-type').onchange = validateProposalForm;
+            
+            // Setup wallet change detection
+            setupWalletChangeDetection();
+        }
+
+        // Setup wallet change detection
+        function setupWalletChangeDetection() {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length === 0) {
+                        addLog('🔌 Wallet disconnected', 'warning');
+                        governanceState.connected = false;
+                        governanceState.userAccount = null;
+                        document.getElementById('wallet-address').textContent = 'Disconnected';
+                        document.getElementById('voting-power').textContent = 'N/A';
+                        return;
+                    }
+
+                    const oldAccount = governanceState.userAccount;
+                    if (oldAccount && oldAccount.toLowerCase() !== accounts[0].toLowerCase()) {
+                        addLog(`🔄 Wallet changed from ${oldAccount?.slice(0, 6)}...${oldAccount?.slice(-4)} to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
+                        
+                        // Update account
+                        governanceState.userAccount = accounts[0];
+                        
+                        // Reload all data for new account
+                        try {
+                            await ensurePolygonNetwork();
+                            await initializeContract();
+                            updateConnectedUI();
+                            await loadGovernanceStatistics();
+                            await loadProposals();
+                            await updateNetworkStats();
+                            
+                            addLog('✅ Wallet data updated for new account', 'success');
+                        } catch (error) {
+                            addLog('❌ Failed to update wallet data: ' + error.message, 'error');
+                        }
+                    }
+                });
+                
+                addLog('👂 Wallet change detection active', 'success');
+            } else {
+                addLog('⚠️ MetaMask not detected for wallet change detection', 'warning');
+            }
+        }
+
+        // Auto-detect wallet from terminal (no connection needed)
+        async function initializeWalletFromTerminal() {
+            try {
+                addLog('🔗 Auto-detecting wallet from terminal...', 'info');
+                
+                const isMobile = isMobileDevice();
+                let provider;
+
+                if (isMobile) {
+                    addLog('📱 Mobile device detected', 'info');
+                    provider = await detectEthereumProvider({ mustBeMetaMask: false });
+                    
+                    if (!provider && window.ethereum) {
+                        provider = window.ethereum;
+                    }
+                } else {
+                    provider = await detectEthereumProvider({ mustBeMetaMask: true });
+                }
+
+                if (!provider) {
+                    if (isMobile) {
+                        addLog('❌ MetaMask mobile not detected', 'error');
+                        addLog('📱 Please open this page in MetaMask mobile browser', 'warning');
+                        
+                        const openInMetaMask = confirm('Open in MetaMask mobile app?');
+                        if (openInMetaMask) {
+                            const metamaskUrl = `https://metamask.app.link/dapp/${window.location.href.replace('https://', '').replace('http://', '')}`;
+                            window.open(metamaskUrl, '_blank');
+                        }
+                    } else {
+                        addLog('❌ MetaMask not found. Please install MetaMask extension.', 'error');
+                    }
+                    return;
+                }
+
+                // Get already connected accounts (from terminal)
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                
+                if (!accounts || accounts.length === 0) {
+                    addLog('⚠️ No wallet connected. Please connect via terminal first.', 'warning');
+                    addLog('🔄 Will retry detection in 5 seconds...', 'info');
+                    
+                    // Retry detection after 5 seconds
+                    setTimeout(async () => {
+                        await initializeWalletFromTerminal();
+                    }, 5000);
+                    return;
+                }
+
+                governanceState.userAccount = accounts[0];
+                addLog('✅ Wallet detected: ' + governanceState.userAccount.substring(0, 10) + '...', 'success');
+
+                // Initialize Web3 if not already done
+                if (!governanceState.web3) {
+                    governanceState.web3 = new Web3(provider);
+                }
+                
+                // Verify network
+                await ensurePolygonNetwork();
+                
+                // Initialize contract
+                await initializeContract();
+                
+                // Update UI
+                updateConnectedUI();
+                await loadGovernanceStatistics();
+                await loadProposals();
+                
+                // Update network stats with real data
+                await updateNetworkStats();
+
+            } catch (error) {
+                addLog('❌ Auto-detection failed: ' + error.message, 'error');
+            }
+        }
+
+        // Ensure Polygon network
+        async function ensurePolygonNetwork() {
+            const chainId = await governanceState.web3.eth.getChainId();
+            
+            if (chainId !== 137) {
+                addLog('⚠️ Wrong network. Switching to Polygon...', 'warning');
+                
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }] // 137 in hex
+                    });
+                    addLog('✅ Switched to Polygon network', 'success');
+                } catch (error) {
+                    addLog('❌ Failed to switch network: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+        }
+
+        // Initialize contract
+        async function initializeContract() {
+            if (!TAAMS_CONTRACT.abi) {
+                throw new Error('Contract ABI not loaded');
+            }
+
+            governanceState.contract = new governanceState.web3.eth.Contract(TAAMS_CONTRACT.abi, TAAMS_CONTRACT.address);
+            addLog('📋 Contract initialized', 'success');
+        }
+
+        // Update UI for connected state
+        function updateConnectedUI() {
+            const walletInfo = document.getElementById('wallet-info');
+            document.getElementById('wallet-address').textContent = governanceState.userAccount.substring(0, 10) + '...';
+            
+            governanceState.connected = true;
+            
+            // Load wallet balances
+            loadWalletBalances();
+        }
+
+        // Load wallet balances (TAAMS, MATIC, BL2P)
+        async function loadWalletBalances() {
+            try {
+                addLog('💰 Loading wallet balances...', 'info');
+                
+                // Get balances in parallel
+                const [
+                    tAAMSBalance,
+                    maticBalance,
+                    bl2pBalance
+                ] = await Promise.all([
+                    governanceState.contract.methods.balanceOf(governanceState.userAccount).call(),
+                    governanceState.web3.eth.getBalance(governanceState.userAccount),
+                    governanceState.contract.methods.getRemainingValidBL2P(governanceState.userAccount).call()
+                ]);
+                
+                // Convert and display balances
+                const tAAMSFormatted = parseFloat(governanceState.web3.utils.fromWei(tAAMSBalance, 'ether')).toLocaleString();
+                const maticFormatted = parseFloat(governanceState.web3.utils.fromWei(maticBalance, 'ether')).toFixed(4);
+                const bl2pFormatted = parseFloat(governanceState.web3.utils.fromWei(bl2pBalance, 'ether')).toLocaleString();
+                
+                document.getElementById('taams-balance').textContent = tAAMSFormatted + ' TAAMS';
+                document.getElementById('matic-balance').textContent = maticFormatted + ' MATIC';
+                document.getElementById('bl2p-balance').textContent = bl2pFormatted + ' BL2P';
+                
+                addLog(`💰 Balances loaded - TAAMS: ${tAAMSFormatted}, MATIC: ${maticFormatted}, BL2P: ${bl2pFormatted}`, 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load wallet balances: ' + error.message, 'error');
+                document.getElementById('taams-balance').textContent = 'Error';
+                document.getElementById('matic-balance').textContent = 'Error';
+                document.getElementById('bl2p-balance').textContent = 'Error';
+            }
+        }
+
+        // Load real governance statistics from blockchain
+        async function loadGovernanceStatistics() {
+            try {
+                addLog('📊 Loading real governance statistics...', 'info');
+                
+                // Get real blockchain data
+                const [
+                    proposalCount,
+                    quorum,
+                    voteThreshold,
+                    userBL2P,
+                    currentBlock
+                ] = await Promise.all([
+                    governanceState.contract.methods.proposalCount().call(),
+                    governanceState.contract.methods.QUORUM().call(),
+                    governanceState.contract.methods.VOTE_THRESHOLD().call(),
+                    governanceState.contract.methods.getRemainingValidBL2P(governanceState.userAccount).call(),
+                    governanceState.web3.eth.getBlockNumber()
+                ]);
+                
+                // Update state with real data
+                governanceState.proposalCount = parseInt(proposalCount);
+                governanceState.quorum = parseInt(quorum);
+                governanceState.voteThreshold = parseInt(voteThreshold);
+                governanceState.votingPower = parseFloat(governanceState.web3.utils.fromWei(userBL2P, 'ether'));
+                governanceState.currentBlock = currentBlock;
+                
+                // Count active proposals - get real count from blockchain
+                let activeCount = 0;
+                for (let i = 0; i < governanceState.proposalCount; i++) {
+                    try {
+                        const proposal = await governanceState.contract.methods.proposals(i).call();
+                        if (!proposal.executed && proposal.endBlock > currentBlock) {
+                            activeCount++;
+                        }
+                    } catch (error) {
+                        // Skip proposals that can't be loaded
+                        continue;
+                    }
+                }
+                governanceState.activeProposals = activeCount;
+                
+                // Update UI with real data
+                document.getElementById('proposal-count').textContent = governanceState.proposalCount;
+                document.getElementById('quorum').textContent = governanceState.quorum + '%';
+                document.getElementById('vote-threshold').textContent = governanceState.voteThreshold + '%';
+                document.getElementById('active-proposals').textContent = governanceState.activeProposals;
+                document.getElementById('voting-power').textContent = governanceState.votingPower.toLocaleString() + ' BL2P';
+                
+                addLog('📊 Real governance statistics loaded successfully', 'success');
+                addLog(`📈 Total Proposals: ${governanceState.proposalCount}`, 'info');
+                addLog(`🗳️ Your Voting Power: ${governanceState.votingPower.toLocaleString()} BL2P`, 'info');
+                addLog(`🎯 Quorum: ${governanceState.quorum}%`, 'info');
+                
+            } catch (error) {
+                addLog('❌ Failed to load real governance statistics: ' + error.message, 'error');
+                // Set error state
+                document.getElementById('proposal-count').textContent = 'Error';
+                document.getElementById('quorum').textContent = 'Error';
+                document.getElementById('vote-threshold').textContent = 'Error';
+                document.getElementById('active-proposals').textContent = 'Error';
+            }
+        }
+
+        // Load real proposals from blockchain
+        async function loadProposals() {
+            try {
+                addLog('📜 Loading real proposals from blockchain...', 'info');
+                
+                const proposalsList = document.getElementById('proposals-list');
+                proposalsList.innerHTML = '<div class="log-entry log-info">📊 Loading proposals...</div>';
+                
+                if (governanceState.proposalCount === 0) {
+                    proposalsList.innerHTML = '<div class="log-entry log-info">📝 No proposals found</div>';
+                    addLog('📜 No proposals found in governance contract', 'info');
+                    return;
+                }
+                
+                // Load last 5 proposals
+                const proposalsToLoad = Math.min(5, governanceState.proposalCount);
+                const proposals = [];
+                
+                for (let i = governanceState.proposalCount - proposalsToLoad; i < governanceState.proposalCount; i++) {
+                    try {
+                        const proposal = await governanceState.contract.methods.proposals(i).call();
+                        proposals.push({
+                            id: i,
+                            ...proposal
+                        });
+                    } catch (error) {
+                        console.warn('Error loading proposal', i, error);
+                    }
+                }
+                
+                // Clear loading message
+                proposalsList.innerHTML = '';
+                
+                if (proposals.length === 0) {
+                    proposalsList.innerHTML = '<div class="log-entry log-info">📝 No proposals could be loaded</div>';
+                    return;
+                }
+                
+                // Display proposals
+                proposals.forEach(proposal => {
+                    const proposalDiv = document.createElement('div');
+                    proposalDiv.className = 'proposal-item';
+                    
+                    const status = proposal.executed ? 'executed' : 
+                                  (proposal.endBlock < governanceState.currentBlock ? 'ended' : 'active');
+                    
+                    const statusClass = status === 'active' ? 'status-active' : 
+                                       status === 'ended' ? 'status-ended' : 'status-executed';
+                    
+                    proposalDiv.innerHTML = `
+                        <div class="proposal-header">
+                            <span class="proposal-id">Proposal #${proposal.id}</span>
+                            <span class="proposal-status ${statusClass}">${status.toUpperCase()}</span>
+                        </div>
+                        <div class="proposal-description">${proposal.description || 'No description available'}</div>
+                        <div class="proposal-votes">
+                            <span class="vote-for">For: ${proposal.forVotes}</span>
+                            <span class="vote-against">Against: ${proposal.againstVotes}</span>
+                        </div>
+                        ${status === 'active' ? `
+                            <div class="vote-buttons">
+                                <button class="vote-btn for" onclick="voteOnProposal(${proposal.id}, true)">Vote For</button>
+                                <button class="vote-btn against" onclick="voteOnProposal(${proposal.id}, false)">Vote Against</button>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    proposalsList.appendChild(proposalDiv);
+                });
+                
+                addLog(`📜 Loaded ${proposals.length} proposals from blockchain`, 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load proposals: ' + error.message, 'error');
+                const proposalsList = document.getElementById('proposals-list');
+                proposalsList.innerHTML = '<div class="log-entry log-error">❌ Failed to load proposals</div>';
+            }
+        }
+
+        // Validate proposal form
+        function validateProposalForm() {
+            const description = document.getElementById('proposal-description').value;
+            const submitBtn = document.getElementById('submit-proposal-btn');
+            
+            if (description.trim().length < 10) {
+                submitBtn.disabled = true;
+                return;
+            }
+            
+            if (!governanceState.connected || governanceState.votingPower < 100) {
+                submitBtn.disabled = true;
+                addLog('⚠️ Minimum 100 BL2P required to submit proposals', 'warning');
+                return;
+            }
+            
+            submitBtn.disabled = false;
+        }
+
+        // Submit proposal
+        async function submitProposal() {
+            if (!governanceState.connected || !governanceState.userAccount) {
+                addLog('⚠️ Wallet not detected. Please access via terminal.', 'warning');
+                return;
+            }
+
+            const description = document.getElementById('proposal-description').value;
+            const proposalType = parseInt(document.getElementById('proposal-type').value);
+            const newValue = document.getElementById('proposal-value').value || '0';
+            
+            if (description.trim().length < 10) {
+                addLog('⚠️ Please provide a detailed description (minimum 10 characters)', 'warning');
+                return;
+            }
+
+            try {
+                addLog('📝 Submitting proposal...', 'info');
+                
+                const submitBtn = document.getElementById('submit-proposal-btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'SUBMITTING...';
+
+                // Estimate gas
+                const gasEstimate = await governanceState.contract.methods.submitProposal(
+                    description,
+                    newValue,
+                    '0x0000000000000000000000000000000000000000', // No address for basic proposals
+                    proposalType
+                ).estimateGas({ from: governanceState.userAccount });
+                
+                addLog('⛽ Gas estimated: ' + gasEstimate.toLocaleString(), 'info');
+                
+                if (isMobileDevice()) {
+                    addLog('📱 MetaMask mobile will open for transaction approval', 'info');
+                    addLog('⏳ Please approve the proposal submission...', 'warning');
+                }
+
+                // Execute proposal submission
+                const result = await governanceState.contract.methods.submitProposal(
+                    description,
+                    newValue,
+                    '0x0000000000000000000000000000000000000000',
+                    proposalType
+                ).send({
+                    from: governanceState.userAccount,
+                    gas: Math.floor(gasEstimate * 1.2)
+                });
+
+                addLog('📝 PROPOSAL SUBMITTED SUCCESSFULLY! Hash: ' + result.transactionHash, 'success');
+                addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
+                
+                // Update statistics and proposals
+                await loadGovernanceStatistics();
+                await loadProposals();
+                
+                // Reset form
+                document.getElementById('proposal-description').value = '';
+                document.getElementById('proposal-value').value = '';
+                validateProposalForm();
+
+            } catch (error) {
+                addLog('❌ Proposal submission failed: ' + error.message, 'error');
+            } finally {
+                const submitBtn = document.getElementById('submit-proposal-btn');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📝 SUBMIT PROPOSAL';
+            }
+        }
+
+        // Vote on proposal
+        async function voteOnProposal(proposalId, support) {
+            if (!governanceState.connected || !governanceState.userAccount) {
+                addLog('⚠️ Wallet not detected. Please access via terminal.', 'warning');
+                return;
+            }
+
+            try {
+                addLog(`🗳️ Voting ${support ? 'FOR' : 'AGAINST'} proposal #${proposalId}...`, 'info');
+
+                // For commit-reveal voting, we'd need to implement the commit phase first
+                // This is a simplified direct vote for demonstration
+                const secret = governanceState.web3.utils.randomHex(32);
+                
+                // Commit vote first (if using commit-reveal)
+                const commitHash = governanceState.web3.utils.keccak256(
+                    governanceState.web3.eth.abi.encodeParameters(
+                        ['bool', 'bytes32'],
+                        [support, secret]
+                    )
+                );
+
+                const commitResult = await governanceState.contract.methods.commitVote(proposalId, commitHash).send({
+                    from: governanceState.userAccount
+                });
+
+                addLog('✅ Vote committed! Waiting for reveal phase...', 'success');
+                
+                // In a real implementation, you'd wait for the reveal phase
+                // For now, we'll attempt to reveal immediately (this might fail if not in reveal phase)
+                setTimeout(async () => {
+                    try {
+                        const revealResult = await governanceState.contract.methods.revealVote(
+                            proposalId, 
+                            support, 
+                            secret
+                        ).send({
+                            from: governanceState.userAccount
+                        });
+
+                        addLog('🗳️ VOTE REVEALED SUCCESSFULLY!', 'success');
+                        addLog('🔗 Transaction: https://polygonscan.com/tx/' + revealResult.transactionHash, 'info');
+                        
+                        await loadProposals();
+                    } catch (revealError) {
+                        addLog('⚠️ Vote committed but reveal failed. Try revealing later during reveal phase.', 'warning');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                addLog('❌ Voting failed: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize network statistics
+        function initializeNetworkStats() {
+            addLog('⚡ Initializing network statistics...', 'info');
+            updateNetworkStats();
+            
+            // Update network stats every 10 seconds
+            setInterval(() => {
+                if (governanceState.web3) {
+                    updateNetworkStats();
+                }
+            }, 10000);
+        }
+
+        // Update network statistics display
+        async function updateNetworkStats() {
+            try {
+                if (!governanceState.web3) {
+                    document.getElementById('current-block').textContent = 'Not connected';
+                    document.getElementById('gas-price').textContent = 'Not connected';
+                    document.getElementById('network-status').textContent = '🔴 Disconnected';
+                    return;
+                }
+
+                // Get current block number
+                const currentBlock = await governanceState.web3.eth.getBlockNumber();
+                document.getElementById('current-block').textContent = currentBlock.toLocaleString();
+                
+                // Get current gas price
+                const gasPrice = await governanceState.web3.eth.getGasPrice();
+                const gasPriceGwei = governanceState.web3.utils.fromWei(gasPrice, 'gwei');
+                document.getElementById('gas-price').textContent = parseFloat(gasPriceGwei).toFixed(1) + ' Gwei';
+                
+                // Update network status
+                document.getElementById('network-status').textContent = '🟢 Active';
+                
+                // Update state
+                governanceState.currentBlock = currentBlock;
+                
+            } catch (error) {
+                console.warn('Network stats update error:', error);
+                document.getElementById('current-block').textContent = 'Error';
+                document.getElementById('gas-price').textContent = 'Error';
+                document.getElementById('network-status').textContent = '🟡 Error';
+            }
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logs-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            // Limit to 50 log entries
+            while (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+        }
+
+        // Auto-update statistics every 30 seconds
+        setInterval(async () => {
+            if (governanceState.connected) {
+                await loadGovernanceStatistics();
+                await loadProposals();
+            }
+        }, 30000);
+
+        // Navigation function
+        function goBackToTerminal() {
+            addLog('↩️ Returning to TAAMS Terminal...', 'info');
+            
+            if (isMobileDevice()) {
+                // Mobile: navigate in same tab
+                window.location.href = 'terminal.html';
+            } else {
+                // Desktop: go back or open terminal
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'terminal.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

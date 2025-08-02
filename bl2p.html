@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 TAAMS BL2P Hub - Token Management Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ffc107;
+            animation: bl2pGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes bl2pGlow {
+            0% { text-shadow: 0 0 20px #ffc107, 0 0 30px #ffc107, 0 0 40px #ffc107; }
+            100% { text-shadow: 0 0 30px #ffc107, 0 0 40px #ffc107, 0 0 50px #ffc107; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 193, 7, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffc107;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .bl2p-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .bl2p-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bl2p-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ffc107;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .bl2p-panel h2 {
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .bl2p-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            color: #ffc107;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .bl2p-input:focus {
+            outline: none;
+            border-color: #ffc107;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+        }
+
+        .bl2p-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ffc107, #ffb300);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .bl2p-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
+        }
+
+        .bl2p-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .percentage-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .percentage-btn {
+            padding: 8px;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            color: #ffc107;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .percentage-btn:hover {
+            background: rgba(255, 193, 7, 0.3);
+            transform: scale(1.05);
+        }
+
+        .wallet-section {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .wallet-info {
+            color: #ffc107;
+            margin-top: 15px;
+        }
+
+        .info-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h4 {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .network-stats-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .network-stats-panel h4 {
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .network-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            color: #00ff88;
+            font-weight: normal;
+        }
+
+        .stat-value {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .bl2p-item {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .bl2p-item:hover {
+            background: rgba(255, 193, 7, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .bl2p-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bl2p-amount {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bl2p-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-valid {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-expired {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .status-maturing {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .bl2p-details {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .logs-section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .log-info { color: #ffc107; }
+        .log-success { color: #28a745; background: rgba(40, 167, 69, 0.1); }
+        .log-warning { color: #ffc107; background: rgba(255, 193, 7, 0.1); }
+        .log-error { color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+
+        .back-nav {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            color: #ffc107;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 193, 7, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .bl2p-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .maturity-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .maturity-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffc107, #00ff88);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .network-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .bl2p-panel {
+                padding: 20px;
+            }
+
+            .percentage-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 TAAMS BL2P HUB</h1>
+            <p>Manage your BL2P tokens, transfers, and maturity tracking</p>
+            
+            <!-- Navigation Back -->
+            <div class="back-nav">
+                <button onclick="goBackToTerminal()" class="back-btn">
+                    ↩️ BACK TO TERMINAL
+                </button>
+            </div>
+        </div>
+
+        <!-- Wallet Info (Auto-detected from terminal) -->
+        <div class="wallet-section">
+            <div id="wallet-info" class="wallet-info">
+                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
+                <p>💰 TAAMS: <span id="taams-balance">Loading...</span></p>
+                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
+                <p>🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-bl2p">Loading...</div>
+                <div class="stat-label">Total BL2P Supply</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="valid-bl2p">Loading...</div>
+                <div class="stat-label">Your Valid BL2P</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="maturing-bl2p">Loading...</div>
+                <div class="stat-label">Maturing BL2P</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="expired-bl2p">Loading...</div>
+                <div class="stat-label">Expired BL2P</div>
+            </div>
+        </div>
+
+        <!-- Real-time Network Stats -->
+        <div class="network-stats-panel">
+            <h4>⚡ TAAMS Network Status</h4>
+            <div class="network-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Current Block:</span>
+                    <span class="stat-value" id="current-block">Loading...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Network:</span>
+                    <span class="stat-value">🔺 Polygon</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Gas Price:</span>
+                    <span class="stat-value" id="gas-price">Loading...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value" id="network-status">🟢 Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BL2P Management Section -->
+        <div class="bl2p-section">
+            <!-- Transfer BL2P -->
+            <div class="bl2p-panel">
+                <h2>📤 Transfer BL2P</h2>
+                <div class="info-box">
+                    <h4>🔄 BL2P Transfer</h4>
+                    <p>Transfer your BL2P tokens to other addresses. BL2P tokens maintain their maturity status during transfers.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Recipient Address:</label>
+                    <input type="text" id="transfer-address" class="bl2p-input" placeholder="0x...">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Amount to Transfer:</label>
+                    <div class="percentage-buttons">
+                        <button class="percentage-btn" onclick="setTransferPercentage(25)">25%</button>
+                        <button class="percentage-btn" onclick="setTransferPercentage(50)">50%</button>
+                        <button class="percentage-btn" onclick="setTransferPercentage(75)">75%</button>
+                        <button class="percentage-btn" onclick="setTransferPercentage(100)">MAX</button>
+                    </div>
+                    <input type="number" id="transfer-amount" class="bl2p-input" placeholder="Enter BL2P amount" step="0.001">
+                </div>
+                
+                <button id="transfer-btn" class="bl2p-btn" disabled>📤 TRANSFER BL2P</button>
+            </div>
+
+            <!-- BL2P Portfolio -->
+            <div class="bl2p-panel">
+                <h2>💼 BL2P Portfolio</h2>
+                <div class="bl2p-list" id="bl2p-list">
+                    <div class="log-entry log-info">📊 Loading your BL2P portfolio...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced BL2P Operations -->
+        <div class="bl2p-section">
+            <!-- Claim Mature BL2P -->
+            <div class="bl2p-panel">
+                <h2>⏰ Maturity Management</h2>
+                <div class="info-box">
+                    <h4>🔄 BL2P Maturity</h4>
+                    <p>BL2P tokens mature over time. Mature tokens provide full voting power and can be used for all protocol functions.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Maturity Status:</label>
+                    <div id="maturity-status" class="bl2p-input" style="min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                        Loading maturity information...
+                    </div>
+                </div>
+                
+                <button id="claim-mature-btn" class="bl2p-btn" disabled>⏰ CLAIM MATURE BL2P</button>
+                <button id="refresh-maturity-btn" class="bl2p-btn">🔄 REFRESH MATURITY</button>
+            </div>
+
+            <!-- BL2P Analytics -->
+            <div class="bl2p-panel">
+                <h2>📊 BL2P Analytics</h2>
+                <div class="info-box">
+                    <h4>📈 Portfolio Analytics</h4>
+                    <p>Track your BL2P token performance, maturity progression, and historical data.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Portfolio Summary:</label>
+                    <div id="portfolio-summary" class="bl2p-input" style="min-height: 120px; display: block; padding: 15px;">
+                        <div style="margin-bottom: 10px;">📊 Loading portfolio analytics...</div>
+                    </div>
+                </div>
+                
+                <button id="export-data-btn" class="bl2p-btn">📋 EXPORT PORTFOLIO DATA</button>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="logs-section">
+            <h3 class="logs-title">🔍 BL2P Portal Logs</h3>
+            <div id="logs-container">
+                <div class="log-entry log-info">💰 BL2P Portal initialized</div>
+                <div class="log-entry log-info">📊 Loading BL2P statistics...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let bl2pState = {
+            connected: false,
+            userAccount: null,
+            web3: null,
+            contract: null,
+            bl2pBalance: 0,
+            validBL2P: 0,
+            maturingBL2P: 0,
+            expiredBL2P: 0,
+            totalBL2PSupply: 0,
+            currentBlock: 0,
+            bl2pPortfolio: []
+        };
+
+        // Contract configuration
+        const TAAMS_CONTRACT = {
+            address: '0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef',
+            abi: null // Will be loaded from TAAMS_ABI.json
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            addLog('💰 TAAMS BL2P Portal loading...', 'info');
+            await loadContractABI();
+            initializeNetworkStats();
+            setupEventListeners();
+            
+            // Auto-detect wallet from terminal
+            await initializeWalletFromTerminal();
+            
+            addLog('✅ BL2P Portal ready!', 'success');
+        });
+
+        // Load contract ABI
+        async function loadContractABI() {
+            try {
+                const response = await fetch('./TAAMS_ABI.json');
+                TAAMS_CONTRACT.abi = await response.json();
+                addLog('📋 Contract ABI loaded', 'success');
+            } catch (error) {
+                addLog('❌ Failed to load contract ABI: ' + error.message, 'error');
+            }
+        }
+
+        // Mobile device detection
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('transfer-btn').onclick = transferBL2P;
+            document.getElementById('claim-mature-btn').onclick = claimMatureBL2P;
+            document.getElementById('refresh-maturity-btn').onclick = refreshMaturityStatus;
+            document.getElementById('export-data-btn').onclick = exportPortfolioData;
+            
+            // Input validation
+            document.getElementById('transfer-address').oninput = validateTransferForm;
+            document.getElementById('transfer-amount').oninput = validateTransferForm;
+            
+            // Setup wallet change detection
+            setupWalletChangeDetection();
+        }
+
+        // Setup wallet change detection
+        function setupWalletChangeDetection() {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length === 0) {
+                        addLog('🔌 Wallet disconnected', 'warning');
+                        bl2pState.connected = false;
+                        bl2pState.userAccount = null;
+                        document.getElementById('wallet-address').textContent = 'Disconnected';
+                        document.getElementById('taams-balance').textContent = 'N/A';
+                        document.getElementById('matic-balance').textContent = 'N/A';
+                        document.getElementById('bl2p-balance').textContent = 'N/A';
+                        document.getElementById('valid-bl2p').textContent = 'N/A';
+                        document.getElementById('maturing-bl2p').textContent = 'N/A';
+                        return;
+                    }
+
+                    const oldAccount = bl2pState.userAccount;
+                    if (oldAccount && oldAccount.toLowerCase() !== accounts[0].toLowerCase()) {
+                        addLog(`🔄 Wallet changed from ${oldAccount?.slice(0, 6)}...${oldAccount?.slice(-4)} to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
+                        
+                        // Update account
+                        bl2pState.userAccount = accounts[0];
+                        
+                        // Reload all data for new account
+                        try {
+                            await ensurePolygonNetwork();
+                            await initializeContract();
+                            updateConnectedUI();
+                            await loadBL2PStatistics();
+                            await loadPortfolioData();
+                            await updateNetworkStats();
+                            
+                            addLog('✅ Wallet data updated for new account', 'success');
+                        } catch (error) {
+                            addLog('❌ Failed to update wallet data: ' + error.message, 'error');
+                        }
+                    }
+                });
+                
+                addLog('👂 Wallet change detection active', 'success');
+            } else {
+                addLog('⚠️ MetaMask not detected for wallet change detection', 'warning');
+            }
+        }
+
+        // Auto-detect wallet from terminal (no connection needed)
+        async function initializeWalletFromTerminal() {
+            try {
+                addLog('🔗 Auto-detecting wallet from terminal...', 'info');
+                
+                const isMobile = isMobileDevice();
+                let provider;
+
+                if (isMobile) {
+                    addLog('📱 Mobile device detected', 'info');
+                    provider = await detectEthereumProvider({ mustBeMetaMask: false });
+                    
+                    if (!provider && window.ethereum) {
+                        provider = window.ethereum;
+                    }
+                } else {
+                    provider = await detectEthereumProvider({ mustBeMetaMask: true });
+                }
+
+                if (!provider) {
+                    if (isMobile) {
+                        addLog('❌ MetaMask mobile not detected', 'error');
+                        addLog('📱 Please open this page in MetaMask mobile browser', 'warning');
+                        
+                        const openInMetaMask = confirm('Open in MetaMask mobile app?');
+                        if (openInMetaMask) {
+                            const metamaskUrl = `https://metamask.app.link/dapp/${window.location.href.replace('https://', '').replace('http://', '')}`;
+                            window.open(metamaskUrl, '_blank');
+                        }
+                    } else {
+                        addLog('❌ MetaMask not found. Please install MetaMask extension.', 'error');
+                    }
+                    return;
+                }
+
+                // Get already connected accounts (from terminal)
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                
+                if (!accounts || accounts.length === 0) {
+                    addLog('⚠️ No wallet connected. Please connect via terminal first.', 'warning');
+                    addLog('🔄 Will retry detection in 5 seconds...', 'info');
+                    
+                    // Retry detection after 5 seconds
+                    setTimeout(async () => {
+                        await initializeWalletFromTerminal();
+                    }, 5000);
+                    return;
+                }
+
+                bl2pState.userAccount = accounts[0];
+                addLog('✅ Wallet detected: ' + bl2pState.userAccount.substring(0, 10) + '...', 'success');
+
+                // Initialize Web3 if not already done
+                if (!bl2pState.web3) {
+                    bl2pState.web3 = new Web3(provider);
+                }
+                
+                // Verify network
+                await ensurePolygonNetwork();
+                
+                // Initialize contract
+                await initializeContract();
+                
+                // Update UI
+                updateConnectedUI();
+                await loadBL2PStatistics();
+                await loadBL2PPortfolio();
+                
+                // Update network stats with real data
+                await updateNetworkStats();
+
+            } catch (error) {
+                addLog('❌ Auto-detection failed: ' + error.message, 'error');
+            }
+        }
+
+        // Ensure Polygon network
+        async function ensurePolygonNetwork() {
+            const chainId = await bl2pState.web3.eth.getChainId();
+            
+            if (chainId !== 137) {
+                addLog('⚠️ Wrong network. Switching to Polygon...', 'warning');
+                
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }] // 137 in hex
+                    });
+                    addLog('✅ Switched to Polygon network', 'success');
+                } catch (error) {
+                    addLog('❌ Failed to switch network: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+        }
+
+        // Initialize contract
+        async function initializeContract() {
+            if (!TAAMS_CONTRACT.abi) {
+                throw new Error('Contract ABI not loaded');
+            }
+
+            bl2pState.contract = new bl2pState.web3.eth.Contract(TAAMS_CONTRACT.abi, TAAMS_CONTRACT.address);
+            addLog('📋 Contract initialized', 'success');
+        }
+
+        // Update UI for connected state
+        function updateConnectedUI() {
+            const walletInfo = document.getElementById('wallet-info');
+            document.getElementById('wallet-address').textContent = bl2pState.userAccount.substring(0, 10) + '...';
+            
+            bl2pState.connected = true;
+            
+            // Load wallet balances
+            loadWalletBalances();
+        }
+
+        // Load wallet balances (TAAMS, MATIC, BL2P)
+        async function loadWalletBalances() {
+            try {
+                addLog('💰 Loading wallet balances...', 'info');
+                
+                // Get balances in parallel
+                const [
+                    tAAMSBalance,
+                    maticBalance,
+                    bl2pBalance
+                ] = await Promise.all([
+                    bl2pState.contract.methods.balanceOf(bl2pState.userAccount).call(),
+                    bl2pState.web3.eth.getBalance(bl2pState.userAccount),
+                    bl2pState.contract.methods.getRemainingValidBL2P ? 
+                        bl2pState.contract.methods.getRemainingValidBL2P(bl2pState.userAccount).call() :
+                        bl2pState.contract.methods.balanceOf(bl2pState.userAccount).call() // Fallback
+                ]);
+                
+                // Convert and display balances
+                const tAAMSFormatted = parseFloat(bl2pState.web3.utils.fromWei(tAAMSBalance, 'ether')).toLocaleString();
+                const maticFormatted = parseFloat(bl2pState.web3.utils.fromWei(maticBalance, 'ether')).toFixed(4);
+                const bl2pFormatted = parseFloat(bl2pState.web3.utils.fromWei(bl2pBalance, 'ether')).toLocaleString();
+                
+                document.getElementById('taams-balance').textContent = tAAMSFormatted + ' TAAMS';
+                document.getElementById('matic-balance').textContent = maticFormatted + ' MATIC';
+                document.getElementById('bl2p-balance').textContent = bl2pFormatted + ' BL2P';
+                
+                addLog(`💰 Balances loaded - TAAMS: ${tAAMSFormatted}, MATIC: ${maticFormatted}, BL2P: ${bl2pFormatted}`, 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load wallet balances: ' + error.message, 'error');
+                document.getElementById('taams-balance').textContent = 'Error';
+                document.getElementById('matic-balance').textContent = 'Error';
+                document.getElementById('bl2p-balance').textContent = 'Error';
+            }
+        }
+
+        // Load real BL2P statistics from blockchain
+        async function loadBL2PStatistics() {
+            try {
+                addLog('📊 Loading real BL2P statistics...', 'info');
+                
+                // Get real blockchain data
+                const [
+                    bl2pBalance,
+                    validBL2P,
+                    currentBlock,
+                    totalSupply
+                ] = await Promise.all([
+                    bl2pState.contract.methods.balanceOf(bl2pState.userAccount).call(),
+                    bl2pState.contract.methods.getRemainingValidBL2P(bl2pState.userAccount).call(),
+                    bl2pState.web3.eth.getBlockNumber(),
+                    bl2pState.contract.methods.totalSupply().call()
+                ]);
+                
+                // Update state with real data
+                bl2pState.bl2pBalance = parseFloat(bl2pState.web3.utils.fromWei(bl2pBalance, 'ether'));
+                bl2pState.validBL2P = parseFloat(bl2pState.web3.utils.fromWei(validBL2P, 'ether'));
+                bl2pState.currentBlock = currentBlock;
+                bl2pState.totalBL2PSupply = parseFloat(bl2pState.web3.utils.fromWei(totalSupply, 'ether'));
+                
+                // Calculate maturing and expired BL2P (simplified calculation)
+                bl2pState.maturingBL2P = Math.max(0, bl2pState.bl2pBalance - bl2pState.validBL2P);
+                bl2pState.expiredBL2P = 0; // Would need additional contract calls to determine expired tokens
+                
+                // Update UI with real data
+                document.getElementById('total-bl2p').textContent = bl2pState.totalBL2PSupply.toLocaleString();
+                document.getElementById('valid-bl2p').textContent = bl2pState.validBL2P.toLocaleString();
+                document.getElementById('maturing-bl2p').textContent = bl2pState.maturingBL2P.toLocaleString();
+                document.getElementById('expired-bl2p').textContent = bl2pState.expiredBL2P.toLocaleString();
+                document.getElementById('bl2p-balance').textContent = bl2pState.bl2pBalance.toLocaleString() + ' BL2P';
+                
+                addLog('📊 Real BL2P statistics loaded successfully', 'success');
+                addLog(`💰 Your BL2P Balance: ${bl2pState.bl2pBalance.toLocaleString()}`, 'info');
+                addLog(`✅ Valid BL2P: ${bl2pState.validBL2P.toLocaleString()}`, 'info');
+                addLog(`⏰ Maturing BL2P: ${bl2pState.maturingBL2P.toLocaleString()}`, 'info');
+                
+            } catch (error) {
+                addLog('❌ Failed to load real BL2P statistics: ' + error.message, 'error');
+                // Set error state
+                document.getElementById('total-bl2p').textContent = 'Error';
+                document.getElementById('valid-bl2p').textContent = 'Error';
+                document.getElementById('maturing-bl2p').textContent = 'Error';
+                document.getElementById('expired-bl2p').textContent = 'Error';
+            }
+        }
+
+        // Load BL2P portfolio details
+        async function loadBL2PPortfolio() {
+            try {
+                addLog('💼 Loading BL2P portfolio...', 'info');
+                
+                const portfolioContainer = document.getElementById('bl2p-list');
+                portfolioContainer.innerHTML = '<div class="log-entry log-info">📊 Loading portfolio...</div>';
+                
+                if (bl2pState.bl2pBalance === 0) {
+                    portfolioContainer.innerHTML = '<div class="log-entry log-info">💼 No BL2P tokens found</div>';
+                    addLog('💼 No BL2P tokens in portfolio', 'info');
+                    return;
+                }
+                
+                // Clear loading message
+                portfolioContainer.innerHTML = '';
+                
+                // Create portfolio summary
+                const totalBL2P = document.createElement('div');
+                totalBL2P.className = 'bl2p-item';
+                totalBL2P.innerHTML = `
+                    <div class="bl2p-header">
+                        <span class="bl2p-amount">${bl2pState.bl2pBalance.toLocaleString()} BL2P</span>
+                        <span class="bl2p-status status-valid">TOTAL BALANCE</span>
+                    </div>
+                    <div class="bl2p-details">
+                        Valid: ${bl2pState.validBL2P.toLocaleString()} BL2P | 
+                        Maturing: ${bl2pState.maturingBL2P.toLocaleString()} BL2P
+                    </div>
+                    <div class="maturity-progress">
+                        <div class="maturity-bar" style="width: ${(bl2pState.validBL2P / bl2pState.bl2pBalance * 100)}%"></div>
+                    </div>
+                `;
+                portfolioContainer.appendChild(totalBL2P);
+                
+                // Add detailed breakdown if there are maturing tokens
+                if (bl2pState.maturingBL2P > 0) {
+                    // Calculate real maturity percentage based on blockchain data
+                    const maturityPercentage = bl2pState.maturingBL2P > 0 ? 
+                        (bl2pState.validBL2P / (bl2pState.validBL2P + bl2pState.maturingBL2P) * 100) : 0;
+                    
+                    const maturingItem = document.createElement('div');
+                    maturingItem.className = 'bl2p-item';
+                    maturingItem.innerHTML = `
+                        <div class="bl2p-header">
+                            <span class="bl2p-amount">${bl2pState.maturingBL2P.toLocaleString()} BL2P</span>
+                            <span class="bl2p-status status-maturing">MATURING</span>
+                        </div>
+                        <div class="bl2p-details">
+                            Tokens still maturing - will gain full voting power over time
+                        </div>
+                        <div class="maturity-progress">
+                            <div class="maturity-bar" style="width: ${maturityPercentage.toFixed(1)}%"></div>
+                        </div>
+                    `;
+                    portfolioContainer.appendChild(maturingItem);
+                }
+                
+                addLog(`💼 Portfolio loaded - ${bl2pState.bl2pBalance.toLocaleString()} BL2P total`, 'success');
+                
+                // Update portfolio summary
+                updatePortfolioSummary();
+                
+            } catch (error) {
+                addLog('❌ Failed to load BL2P portfolio: ' + error.message, 'error');
+                const portfolioContainer = document.getElementById('bl2p-list');
+                portfolioContainer.innerHTML = '<div class="log-entry log-error">❌ Failed to load portfolio</div>';
+            }
+        }
+
+        // Update portfolio summary
+        function updatePortfolioSummary() {
+            const summaryContainer = document.getElementById('portfolio-summary');
+            
+            const maturityPercentage = bl2pState.bl2pBalance > 0 ? 
+                (bl2pState.validBL2P / bl2pState.bl2pBalance * 100).toFixed(1) : 0;
+            
+            summaryContainer.innerHTML = `
+                <div style="margin-bottom: 8px;">💰 Total BL2P: ${bl2pState.bl2pBalance.toLocaleString()}</div>
+                <div style="margin-bottom: 8px;">✅ Valid BL2P: ${bl2pState.validBL2P.toLocaleString()} (${maturityPercentage}%)</div>
+                <div style="margin-bottom: 8px;">⏰ Maturing BL2P: ${bl2pState.maturingBL2P.toLocaleString()}</div>
+                <div style="margin-bottom: 8px;">🔗 Contract: ${TAAMS_CONTRACT.address}</div>
+                <div>📊 Network: Polygon Mainnet</div>
+            `;
+        }
+
+        // Set transfer percentage
+        function setTransferPercentage(percentage) {
+            const amount = (bl2pState.bl2pBalance * percentage / 100).toFixed(6);
+            document.getElementById('transfer-amount').value = amount;
+            validateTransferForm();
+            addLog(`📊 Set transfer amount to ${percentage}% (${amount} BL2P)`, 'info');
+        }
+
+        // Validate transfer form
+        function validateTransferForm() {
+            const address = document.getElementById('transfer-address').value;
+            const amount = parseFloat(document.getElementById('transfer-amount').value);
+            const transferBtn = document.getElementById('transfer-btn');
+            
+            if (!address || !bl2pState.web3?.utils.isAddress(address)) {
+                transferBtn.disabled = true;
+                return;
+            }
+            
+            if (!amount || amount <= 0 || amount > bl2pState.bl2pBalance) {
+                transferBtn.disabled = true;
+                return;
+            }
+            
+            if (!bl2pState.connected) {
+                transferBtn.disabled = true;
+                return;
+            }
+            
+            transferBtn.disabled = false;
+        }
+
+        // Transfer BL2P tokens
+        async function transferBL2P() {
+            if (!bl2pState.connected || !bl2pState.userAccount) {
+                addLog('⚠️ Wallet not detected. Please access via terminal.', 'warning');
+                return;
+            }
+
+            const address = document.getElementById('transfer-address').value;
+            const amount = parseFloat(document.getElementById('transfer-amount').value);
+            
+            if (!bl2pState.web3.utils.isAddress(address)) {
+                addLog('⚠️ Invalid recipient address', 'warning');
+                return;
+            }
+
+            if (amount <= 0 || amount > bl2pState.bl2pBalance) {
+                addLog('⚠️ Invalid transfer amount', 'warning');
+                return;
+            }
+
+            try {
+                addLog('📤 Initiating BL2P transfer...', 'info');
+                
+                const transferBtn = document.getElementById('transfer-btn');
+                transferBtn.disabled = true;
+                transferBtn.textContent = 'TRANSFERRING...';
+
+                const amountWei = bl2pState.web3.utils.toWei(amount.toString(), 'ether');
+
+                // Estimate gas
+                const gasEstimate = await bl2pState.contract.methods.transfer(address, amountWei)
+                    .estimateGas({ from: bl2pState.userAccount });
+                
+                addLog('⛽ Gas estimated: ' + gasEstimate.toLocaleString(), 'info');
+                
+                if (isMobileDevice()) {
+                    addLog('📱 MetaMask mobile will open for transaction approval', 'info');
+                    addLog('⏳ Please approve the BL2P transfer...', 'warning');
+                }
+
+                // Execute transfer
+                const result = await bl2pState.contract.methods.transfer(address, amountWei).send({
+                    from: bl2pState.userAccount,
+                    gas: Math.floor(gasEstimate * 1.2)
+                });
+
+                addLog('📤 BL2P TRANSFER SUCCESSFUL! Hash: ' + result.transactionHash, 'success');
+                addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
+                
+                // Update statistics and portfolio
+                await loadBL2PStatistics();
+                await loadBL2PPortfolio();
+                
+                // Reset form
+                document.getElementById('transfer-address').value = '';
+                document.getElementById('transfer-amount').value = '';
+                validateTransferForm();
+
+            } catch (error) {
+                addLog('❌ BL2P transfer failed: ' + error.message, 'error');
+            } finally {
+                const transferBtn = document.getElementById('transfer-btn');
+                transferBtn.disabled = false;
+                transferBtn.textContent = '📤 TRANSFER BL2P';
+            }
+        }
+
+        // Refresh maturity status
+        async function refreshMaturityStatus() {
+            try {
+                addLog('⏰ Refreshing BL2P maturity status...', 'info');
+                
+                await loadBL2PStatistics();
+                await loadBL2PPortfolio();
+                
+                const maturityContainer = document.getElementById('maturity-status');
+                const maturityPercentage = bl2pState.bl2pBalance > 0 ? 
+                    (bl2pState.validBL2P / bl2pState.bl2pBalance * 100).toFixed(1) : 0;
+                
+                maturityContainer.innerHTML = `
+                    <div style="text-align: left;">
+                        <div>✅ Valid BL2P: ${bl2pState.validBL2P.toLocaleString()}</div>
+                        <div>⏰ Maturing: ${bl2pState.maturingBL2P.toLocaleString()}</div>
+                        <div>📊 Maturity: ${maturityPercentage}%</div>
+                    </div>
+                `;
+                
+                addLog('✅ Maturity status updated', 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to refresh maturity status: ' + error.message, 'error');
+            }
+        }
+
+        // Claim mature BL2P (placeholder - would need specific contract function)
+        async function claimMatureBL2P() {
+            addLog('⏰ Mature BL2P claiming functionality would be implemented based on specific contract mechanics', 'info');
+            addLog('💡 In current implementation, BL2P tokens mature automatically over time', 'info');
+        }
+
+        // Export portfolio data
+        function exportPortfolioData() {
+            const portfolioData = {
+                address: bl2pState.userAccount,
+                timestamp: new Date().toISOString(),
+                totalBL2P: bl2pState.bl2pBalance,
+                validBL2P: bl2pState.validBL2P,
+                maturingBL2P: bl2pState.maturingBL2P,
+                expiredBL2P: bl2pState.expiredBL2P,
+                maturityPercentage: bl2pState.bl2pBalance > 0 ? 
+                    (bl2pState.validBL2P / bl2pState.bl2pBalance * 100).toFixed(2) : 0,
+                network: 'Polygon',
+                contractAddress: TAAMS_CONTRACT.address
+            };
+            
+            const dataStr = JSON.stringify(portfolioData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `taams-bl2p-portfolio-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            addLog('📋 Portfolio data exported successfully', 'success');
+        }
+
+        // Initialize network statistics
+        function initializeNetworkStats() {
+            addLog('⚡ Initializing network statistics...', 'info');
+            updateNetworkStats();
+            
+            // Update network stats every 10 seconds
+            setInterval(() => {
+                if (bl2pState.web3) {
+                    updateNetworkStats();
+                }
+            }, 10000);
+        }
+
+        // Update network statistics display
+        async function updateNetworkStats() {
+            try {
+                if (!bl2pState.web3) {
+                    document.getElementById('current-block').textContent = 'Not connected';
+                    document.getElementById('gas-price').textContent = 'Not connected';
+                    document.getElementById('network-status').textContent = '🔴 Disconnected';
+                    return;
+                }
+
+                // Get current block number
+                const currentBlock = await bl2pState.web3.eth.getBlockNumber();
+                document.getElementById('current-block').textContent = currentBlock.toLocaleString();
+                
+                // Get current gas price
+                const gasPrice = await bl2pState.web3.eth.getGasPrice();
+                const gasPriceGwei = bl2pState.web3.utils.fromWei(gasPrice, 'gwei');
+                document.getElementById('gas-price').textContent = parseFloat(gasPriceGwei).toFixed(1) + ' Gwei';
+                
+                // Update network status
+                document.getElementById('network-status').textContent = '🟢 Active';
+                
+                // Update state
+                bl2pState.currentBlock = currentBlock;
+                
+            } catch (error) {
+                console.warn('Network stats update error:', error);
+                document.getElementById('current-block').textContent = 'Error';
+                document.getElementById('gas-price').textContent = 'Error';
+                document.getElementById('network-status').textContent = '🟡 Error';
+            }
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logs-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            // Limit to 50 log entries
+            while (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+        }
+
+        // Auto-update statistics every 30 seconds
+        setInterval(async () => {
+            if (bl2pState.connected) {
+                await loadBL2PStatistics();
+                await loadBL2PPortfolio();
+            }
+        }, 30000);
+
+        // Navigation function
+        function goBackToTerminal() {
+            addLog('↩️ Returning to TAAMS Terminal...', 'info');
+            
+            if (isMobileDevice()) {
+                // Mobile: navigate in same tab
+                window.location.href = 'terminal.html';
+            } else {
+                // Desktop: go back or open terminal
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'terminal.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
