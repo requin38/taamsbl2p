@@ -1,0 +1,2763 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAAMS Protocol - Ignition Terminal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0a0a;
+            color: #00ff88;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animation de fond matricielle */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a0a 0%, #0f1419 50%, #0a0a0a 100%);
+        }
+        
+        .matrix-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #00ff8833 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #ff006633 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .terminal-header {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px #00ff88;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00ff88, #ff0066);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff88; }
+            to { text-shadow: 0 0 30px #00ff88, 0 0 40px #ff0066; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status-item {
+            padding: 5px 10px;
+            background: rgba(0, 255, 136, 0.2);
+            border-radius: 5px;
+            border: 1px solid #00ff88;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .terminal-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+        
+        .panel-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .airdrop-info {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .airdrop-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff0066;
+            text-shadow: 0 0 15px #ff0066;
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #ff0066);
+            transition: width 0.5s ease;
+            animation: progress-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes progress-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(45deg, #ff0066, #cc0055);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0, 255, 136, 0.3);
+            color: #fff;
+        }
+        
+        .test-btn {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: linear-gradient(45deg, #00cc6a, #00ff88);
+            transform: translateY(-1px);
+        }
+        
+        .test-btn:active {
+            transform: translateY(0);
+        }
+        
+        .wallet-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .wallet-address {
+            font-size: 0.9rem;
+            color: #888;
+            word-break: break-all;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 8px;
+            border: 1px solid #00ff88;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .terminal-log {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .log-entry.success {
+            color: #00ff88;
+        }
+        
+        .log-entry.error {
+            color: #ff0066;
+        }
+        
+        .log-entry.info {
+            color: #0088ff;
+        }
+        
+        .navigation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .nav-item {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item:hover {
+            border-color: #00ff88;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .nav-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .nav-item.locked:hover {
+            transform: none;
+            border-color: #333;
+            box-shadow: none;
+        }
+        
+        .nav-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+        
+        .nav-description {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .lock-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ff0066;
+            font-size: 1.2rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid #00ff88;
+            white-space: nowrap;
+            animation: typing 3s steps(30, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00ff88; }
+        }
+        
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .alert.success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .alert.error {
+            background: rgba(255, 0, 102, 0.2);
+            border: 1px solid #ff0066;
+            color: #ff0066;
+        }
+        
+        .alert.warning {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+
+        /* Nouvelles sections pour les utilisateurs enregistrés */
+        .premium-section {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(255, 0, 102, 0.1));
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .balance-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+
+        .connection-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+
+        .connection-indicator.connected {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .connection-indicator.disconnected {
+            background: #ff0066;
+            box-shadow: 0 0 10px #ff0066;
+        }
+
+        .reload-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .reload-button:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: rotate(180deg);
+        }
+
+        /* ====== STYLES POUR LES MODULES ====== */
+        .module-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .module-window {
+            background: #0a0a0a;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            min-width: 600px;
+            overflow-y: auto;
+            box-shadow: 0 0 30px #00ff88;
+            transform: scale(1);
+            transition: all 0.3s ease;
+        }
+
+        .module-header {
+            background: linear-gradient(45deg, #00ff88, #ff0066);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .module-header-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .close-module {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-module:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .module-content {
+            padding: 20px;
+            color: #00ff88;
+        }
+
+        .module-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .burn-stats, .staking-stats, .governance-stats, .bl2p-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .burn-interface, .staking-interface, .bl2p-interface {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .burn-interface input, .staking-interface input, .bl2p-interface input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 200px;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #00ff88, #ff0066);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ff88;
+        }
+
+        .proposals-list {
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 200px;
+        }
+
+        .proposal-item {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .liquidity-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .loading {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* ====== STYLES POUR ADVERTISEMENT HUB ====== */
+        .ad-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ad-interface {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .ad-interface h3 {
+            margin-top: 0;
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .ad-interface textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .ad-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .char-counter {
+            color: #00ff88;
+            font-size: 0.9rem;
+        }
+
+        .ads-list h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .ad-item {
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .ad-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .ad-id {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .ad-message {
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .no-ads, .error {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .error {
+            color: #ff0066;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    <div class="connection-indicator" id="connection-indicator"></div>
+    <div class="reload-button" id="reload-button" title="Refresh Connection">🔄</div>
+    
+    <div class="container">
+        <div class="terminal-header">
+            <div class="logo">TAAMS PROTOCOL</div>
+            <div class="subtitle typing-effect">// IGNITION TERMINAL ACCESS //</div>
+            
+            <div class="status-bar">
+                <div class="status-item">NETWORK: <span id="network-status">DISCONNECTED</span></div>
+                <div class="status-item">BLOCK: <span id="current-block">---</span></div>
+                <div class="status-item">STATUS: <span id="user-status">UNAUTHORIZED</span></div>
+                <div class="status-item">AIRDROP: <span id="airdrop-status">DISCONNECTED</span></div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="terminal-panel">
+                <div class="panel-header">IGNITION AIRDROP</div>
+                
+                <div class="wallet-section">
+                    <button class="btn" id="connect-wallet">CONNECT WALLET</button>
+                    <div class="wallet-address" id="wallet-address" style="display: none;"></div>
+                </div>
+                
+                <div class="airdrop-info">
+                    <div class="stat-label">CLAIMABLE AMOUNT</div>
+                    <div class="airdrop-amount" id="claimable-amount">0 TAAMS</div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="airdrop-progress" style="width: 0%;"></div>
+                    </div>
+                    
+                    <div id="airdrop-actions">
+                        <button class="btn" id="register-btn" disabled>REGISTER FOR AIRDROP</button>
+                        <button class="btn" id="claim-btn" disabled>CLAIM AIRDROP</button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="participants-count">0</div>
+                        <div class="stat-label">PARTICIPANTS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="max-participants">1000</div>
+                        <div class="stat-label">MAX SLOTS</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terminal-panel">
+                <div class="panel-header">PROTOCOL STATS</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-supply">0</div>
+                        <div class="stat-label">TOTAL SUPPLY</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="burn-phase">INACTIVE</div>
+                        <div class="stat-label">BURN PHASE</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-burned">0</div>
+                        <div class="stat-label">TOTAL BURNED</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="bl2p-revealed">NO</div>
+                        <div class="stat-label">BL2P REVEALED</div>
+                    </div>
+                </div>
+                
+                <div class="terminal-log" id="log-container">
+                </div>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <div class="nav-item locked" id="nav-burn">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">BURN PORTAL</div>
+                <div class="nav-description">Participate in token burning cycles</div>
+            </div>
+            
+            <div class="nav-item locked" id="nav-stake">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">STAKING CHAMBER</div>
+                <div class="nav-description">Stake tokens for rewards</div>
+            </div>
+            
+            <div class="nav-item locked" id="nav-governance">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">GOVERNANCE HUB</div>
+                <div class="nav-description">Vote on protocol proposals</div>
+            </div>
+            
+            <div class="nav-item locked" id="nav-bl2p">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">BL2P MANAGER</div>
+                <div class="nav-description">Manage your BL2P tokens</div>
+            </div>
+            
+            <div class="nav-item locked" id="nav-ads">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">ADVERTISEMENT HUB</div>
+                <div class="nav-description">Post and view advertisements</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>TAAMS PROTOCOL © 2025 | DECENTRALIZED BURN-TO-EARN ECOSYSTEM</p>
+            <p>CONTRACT: 0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef | SECURE • DECENTRALIZED • REVOLUTIONARY</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.10.0/web3.min.js"></script>
+    <script>
+        // Configuration du contrat avec ABI complet
+        const CONTRACT_ADDRESS = "0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef";
+        const POLYGON_CHAIN_ID = 137;
+        const MAX_IGNITION_PARTICIPANTS = 1000;
+        
+        // ABI du contrat TAAMS avec toutes les fonctions nécessaires
+        const CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"initialOwner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"ActivationThresholdNotMet","type":"error"},{"inputs":[],"name":"AirdropAlreadyTriggered","type":"error"},{"inputs":[],"name":"AlreadyClaimed","type":"error"},{"inputs":[],"name":"AlreadyRegistered","type":"error"},{"inputs":[],"name":"AlreadyVoted","type":"error"},{"inputs":[],"name":"AmountZero","type":"error"},{"inputs":[],"name":"BL2PNotExpired","type":"error"},{"inputs":[],"name":"BL2PNotMatured","type":"error"},{"inputs":[],"name":"BelowMinimumStake","type":"error"},{"inputs":[],"name":"BurnCycleEnded","type":"error"},{"inputs":[],"name":"BurnPhaseNotActive","type":"error"},{"inputs":[],"name":"ContractPaused","type":"error"},{"inputs":[],"name":"DelegationActive","type":"error"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"allowance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientAllowance","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientBalance","type":"error"},{"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC20InvalidApprover","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC20InvalidReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC20InvalidSender","type":"error"},{"inputs":[{"internalType":"address","name":"spender","type":"address"}],"name":"ERC20InvalidSpender","type":"error"},{"inputs":[],"name":"ExceedsBL2PBoostLimit","type":"error"},{"inputs":[],"name":"ExceedsBurnTarget","type":"error"},{"inputs":[],"name":"ExceedsDelegateLimit","type":"error"},{"inputs":[],"name":"GovernanceNotSet","type":"error"},{"inputs":[],"name":"InsufficientBalance","type":"error"},{"inputs":[],"name":"InsufficientContractBalance","type":"error"},{"inputs":[],"name":"InsufficientReserve","type":"error"},{"inputs":[],"name":"InvalidAddress","type":"error"},{"inputs":[],"name":"InvalidBL2PLifespan","type":"error"},{"inputs":[],"name":"InvalidBurnAmount","type":"error"},{"inputs":[],"name":"InvalidClaimConditions","type":"error"},{"inputs":[],"name":"InvalidCommit","type":"error"},{"inputs":[],"name":"InvalidDelegate","type":"error"},{"inputs":[],"name":"InvalidDelegatedPercent","type":"error"},{"inputs":[],"name":"InvalidInactivityBurnRate","type":"error"},{"inputs":[],"name":"InvalidMaturationPeriod","type":"error"},{"inputs":[],"name":"InvalidProposalPayload","type":"error"},{"inputs":[],"name":"InvalidRecipient","type":"error"},{"inputs":[],"name":"InvalidRewardRate","type":"error"},{"inputs":[],"name":"InvalidTransferConditions","type":"error"},{"inputs":[],"name":"MaxParticipantsReached","type":"error"},{"inputs":[],"name":"NoActiveStake","type":"error"},{"inputs":[],"name":"NoClaimableAmount","type":"error"},{"inputs":[],"name":"NoContractCallers","type":"error"},{"inputs":[],"name":"NoDelegation","type":"error"},{"inputs":[],"name":"NoParticipants","type":"error"},{"inputs":[],"name":"NoReward","type":"error"},{"inputs":[],"name":"NoValidBL2P","type":"error"},{"inputs":[],"name":"NotAuthorized","type":"error"},{"inputs":[],"name":"NotContract","type":"error"},{"inputs":[],"name":"NotWhitelisted","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"inputs":[],"name":"ProposalCooldownActive","type":"error"},{"inputs":[],"name":"ProposalDoesNotExist","type":"error"},{"inputs":[],"name":"ProposalExecuted","type":"error"},{"inputs":[],"name":"QuorumNotMet","type":"error"},{"inputs":[],"name":"QuorumOutOfBounds","type":"error"},{"inputs":[],"name":"ReentrancyGuardReentrantCall","type":"error"},{"inputs":[],"name":"RegistrationClosed","type":"error"},{"inputs":[{"internalType":"address","name":"token","type":"address"}],"name":"SafeERC20FailedOperation","type":"error"},{"inputs":[],"name":"StakeAlreadyActive","type":"error"},{"inputs":[],"name":"TooManyUsers","type":"error"},{"inputs":[],"name":"UnlockPeriodNotElapsed","type":"error"},{"inputs":[],"name":"VoteThresholdNotMet","type":"error"},{"inputs":[],"name":"VoteThresholdOutOfBounds","type":"error"},{"inputs":[],"name":"VotingPeriodInactive","type":"error"},{"inputs":[],"name":"VotingPeriodNotEnded","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"adId","type":"uint256"},{"indexed":false,"internalType":"string","name":"message","type":"string"}],"name":"AdvertisementPosted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"bonusAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cycle","type":"uint256"}],"name":"BL2PBonusBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"bool","name":"matured","type":"bool"}],"name":"BL2PMaturityUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"BL2PRevealed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"BL2PRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"bl2pAmount","type":"uint256"}],"name":"BL2PStaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"BL2PTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address[]","name":"users","type":"address[]"},{"indexed":false,"internalType":"uint256[]","name":"rewards","type":"uint256[]"}],"name":"BatchBL2PRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"BurnPhaseActivated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegator","type":"address"}],"name":"DelegationRevoked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"newContract","type":"address"}],"name":"GovernanceContractUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"participant","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"IgnitionAirdropClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"totalParticipants","type":"uint256"}],"name":"IgnitionAirdropTriggered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"participant","type":"address"},{"indexed":false,"internalType":"uint256","name":"participantNumber","type":"uint256"}],"name":"IgnitionParticipantRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bool","name":"isOpen","type":"bool"}],"name":"IgnitionRegistrationStatusChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"InactiveBL2PBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newValue","type":"uint256"}],"name":"LockedReserveUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"enum TAAMS.ProposalType","name":"proposalType","type":"uint8"},{"indexed":false,"internalType":"uint256","name":"newValue","type":"uint256"},{"indexed":false,"internalType":"address","name":"newAddress","type":"address"}],"name":"ParameterUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"string","name":"reason","type":"string"}],"name":"ProposalFailed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":true,"internalType":"address","name":"proposer","type":"address"},{"indexed":false,"internalType":"string","name":"description","type":"string"},{"indexed":false,"internalType":"enum TAAMS.ProposalType","name":"proposalType","type":"uint8"}],"name":"ProposalSubmitted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"id","type":"uint256"}],"name":"ProposalWasExecuted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newQuorum","type":"uint256"}],"name":"QuorumUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"referrer","type":"address"},{"indexed":false,"internalType":"uint256","name":"bonus","type":"uint256"}],"name":"ReferralBonusPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"remainingBalance","type":"uint256"}],"name":"ReserveUnlocked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"StakingRewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"burner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"totalBurned","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"cycle","type":"uint256"}],"name":"TokensBurned","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Unstaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":true,"internalType":"address","name":"voter","type":"address"},{"indexed":false,"internalType":"bytes32","name":"commitHash","type":"bytes32"}],"name":"VoteCommitted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegator","type":"address"},{"indexed":true,"internalType":"address","name":"delegate","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"VoteDelegated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":true,"internalType":"address","name":"voter","type":"address"},{"indexed":false,"internalType":"bool","name":"support","type":"bool"},{"indexed":false,"internalType":"uint256","name":"weight","type":"uint256"}],"name":"VoteRevealed","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newThreshold","type":"uint256"}],"name":"VoteThresholdUpdated","type":"event"},{"inputs":[],"name":"ACTIVATION_THRESHOLD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"ANNUAL_BURN_AMOUNT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"BURN_TARGET","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"IGNITION_AIRDROP_POOL","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"LOCKED_RESERVE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"PROPOSAL_COOLDOWN","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"QUORUM","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"STAKING_REWARD_RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"VOTE_THRESHOLD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"activeDelegations","outputs":[{"internalType":"address","name":"source","type":"address"},{"internalType":"address","name":"delegate","type":"address"},{"internalType":"uint256","name":"bl2pAmount","type":"uint256"},{"internalType":"uint256","name":"delegationBlock","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"advertisementCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"advertisements","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"uint256","name":"postedBlock","type":"uint256"},{"internalType":"string","name":"message","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address[]","name":"users","type":"address[]"}],"name":"batchClaimBL2PReward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"bl2pClaimed","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"bl2pLifespanBlocks","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"bl2pMeta","outputs":[{"internalType":"uint256","name":"birthAndExpiry","type":"uint256"},{"internalType":"bool","name":"matured","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"bl2pRevealed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"name":"burnContributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"burnDeadlineTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"burnInactiveBL2P","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"burnPhaseActive","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"checkActivation","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"claimBL2PReward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"claimIgnitionAirdrop","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes32","name":"commitHash","type":"bytes32"}],"name":"commitVote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"currentBurnCycle","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"cycleBurnedTotal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"delegate","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"delegateVote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"delegatedBL2PReceived","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"earlyAdopterCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"emergencyPaused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"executeProposal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getBL2PLifetime","outputs":[{"internalType":"uint256","name":"birthBlock","type":"uint256"},{"internalType":"uint256","name":"expiryBlock","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getIgnitionInfo","outputs":[{"internalType":"bool","name":"triggered","type":"bool"},{"internalType":"bool","name":"regOpen","type":"bool"},{"internalType":"uint256","name":"participants","type":"uint256"},{"internalType":"uint256","name":"maxParticipants","type":"uint256"},{"internalType":"bool","name":"userRegistered","type":"bool"},{"internalType":"uint256","name":"userAmount","type":"uint256"},{"internalType":"bool","name":"userClaimed","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getIgnitionParticipants","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getLastProposer","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getRemainingBurnable","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getRemainingValidBL2P","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTopDelegates","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"governanceContract","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"ignitionAirdropTriggered","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"ignitionClaimableAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"ignitionClaimed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"ignitionParticipants","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"ignitionRegistrationOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"ignitionWhitelist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"inactivityBurnRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastAdvertisementTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastBurnCycleStartTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastProposalTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastUnlockTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastVoteTimestamp","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lockedReserveBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maturationPeriodBlocks","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxDelegatedBL2PPercent","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"participateInBurn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"proposalCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"proposals","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"uint256","name":"startBlock","type":"uint256"},{"internalType":"uint256","name":"endBlock","type":"uint256"},{"internalType":"uint256","name":"newValue","type":"uint256"},{"internalType":"uint256","name":"forVotes","type":"uint256"},{"internalType":"uint256","name":"againstVotes","type":"uint256"},{"internalType":"address","name":"proposer","type":"address"},{"internalType":"address","name":"newAddress","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"enum TAAMS.ProposalType","name":"proposalType","type":"uint8"},{"internalType":"bool","name":"executed","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrals","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"registerForIgnitionAirdrop","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bool","name":"support","type":"bool"},{"internalType":"bytes32","name":"secret","type":"bytes32"}],"name":"revealVote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"revokeDelegation","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newContract","type":"address"}],"name":"setGovernanceContract","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bool","name":"isOpen","type":"bool"}],"name":"setIgnitionRegistrationStatus","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"stakes","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"startBlock","type":"uint256"},{"internalType":"uint256","name":"bl2pBoost","type":"uint256"},{"internalType":"bool","name":"active","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"desc","type":"string"},{"internalType":"uint256","name":"newValue","type":"uint256"},{"internalType":"address","name":"newAddress","type":"address"},{"internalType":"enum TAAMS.ProposalType","name":"proposalType","type":"uint8"}],"name":"submitProposal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"topDelegates","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalBurned","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalContributions","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferBL2P","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"triggerIgnitionAirdrop","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"trustedRecipient","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"unstake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"updateBL2PMaturity","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"bl2pAmount","type":"uint256"}],"name":"useBL2PForStaking","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"users","type":"address[]"}],"name":"verifyBL2PIntegrity","outputs":[{"internalType":"bool","name":"isValid","type":"bool"},{"internalType":"uint256","name":"totalBL2P","type":"uint256"}],"stateMutability":"view","type":"function"}];
+        
+        let web3;
+        let contract;
+        let userAccount;
+        let connectionCheckInterval;
+        let blockUpdateInterval;
+        
+        // État de l'application avec persistance améliorée
+        const state = {
+            connected: false,
+            registered: false,
+            claimableAmount: 0,
+            participants: 0,
+            maxParticipants: MAX_IGNITION_PARTICIPANTS,
+            airdropTriggered: false,
+            userClaimed: false,
+            taamBalance: 0,
+            maticBalance: 0,
+            lastActivity: Date.now(),
+            connectionStable: false,
+            totalSupply: 0,
+            totalBurned: 0,
+            burnPhaseActive: false,
+            bl2pRevealed: false,
+            registrationOpen: false
+        };
+        
+        // Fonctions de persistance améliorées pour multi-wallet
+        function loadPersistedState() {
+            try {
+                const savedAccount = localStorage.getItem('taams_account');
+                
+                if (savedAccount) {
+                    // Charger l'état spécifique à ce wallet
+                    const savedState = localStorage.getItem(`taams_state_${savedAccount}`);
+                    
+                    if (savedState) {
+                        const parsedState = JSON.parse(savedState);
+                        
+                        // Vérifier si la session n'est pas trop ancienne (24h max)
+                        const sessionAge = Date.now() - (parsedState.lastActivity || 0);
+                        if (sessionAge > 24 * 60 * 60 * 1000) {
+                            addLog('> SESSION EXPIRED - CLEARING OLD DATA', 'warning');
+                            clearPersistedState();
+                            return false;
+                        }
+                        
+                        Object.assign(state, parsedState);
+                        userAccount = savedAccount;
+                        
+                        if (state.connected) {
+                            addLog(`> RESTORING SESSION FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                            updateConnectedUI();
+                            return true;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading persisted state:', error);
+                clearPersistedState();
+            }
+            return false;
+        }
+        
+        function savePersistedState() {
+            try {
+                if (userAccount) {
+                    state.lastActivity = Date.now();
+                    // Sauvegarder l'état spécifique à ce wallet
+                    localStorage.setItem(`taams_state_${userAccount}`, JSON.stringify(state));
+                    localStorage.setItem('taams_account', userAccount);
+                    addLog(`> SESSION SAVED FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                }
+            } catch (error) {
+                console.error('Error saving state:', error);
+            }
+        }
+        
+        function clearPersistedState() {
+            try {
+                // Nettoyer l'état du wallet actuel si il existe
+                if (userAccount) {
+                    localStorage.removeItem(`taams_state_${userAccount}`);
+                    addLog(`> CLEARED DATA FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                }
+                
+                // Nettoyer les références générales
+                localStorage.removeItem('taams_account');
+                
+                // Optionnellement, nettoyer tous les états de wallets anciens (plus de 7 jours)
+                const now = Date.now();
+                const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('taams_state_0x')) {
+                        try {
+                            const stateData = JSON.parse(localStorage.getItem(key));
+                            if (stateData.lastActivity && stateData.lastActivity < sevenDaysAgo) {
+                                localStorage.removeItem(key);
+                                addLog(`> CLEANED OLD WALLET DATA: ${key.slice(-10)}`, 'info');
+                            }
+                        } catch (e) {
+                            // Supprimer les données corrompues
+                            localStorage.removeItem(key);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error clearing persisted state:', error);
+            }
+        }
+        
+        // Fonctions UI améliorées
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            if (!logContainer) return;
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Garder seulement les 100 derniers logs
+            while (logContainer.children.length > 100) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+        }
+        
+        function showAlert(message, type) {
+            // Supprimer les alertes existantes
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            const mainContent = document.querySelector('.main-content');
+            if (container && mainContent) {
+                container.insertBefore(alertDiv, mainContent);
+                setTimeout(() => alertDiv.remove(), 5000);
+            }
+        }
+        
+        function updateConnectionIndicator(connected) {
+            const indicator = document.getElementById('connection-indicator');
+            indicator.className = `connection-indicator ${connected ? 'connected' : 'disconnected'}`;
+        }
+        
+        function updateConnectedUI() {
+            const connectBtn = document.getElementById('connect-wallet');
+            const walletAddress = document.getElementById('wallet-address');
+            
+            connectBtn.textContent = 'CONNECTED';
+            connectBtn.disabled = true;
+            connectBtn.style.background = '#333';
+            walletAddress.textContent = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+            walletAddress.style.display = 'block';
+            document.getElementById('network-status').textContent = 'POLYGON';
+            document.getElementById('user-status').textContent = 'CONNECTED';
+            
+            addDisconnectButton();
+            updateConnectionIndicator(true);
+        }
+        
+        function addDisconnectButton() {
+            const walletSection = document.querySelector('.wallet-section');
+            if (!document.getElementById('disconnect-btn')) {
+                const disconnectBtn = document.createElement('button');
+                disconnectBtn.id = 'disconnect-btn';
+                disconnectBtn.className = 'btn btn-secondary';
+                disconnectBtn.textContent = 'DISCONNECT';
+                disconnectBtn.style.marginTop = '10px';
+                disconnectBtn.onclick = disconnectWallet;
+                
+                const refreshBtn = document.createElement('button');
+                refreshBtn.id = 'refresh-data-btn';
+                refreshBtn.className = 'btn btn-secondary';
+                refreshBtn.textContent = '🔄 REFRESH BLOCKCHAIN DATA';
+                refreshBtn.style.marginTop = '10px';
+                refreshBtn.style.marginLeft = '10px';
+                refreshBtn.onclick = refreshConnection;
+                
+                walletSection.appendChild(disconnectBtn);
+                walletSection.appendChild(refreshBtn);
+            }
+        }
+        
+        function updateBalanceDisplay() {
+            const walletAddress = document.getElementById('wallet-address');
+            
+            let balanceDiv = document.getElementById('balance-display');
+            if (!balanceDiv) {
+                balanceDiv = document.createElement('div');
+                balanceDiv.id = 'balance-display';
+                balanceDiv.className = 'balance-display';
+                walletAddress.parentNode.insertBefore(balanceDiv, walletAddress.nextSibling);
+            }
+            
+            balanceDiv.innerHTML = `
+                <div style="margin-bottom: 5px; padding: 5px; background: rgba(0,255,136,0.1); border-radius: 3px;">
+                    <span style="color: #00ff88;">TAAMS:</span> 
+                    <span style="color: #fff; font-weight: bold;">${state.taamBalance.toLocaleString()} TAAMS</span>
+                    <span style="color: #888; font-size: 0.8em;">(REAL BALANCE)</span>
+                </div>
+                <div style="padding: 5px; background: rgba(139,92,246,0.1); border-radius: 3px;">
+                    <span style="color: #8b5cf6;">MATIC:</span> 
+                    <span style="color: #fff; font-weight: bold;">${state.maticBalance.toFixed(4)} MATIC</span>
+                    <span style="color: #888; font-size: 0.8em;">(POLYGON NETWORK)</span>
+                </div>
+            `;
+        }
+        
+        function updateUI() {
+            document.getElementById('claimable-amount').textContent = `${state.claimableAmount.toLocaleString()} TAAMS`;
+            document.getElementById('participants-count').textContent = state.participants;
+            document.getElementById('max-participants').textContent = state.maxParticipants;
+            
+            const registerBtn = document.getElementById('register-btn');
+            const claimBtn = document.getElementById('claim-btn');
+            
+            if (state.connected) {
+                updateBalanceDisplay();
+                
+                if (!state.registered && state.registrationOpen) {
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'REGISTER FOR AIRDROP';
+                    registerBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                } else if (!state.registered && !state.registrationOpen) {
+                    registerBtn.disabled = true;
+                    registerBtn.textContent = 'REGISTRATION CLOSED';
+                    registerBtn.style.background = '#666';
+                } else if (state.registered) {
+                    registerBtn.disabled = true;
+                    registerBtn.textContent = 'REGISTERED ✓';
+                    registerBtn.style.background = '#333';
+                }
+                
+                if (state.registered && state.airdropTriggered && !state.userClaimed && state.claimableAmount > 0) {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = 'CLAIM AIRDROP';
+                    claimBtn.style.background = 'linear-gradient(45deg, #ff0066, #cc0055)';
+                } else if (state.userClaimed) {
+                    claimBtn.disabled = true;
+                    claimBtn.textContent = 'CLAIMED ✓';
+                    claimBtn.style.background = '#333';
+                } else {
+                    claimBtn.disabled = true;
+                    claimBtn.textContent = state.airdropTriggered ? 'NOT ELIGIBLE' : 'WAITING ACTIVATION';
+                    claimBtn.style.background = '#333';
+                }
+            }
+            
+            const progress = (state.participants / state.maxParticipants) * 100;
+            document.getElementById('airdrop-progress').style.width = `${progress}%`;
+            
+            if (state.registered) {
+                document.getElementById('user-status').textContent = 'AUTHORIZED';
+                document.getElementById('airdrop-status').textContent = state.airdropTriggered ? 'CLAIMABLE' : 'REGISTERED';
+                unlockNavigation();
+            } else if (state.connected) {
+                document.getElementById('airdrop-status').textContent = state.registrationOpen ? 'NOT REGISTERED' : 'REGISTRATION CLOSED';
+            }
+            
+            if (state.connected) {
+                savePersistedState();
+            }
+        }
+        
+        function resetConnectionState() {
+            state.connected = false;
+            state.connectionStable = false;
+            state.taamBalance = 0;
+            state.maticBalance = 0;
+            userAccount = null;
+            contract = null;
+            
+            const connectBtn = document.getElementById('connect-wallet');
+            connectBtn.textContent = 'CONNECT WALLET';
+            connectBtn.disabled = false;
+            connectBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+            
+            document.getElementById('wallet-address').style.display = 'none';
+            document.getElementById('network-status').textContent = 'DISCONNECTED';
+            document.getElementById('user-status').textContent = 'UNAUTHORIZED';
+            document.getElementById('airdrop-status').textContent = 'DISCONNECTED';
+            
+            updateConnectionIndicator(false);
+            updateUI();
+            
+            // Arrêter les intervalles
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+                connectionCheckInterval = null;
+            }
+            if (blockUpdateInterval) {
+                clearInterval(blockUpdateInterval);
+                blockUpdateInterval = null;
+            }
+        }
+        
+        function disconnectWallet() {
+            addLog('> DISCONNECTING FROM BLOCKCHAIN...', 'info');
+            
+            const disconnectBtn = document.getElementById('disconnect-btn');
+            const refreshBtn = document.getElementById('refresh-data-btn');
+            if (disconnectBtn) {
+                disconnectBtn.textContent = 'DISCONNECTING...';
+                disconnectBtn.disabled = true;
+            }
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+            }
+            
+            clearPersistedState();
+            resetConnectionState();
+            
+            const balanceDiv = document.getElementById('balance-display');
+            if (balanceDiv) balanceDiv.remove();
+            if (disconnectBtn) disconnectBtn.remove();
+            if (refreshBtn) refreshBtn.remove();
+            
+            addLog('> BLOCKCHAIN DISCONNECTED', 'success');
+            showAlert('Blockchain wallet disconnected successfully', 'info');
+        }
+        
+        // Fonctions de connexion améliorées
+        async function checkGasBalance() {
+            if (!web3 || !userAccount) return false;
+            
+            try {
+                const balance = await web3.eth.getBalance(userAccount);
+                const balanceInEther = parseFloat(web3.utils.fromWei(balance, 'ether'));
+                
+                if (balanceInEther < 0.001) {
+                    showAlert('Insufficient MATIC for gas fees. Please add MATIC to your wallet.', 'warning');
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                addLog('> ERROR CHECKING GAS BALANCE', 'error');
+                return false;
+            }
+        }
+        
+        async function estimateGas(method, options) {
+            try {
+                const gasEstimate = await method.estimateGas(options);
+                const gasPrice = await web3.eth.getGasPrice();
+                return {
+                    gasEstimate: parseInt(gasEstimate),
+                    gasPrice: gasPrice
+                };
+            } catch (error) {
+                addLog('> GAS ESTIMATION FAILED', 'error');
+                return null;
+            }
+        }
+        
+        async function loadUserBalances() {
+            if (!userAccount || !web3) return;
+            
+            try {
+                addLog('> LOADING REAL WALLET BALANCES...', 'info');
+                
+                // Charger le solde MATIC réel
+                const maticBalance = await web3.eth.getBalance(userAccount);
+                state.maticBalance = parseFloat(web3.utils.fromWei(maticBalance, 'ether'));
+                
+                if (contract) {
+                    try {
+                        // Charger le solde TAAMS réel
+                        const taamBalance = await contract.methods.balanceOf(userAccount).call();
+                        state.taamBalance = parseFloat(web3.utils.fromWei(taamBalance, 'ether'));
+                        
+                        // Charger données additionnelles de l'utilisateur
+                        const [
+                            userStake,
+                            userBL2P,
+                            userContributions,
+                            userDelegatedBL2P
+                        ] = await Promise.all([
+                            contract.methods.stakes(userAccount).call(),
+                            contract.methods.getRemainingValidBL2P(userAccount).call(),
+                            contract.methods.totalContributions(userAccount).call(),
+                            contract.methods.delegatedBL2PReceived(userAccount).call()
+                        ]);
+                        
+                        // Log des données utilisateur réelles
+                        addLog(`> WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                        addLog(`> MATIC BALANCE: ${state.maticBalance.toFixed(4)} MATIC`, 'info');
+                        addLog(`> TAAMS BALANCE: ${state.taamBalance.toLocaleString()} TAAMS`, 'info');
+                        
+                        if (userStake.active) {
+                            const stakeAmount = parseFloat(web3.utils.fromWei(userStake.amount, 'ether'));
+                            addLog(`> ACTIVE STAKE: ${stakeAmount.toLocaleString()} TAAMS`, 'success');
+                        }
+                        
+                        const bl2pAmount = parseFloat(web3.utils.fromWei(userBL2P, 'ether'));
+                        if (bl2pAmount > 0) {
+                            addLog(`> VALID BL2P: ${bl2pAmount.toLocaleString()} BL2P`, 'success');
+                        }
+                        
+                        const contributionsAmount = parseFloat(web3.utils.fromWei(userContributions, 'ether'));
+                        if (contributionsAmount > 0) {
+                            addLog(`> BURN CONTRIBUTIONS: ${contributionsAmount.toLocaleString()} TAAMS`, 'info');
+                        }
+                        
+                        const delegatedAmount = parseFloat(web3.utils.fromWei(userDelegatedBL2P, 'ether'));
+                        if (delegatedAmount > 0) {
+                            addLog(`> DELEGATED BL2P RECEIVED: ${delegatedAmount.toLocaleString()} BL2P`, 'info');
+                        }
+                        
+                    } catch (error) {
+                        state.taamBalance = 0;
+                        addLog('> TAAMS BALANCE: 0 TAAMS (Contract not accessible)', 'warning');
+                    }
+                }
+                
+                addLog('> REAL BALANCES LOADED FROM BLOCKCHAIN', 'success');
+                
+            } catch (error) {
+                addLog('> ERROR LOADING BLOCKCHAIN BALANCES', 'error');
+                console.error('Balance loading error:', error);
+            }
+        }
+        
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    showAlert('MetaMask is required to access the TAAMS Protocol', 'error');
+                    return;
+                }
+                
+                addLog('> REQUESTING WALLET CONNECTION...', 'info');
+                
+                const connectBtn = document.getElementById('connect-wallet');
+                connectBtn.textContent = 'CONNECTING...';
+                connectBtn.disabled = true;
+                
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                
+                userAccount = accounts[0];
+                state.connected = true;
+                
+                updateConnectedUI();
+                addLog(`> WALLET CONNECTED: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                
+                await Promise.all([
+                    initializeContract(),
+                    loadUserBalances()
+                ]);
+                
+                await checkRegistrationStatus();
+                setupContractEvents();
+                startConnectionMonitoring();
+                savePersistedState();
+                updateUI();
+                
+            } catch (error) {
+                addLog('> WALLET CONNECTION FAILED', 'error');
+                showAlert('Failed to connect wallet: ' + error.message, 'error');
+                
+                const connectBtn = document.getElementById('connect-wallet');
+                connectBtn.textContent = 'CONNECT WALLET';
+                connectBtn.disabled = false;
+                connectBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                
+                clearPersistedState();
+            }
+        }
+        
+        async function registerForAirdrop() {
+            if (!state.connected || !contract) {
+                showAlert('Please connect your wallet and ensure contract is loaded', 'warning');
+                return;
+            }
+            
+            if (!state.registrationOpen) {
+                showAlert('Registration is currently closed', 'error');
+                return;
+            }
+            
+            if (state.participants >= state.maxParticipants) {
+                showAlert('Maximum participants reached', 'error');
+                return;
+            }
+            
+            if (!(await checkGasBalance())) {
+                return;
+            }
+            
+            try {
+                addLog('> INITIATING AIRDROP REGISTRATION...', 'info');
+                const registerBtn = document.getElementById('register-btn');
+                registerBtn.disabled = true;
+                registerBtn.textContent = 'REGISTERING...';
+                registerBtn.style.background = '#666';
+                
+                const method = contract.methods.registerForIgnitionAirdrop();
+                const gasInfo = await estimateGas(method, { from: userAccount });
+                
+                if (!gasInfo) {
+                    throw new Error('Gas estimation failed');
+                }
+                
+                addLog(`> ESTIMATED GAS: ${gasInfo.gasEstimate.toLocaleString()}`, 'info');
+                addLog('> SENDING TRANSACTION...', 'info');
+                
+                const result = await method.send({
+                    from: userAccount,
+                    gas: Math.floor(gasInfo.gasEstimate * 1.2),
+                    gasPrice: gasInfo.gasPrice
+                });
+                
+                addLog(`> TRANSACTION CONFIRMED: ${result.transactionHash}`, 'success');
+                addLog(`> VIEW ON POLYGONSCAN: https://polygonscan.com/tx/${result.transactionHash}`, 'info');
+                addLog('> REGISTRATION SUCCESSFUL!', 'success');
+                showAlert('Successfully registered for Ignition Airdrop!', 'success');
+                
+                // Marquer l'utilisateur comme enregistré et déverrouiller la navigation
+                state.registered = true;
+                updateUI();
+                unlockNavigation();
+                
+                // Attendre un peu avant de vérifier le statut
+                setTimeout(async () => {
+                    await checkRegistrationStatus();
+                }, 3000);
+                
+            } catch (error) {
+                addLog('> REGISTRATION FAILED', 'error');
+                console.error('Registration error:', error);
+                
+                let errorMessage = 'Registration failed. Please try again.';
+                
+                if (error.code === 4001) {
+                    errorMessage = 'Transaction cancelled by user';
+                } else if (error.message.includes('RegistrationClosed')) {
+                    errorMessage = 'Registration is currently closed';
+                } else if (error.message.includes('AlreadyRegistered')) {
+                    errorMessage = 'You are already registered';
+                    await checkRegistrationStatus(); // Refresh status
+                } else if (error.message.includes('MaxParticipantsReached')) {
+                    errorMessage = 'Maximum participants reached';
+                } else if (error.message.includes('insufficient funds')) {
+                    errorMessage = 'Insufficient MATIC for gas fees';
+                }
+                
+                showAlert(errorMessage, error.code === 4001 ? 'warning' : 'error');
+                
+                const registerBtn = document.getElementById('register-btn');
+                if (!state.registered) {
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'REGISTER FOR AIRDROP';
+                    registerBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                }
+            }
+        }
+        
+        async function claimAirdrop() {
+            if (!state.registered || !state.airdropTriggered || !contract) {
+                showAlert('Airdrop not available for claiming yet', 'warning');
+                return;
+            }
+            
+            if (state.userClaimed) {
+                showAlert('You have already claimed your airdrop', 'warning');
+                return;
+            }
+            
+            if (state.claimableAmount <= 0) {
+                showAlert('No claimable amount available', 'error');
+                return;
+            }
+            
+            if (!(await checkGasBalance())) {
+                return;
+            }
+            
+            try {
+                addLog('> CLAIMING AIRDROP TOKENS...', 'info');
+                const claimBtn = document.getElementById('claim-btn');
+                claimBtn.disabled = true;
+                claimBtn.textContent = 'CLAIMING...';
+                claimBtn.style.background = '#666';
+                
+                const method = contract.methods.claimIgnitionAirdrop();
+                const gasInfo = await estimateGas(method, { from: userAccount });
+                
+                if (!gasInfo) {
+                    throw new Error('Gas estimation failed');
+                }
+                
+                addLog(`> ESTIMATED GAS: ${gasInfo.gasEstimate.toLocaleString()}`, 'info');
+                addLog(`> CLAIMING ${state.claimableAmount.toLocaleString()} TAAMS...`, 'info');
+                addLog('> SENDING CLAIM TRANSACTION...', 'info');
+                
+                const result = await method.send({
+                    from: userAccount,
+                    gas: Math.floor(gasInfo.gasEstimate * 1.2),
+                    gasPrice: gasInfo.gasPrice
+                });
+                
+                addLog(`> CLAIM CONFIRMED: ${result.transactionHash}`, 'success');
+                addLog(`> VIEW ON POLYGONSCAN: https://polygonscan.com/tx/${result.transactionHash}`, 'info');
+                addLog(`> ${state.claimableAmount.toLocaleString()} TAAMS CLAIMED SUCCESSFULLY!`, 'success');
+                showAlert(`${state.claimableAmount.toLocaleString()} TAAMS tokens claimed successfully!`, 'success');
+                
+                state.userClaimed = true;
+                
+                // Attendre un peu avant de recharger les balances
+                setTimeout(async () => {
+                    await Promise.all([
+                        loadUserBalances(),
+                        checkRegistrationStatus()
+                    ]);
+                    updateUI();
+                }, 3000);
+                
+            } catch (error) {
+                addLog('> CLAIM FAILED', 'error');
+                console.error('Claim error:', error);
+                
+                let errorMessage = 'Claim failed. Please try again.';
+                
+                if (error.code === 4001) {
+                    errorMessage = 'Transaction cancelled by user';
+                } else if (error.message.includes('NotWhitelisted')) {
+                    errorMessage = 'You are not registered for the airdrop';
+                } else if (error.message.includes('AlreadyClaimed')) {
+                    errorMessage = 'You have already claimed your airdrop';
+                    state.userClaimed = true;
+                    updateUI();
+                } else if (error.message.includes('NoClaimableAmount')) {
+                    errorMessage = 'No claimable amount available';
+                } else if (error.message.includes('insufficient funds')) {
+                    errorMessage = 'Insufficient MATIC for gas fees';
+                }
+                
+                showAlert(errorMessage, error.code === 4001 ? 'warning' : 'error');
+                
+                const claimBtn = document.getElementById('claim-btn');
+                if (!state.userClaimed && state.claimableAmount > 0) {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = 'CLAIM AIRDROP';
+                    claimBtn.style.background = 'linear-gradient(45deg, #ff0066, #cc0055)';
+                }
+            }
+        }
+        
+        async function initializeContract() {
+            if (!web3) {
+                addLog('> WEB3 NOT INITIALIZED', 'error');
+                return;
+            }
+            
+            try {
+                const networkId = await web3.eth.net.getId();
+                if (networkId !== POLYGON_CHAIN_ID) {
+                    addLog(`> WRONG NETWORK: PLEASE SWITCH TO POLYGON (Current: ${networkId})`, 'error');
+                    showAlert(`Please switch to Polygon network. Current: ${networkId}, Required: ${POLYGON_CHAIN_ID}`, 'error');
+                    
+                    // Proposer de changer de réseau automatiquement
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: web3.utils.toHex(POLYGON_CHAIN_ID) }],
+                        });
+                        addLog('> NETWORK SWITCHED TO POLYGON', 'success');
+                    } catch (switchError) {
+                        // Si le réseau n'est pas ajouté, l'ajouter
+                        if (switchError.code === 4902) {
+                            try {
+                                await window.ethereum.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [{
+                                        chainId: web3.utils.toHex(POLYGON_CHAIN_ID),
+                                        chainName: 'Polygon Mainnet',
+                                        nativeCurrency: {
+                                            name: 'MATIC',
+                                            symbol: 'MATIC',
+                                            decimals: 18
+                                        },
+                                        rpcUrls: ['https://polygon-rpc.com/'],
+                                        blockExplorerUrls: ['https://polygonscan.com/']
+                                    }]
+                                });
+                                addLog('> POLYGON NETWORK ADDED AND SELECTED', 'success');
+                            } catch (addError) {
+                                addLog('> FAILED TO ADD POLYGON NETWORK', 'error');
+                                return;
+                            }
+                        } else {
+                            addLog('> FAILED TO SWITCH NETWORK', 'error');
+                            return;
+                        }
+                    }
+                }
+                
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                addLog('> CONTRACT INITIALIZED ON POLYGON', 'success');
+                
+                await loadContractData();
+                state.connectionStable = true;
+                
+            } catch (error) {
+                addLog('> CONTRACT INITIALIZATION FAILED', 'error');
+                console.error('Contract init error:', error);
+            }
+        }
+        
+        async function loadContractData() {
+            if (!contract) return;
+            
+            try {
+                addLog('> LOADING REAL BLOCKCHAIN DATA...', 'info');
+                
+                const [
+                    totalSupply,
+                    totalBurned,
+                    burnPhaseActive,
+                    bl2pRevealed,
+                    registrationOpen,
+                    maxSupply,
+                    ignitionPool,
+                    activationThreshold,
+                    burnTarget,
+                    lockedReserve,
+                    totalStaked,
+                    currentBlock
+                ] = await Promise.all([
+                    contract.methods.totalSupply().call(),
+                    contract.methods.totalBurned().call(),
+                    contract.methods.burnPhaseActive().call(),
+                    contract.methods.bl2pRevealed().call(),
+                    contract.methods.ignitionRegistrationOpen().call(),
+                    contract.methods.MAX_SUPPLY().call(),
+                    contract.methods.IGNITION_AIRDROP_POOL().call(),
+                    contract.methods.ACTIVATION_THRESHOLD().call(),
+                    contract.methods.BURN_TARGET().call(),
+                    contract.methods.lockedReserveBalance().call(),
+                    contract.methods.totalStaked().call(),
+                    web3.eth.getBlockNumber()
+                ]);
+                
+                // Mettre à jour l'état avec les vraies données blockchain
+                state.totalSupply = parseFloat(web3.utils.fromWei(totalSupply, 'ether'));
+                state.totalBurned = parseFloat(web3.utils.fromWei(totalBurned, 'ether'));
+                state.burnPhaseActive = burnPhaseActive;
+                state.bl2pRevealed = bl2pRevealed;
+                state.registrationOpen = registrationOpen;
+                
+                // Mettre à jour l'UI avec les vraies données
+                document.getElementById('total-supply').textContent = formatNumber(state.totalSupply);
+                document.getElementById('total-burned').textContent = formatNumber(state.totalBurned);
+                document.getElementById('burn-phase').textContent = state.burnPhaseActive ? 'ACTIVE' : 'INACTIVE';
+                document.getElementById('bl2p-revealed').textContent = state.bl2pRevealed ? 'YES' : 'NO';
+                document.getElementById('current-block').textContent = currentBlock;
+                
+                // Logs avec vraies données blockchain
+                addLog(`> TOTAL SUPPLY: ${formatNumber(state.totalSupply)} TAAMS`, 'info');
+                addLog(`> TOTAL BURNED: ${formatNumber(state.totalBurned)} TAAMS`, 'info');
+                addLog(`> MAX SUPPLY: ${formatNumber(parseFloat(web3.utils.fromWei(maxSupply, 'ether')))} TAAMS`, 'info');
+                addLog(`> IGNITION POOL: ${formatNumber(parseFloat(web3.utils.fromWei(ignitionPool, 'ether')))} TAAMS`, 'info');
+                addLog(`> BURN TARGET: ${formatNumber(parseFloat(web3.utils.fromWei(burnTarget, 'ether')))} TAAMS`, 'info');
+                addLog(`> LOCKED RESERVE: ${formatNumber(parseFloat(web3.utils.fromWei(lockedReserve, 'ether')))} TAAMS`, 'info');
+                addLog(`> TOTAL STAKED: ${formatNumber(parseFloat(web3.utils.fromWei(totalStaked, 'ether')))} TAAMS`, 'info');
+                addLog(`> CURRENT BLOCK: ${currentBlock}`, 'info');
+                addLog(`> BURN PHASE: ${state.burnPhaseActive ? 'ACTIVE' : 'INACTIVE'}`, state.burnPhaseActive ? 'success' : 'info');
+                addLog(`> BL2P REVEALED: ${state.bl2pRevealed ? 'YES' : 'NO'}`, state.bl2pRevealed ? 'success' : 'info');
+                addLog(`> REGISTRATION: ${state.registrationOpen ? 'OPEN' : 'CLOSED'}`, state.registrationOpen ? 'success' : 'warning');
+                
+                addLog('> REAL BLOCKCHAIN DATA LOADED', 'success');
+                
+            } catch (error) {
+                addLog('> ERROR LOADING BLOCKCHAIN DATA', 'error');
+                console.error('Contract data error:', error);
+                
+                // Ne pas utiliser de données fallback - garder les vraies données ou 0
+                document.getElementById('total-supply').textContent = '0';
+                document.getElementById('total-burned').textContent = '0';
+                document.getElementById('burn-phase').textContent = 'ERROR';
+                document.getElementById('bl2p-revealed').textContent = 'ERROR';
+                document.getElementById('current-block').textContent = 'ERROR';
+            }
+        }
+        
+        function formatNumber(num) {
+            const number = parseFloat(num);
+            if (number >= 1e9) return (number / 1e9).toFixed(1) + 'B';
+            if (number >= 1e6) return (number / 1e6).toFixed(1) + 'M';
+            if (number >= 1e3) return (number / 1e3).toFixed(1) + 'K';
+            return number.toFixed(0);
+        }
+        
+        async function checkRegistrationStatus() {
+            if (!contract || !userAccount) {
+                addLog('> CONTRACT NOT AVAILABLE FOR STATUS CHECK', 'error');
+                return;
+            }
+            
+            try {
+                addLog(`> CHECKING REGISTRATION STATUS FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                
+                const result = await contract.methods.getIgnitionInfo().call({ from: userAccount });
+                
+                // Sauvegarder l'état spécifique au wallet actuel
+                const previousWallet = state.currentWallet;
+                state.currentWallet = userAccount;
+                state.registered = result.userRegistered;
+                state.participants = parseInt(result.participants);
+                state.maxParticipants = parseInt(result.maxParticipants);
+                state.airdropTriggered = result.triggered;
+                state.userClaimed = result.userClaimed;
+                state.registrationOpen = result.regOpen;
+                state.claimableAmount = result.userRegistered ? parseFloat(web3.utils.fromWei(result.userAmount, 'ether')) : 0;
+                
+                // Mettre à jour les données persistantes spécifiques au wallet
+                state.walletSpecific = {
+                    ...state.walletSpecific,
+                    registrationStatus: result.userRegistered,
+                    claimableAmount: state.claimableAmount,
+                    userClaimed: result.userClaimed,
+                    lastChecked: Date.now()
+                };
+                
+                savePersistedState();
+                updateUI();
+                
+                if (previousWallet && previousWallet !== userAccount) {
+                    addLog(`> SWITCHED FROM WALLET: ${previousWallet.slice(0, 6)}...${previousWallet.slice(-4)}`, 'info');
+                    addLog(`> LOADED DATA FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                }
+                
+                if (result.userRegistered) {
+                    addLog(`> WALLET ${userAccount.slice(0, 6)}...${userAccount.slice(-4)} REGISTRATION: CONFIRMED`, 'success');
+                    addLog(`> CLAIMABLE AMOUNT: ${state.claimableAmount.toLocaleString()} TAAMS`, 'success');
+                    unlockNavigation();
+                } else {
+                    addLog(`> WALLET ${userAccount.slice(0, 6)}...${userAccount.slice(-4)} REGISTRATION: NOT REGISTERED`, 'info');
+                }
+                
+                if (result.triggered) {
+                    addLog('> AIRDROP STATUS: ACTIVE - CLAIMING AVAILABLE', 'success');
+                } else {
+                    addLog('> AIRDROP STATUS: PENDING ACTIVATION', 'info');
+                }
+                
+                addLog(`> PARTICIPANTS: ${state.participants}/${state.maxParticipants}`, 'info');
+                addLog(`> REGISTRATION: ${state.registrationOpen ? 'OPEN' : 'CLOSED'}`, state.registrationOpen ? 'success' : 'warning');
+                
+            } catch (error) {
+                addLog('> ERROR CHECKING REGISTRATION STATUS', 'error');
+                console.error('Registration check error:', error);
+                
+                // Si l'erreur est due à un problème réseau, essayer de reconnecter
+                if (error.message.includes('network') || error.message.includes('connection')) {
+                    addLog('> NETWORK ISSUE DETECTED, ATTEMPTING RECONNECTION...', 'warning');
+                    setTimeout(async () => {
+                        if (state.connected) {
+                            await initializeContract();
+                        }
+                    }, 5000);
+                }
+            }
+        }
+        
+        function unlockNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('locked');
+                const lockIcon = item.querySelector('.lock-icon');
+                if (lockIcon) {
+                    lockIcon.style.display = 'none';
+                }
+            });
+            addLog('> ALL TERMINAL FEATURES UNLOCKED', 'success');
+            showAlert('Navigation features unlocked! You can now access all TAAMS Protocol modules.', 'success');
+        }
+        
+        function setupContractEvents() {
+            if (!contract) return;
+            
+            try {
+                contract.events.IgnitionParticipantRegistered({
+                    fromBlock: 'latest'
+                })
+                .on('data', function(event) {
+                    const participant = event.returnValues.participant;
+                    if (participant.toLowerCase() === userAccount.toLowerCase()) {
+                        addLog('> REGISTRATION CONFIRMED ON-CHAIN', 'success');
+                        checkRegistrationStatus();
+                    }
+                });
+                
+                contract.events.IgnitionAirdropClaimed({
+                    fromBlock: 'latest'
+                })
+                .on('data', function(event) {
+                    const participant = event.returnValues.participant;
+                    if (participant.toLowerCase() === userAccount.toLowerCase()) {
+                        addLog('> AIRDROP CLAIM CONFIRMED ON-CHAIN', 'success');
+                        loadUserBalances();
+                    }
+                });
+                
+                contract.events.IgnitionAirdropTriggered({
+                    fromBlock: 'latest'
+                })
+                .on('data', function(event) {
+                    addLog('> IGNITION AIRDROP TRIGGERED!', 'success');
+                    showAlert('Ignition Airdrop has been triggered! You can now claim your tokens.', 'success');
+                    state.airdropTriggered = true;
+                    updateUI();
+                });
+                
+                addLog('> EVENT LISTENERS ACTIVATED', 'success');
+                
+            } catch (error) {
+                addLog('> ERROR SETTING UP EVENTS', 'error');
+                console.error('Events error:', error);
+            }
+        }
+        
+        // Monitoring de connexion amélioré avec gestion multi-wallet
+        function startConnectionMonitoring() {
+            addLog('> STARTING REAL-TIME BLOCKCHAIN MONITORING...', 'info');
+            
+            // Vérification de la connexion et changements de wallet toutes les 10 secondes
+            connectionCheckInterval = setInterval(async () => {
+                if (state.connected && userAccount) {
+                    const isStillConnected = await checkWalletConnection();
+                    if (!isStillConnected) {
+                        addLog('> BLOCKCHAIN CONNECTION LOST', 'error');
+                        clearPersistedState();
+                        resetConnectionState();
+                        showAlert('Blockchain connection lost. Please reconnect your wallet.', 'error');
+                    }
+                }
+            }, 10000);
+            
+            // Mise à jour des données blockchain temps réel toutes les 20 secondes
+            blockUpdateInterval = setInterval(async () => {
+                if (web3 && state.connectionStable && userAccount) {
+                    try {
+                        const currentBlock = await web3.eth.getBlockNumber();
+                        document.getElementById('current-block').textContent = currentBlock.toLocaleString();
+                        
+                        // Recharger les vraies données blockchain spécifiques au wallet
+                        addLog(`> REFRESHING DATA FOR WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                        
+                        await Promise.all([
+                            loadContractData(),
+                            loadUserBalances()
+                        ]);
+                        
+                        if (state.connected && contract) {
+                            await checkRegistrationStatus();
+                        }
+                        
+                        addLog('> WALLET-SPECIFIC BLOCKCHAIN DATA REFRESHED', 'info');
+                        
+                    } catch (error) {
+                        addLog('> ERROR REFRESHING WALLET BLOCKCHAIN DATA', 'error');
+                        console.error('Wallet blockchain refresh error:', error);
+                    }
+                }
+            }, 20000);
+            
+            addLog('> REAL-TIME MULTI-WALLET MONITORING ACTIVE', 'success');
+        }
+        
+        async function checkWalletConnection() {
+            if (!window.ethereum) return false;
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                
+                // Vérifier si le wallet est toujours connecté et correspond à userAccount
+                if (accounts.length === 0) {
+                    addLog('> NO CONNECTED WALLETS DETECTED', 'warning');
+                    return false;
+                }
+                
+                if (userAccount && accounts.includes(userAccount)) {
+                    addLog(`> WALLET CONNECTION VERIFIED: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                    return true;
+                } else if (userAccount && !accounts.includes(userAccount)) {
+                    addLog(`> WALLET MISMATCH DETECTED`, 'warning');
+                    addLog(`> EXPECTED: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'warning');
+                    addLog(`> CURRENT: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'warning');
+                    
+                    // Auto-switch au nouveau wallet
+                    const oldAccount = userAccount;
+                    userAccount = accounts[0];
+                    
+                    // Réinitialiser l'état pour le nouveau wallet
+                    state.registered = false;
+                    state.claimableAmount = 0;
+                    state.userClaimed = false;
+                    state.taamBalance = 0;
+                    state.maticBalance = 0;
+                    
+                    addLog(`> AUTO-SWITCHING TO NEW WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'info');
+                    
+                    // Charger les données du nouveau wallet
+                    await Promise.all([
+                        loadUserBalances(),
+                        checkRegistrationStatus()
+                    ]);
+                    
+                    updateConnectedUI();
+                    updateUI();
+                    savePersistedState();
+                    
+                    return true;
+                }
+                
+                return false;
+            } catch (error) {
+                addLog('> ERROR CHECKING WALLET CONNECTION', 'error');
+                console.error('Wallet connection check error:', error);
+                return false;
+            }
+        }
+        
+        // Initialisation de l'application
+        async function initializeApp() {
+            addLog('> INITIALIZING TAAMS PROTOCOL BLOCKCHAIN INTERFACE...', 'info');
+            
+            if (typeof window.ethereum !== 'undefined') {
+                addLog('> METAMASK DETECTED - BLOCKCHAIN ACCESS READY', 'success');
+                web3 = new Web3(window.ethereum);
+                addLog('> WEB3 INITIALIZED FOR POLYGON NETWORK', 'success');
+                
+                // Charger les informations de réseau
+                try {
+                    const networkId = await web3.eth.net.getId();
+                    addLog(`> CURRENT NETWORK ID: ${networkId}`, 'info');
+                    if (networkId === POLYGON_CHAIN_ID) {
+                        addLog('> CONNECTED TO POLYGON MAINNET', 'success');
+                    } else {
+                        addLog('> NOT ON POLYGON NETWORK - SWITCH REQUIRED', 'warning');
+                    }
+                } catch (error) {
+                    addLog('> UNABLE TO DETECT NETWORK', 'warning');
+                }
+            } else {
+                addLog('> METAMASK NOT FOUND - BLOCKCHAIN ACCESS UNAVAILABLE', 'error');
+                showAlert('MetaMask is required to access the TAAMS Protocol blockchain data', 'error');
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('connect-wallet').addEventListener('click', connectWallet);
+            document.getElementById('register-btn').addEventListener('click', registerForAirdrop);
+            document.getElementById('claim-btn').addEventListener('click', claimAirdrop);
+            document.getElementById('reload-button').addEventListener('click', refreshConnection);
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!this.classList.contains('locked')) {
+                        const navTitle = this.querySelector('.nav-title').textContent;
+                        addLog(`> ACCESSING ${navTitle}...`, 'success');
+                        
+                        // Ouvrir le module correspondant
+                        switch(navTitle) {
+                            case 'BURN PORTAL':
+                                openBurnPortal();
+                                break;
+                            case 'STAKING CHAMBER':
+                                openStakingChamber();
+                                break;
+                            case 'GOVERNANCE HUB':
+                                openGovernanceHub();
+                                break;
+                            case 'BL2P MANAGER':
+                                openBL2PManager();
+                                break;
+                            case 'ADVERTISEMENT HUB':
+                                openAdvertisementHub();
+                                break;
+                            default:
+                                addLog(`> MODULE ${navTitle} NOT IMPLEMENTED YET`, 'warning');
+                        }
+                    } else {
+                        addLog('> ACCESS DENIED: REGISTRATION REQUIRED', 'error');
+                        showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                    }
+                });
+            });
+        }
+        
+        async function refreshConnection() {
+            addLog('> REFRESHING BLOCKCHAIN CONNECTION...', 'info');
+            const reloadBtn = document.getElementById('reload-button');
+            reloadBtn.style.transform = 'rotate(360deg)';
+            
+            setTimeout(() => {
+                reloadBtn.style.transform = 'rotate(0deg)';
+            }, 500);
+            
+            if (state.connected && userAccount) {
+                try {
+                    // Actualiser toutes les données blockchain en temps réel
+                    await Promise.all([
+                        loadUserBalances(),
+                        loadContractData(),
+                        checkRegistrationStatus()
+                    ]);
+                    
+                    // Obtenir des statistiques blockchain additionnelles
+                    if (contract) {
+                        try {
+                            const [
+                                earlyAdopterCount,
+                                proposalCount,
+                                totalStaked,
+                                currentBurnCycle
+                            ] = await Promise.all([
+                                contract.methods.earlyAdopterCount().call(),
+                                contract.methods.proposalCount().call(),
+                                contract.methods.totalStaked().call(),
+                                contract.methods.currentBurnCycle().call()
+                            ]);
+                            
+                            addLog(`> EARLY ADOPTERS: ${earlyAdopterCount}`, 'info');
+                            addLog(`> GOVERNANCE PROPOSALS: ${proposalCount}`, 'info');
+                            addLog(`> TOTAL STAKED: ${formatNumber(parseFloat(web3.utils.fromWei(totalStaked, 'ether')))} TAAMS`, 'info');
+                            addLog(`> CURRENT BURN CYCLE: ${currentBurnCycle}`, 'info');
+                        } catch (error) {
+                            addLog('> ADDITIONAL STATS UNAVAILABLE', 'warning');
+                        }
+                    }
+                    
+                    addLog('> BLOCKCHAIN DATA REFRESHED SUCCESSFULLY', 'success');
+                } catch (error) {
+                    addLog('> ERROR REFRESHING BLOCKCHAIN DATA', 'error');
+                    console.error('Refresh error:', error);
+                }
+            } else {
+                addLog('> NO ACTIVE BLOCKCHAIN CONNECTION TO REFRESH', 'warning');
+            }
+        }
+        
+        // ====== FONCTIONS DES MODULES ======
+        
+        function openBurnPortal() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> INITIALIZING BURN PORTAL MODULE...', 'success');
+            createModuleInterface('BURN PORTAL', `
+                <div class="module-content">
+                    <h2 class="module-title">🔥 BURN PORTAL</h2>
+                    <div class="burn-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Burned:</span>
+                            <span class="stat-value" id="total-burned">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Your Burned Tokens:</span>
+                            <span class="stat-value" id="user-burned">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Current Burn Cycle:</span>
+                            <span class="stat-value" id="burn-cycle">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="burn-interface">
+                        <input type="number" id="burn-amount" placeholder="Amount to burn" min="0" step="0.001">
+                        <button id="burn-tokens-btn" class="action-btn">🔥 BURN TOKENS</button>
+                    </div>
+                </div>
+            `);
+            loadBurnPortalData();
+        }
+        
+        function openStakingChamber() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> ACCESSING STAKING CHAMBER...', 'success');
+            createModuleInterface('STAKING CHAMBER', `
+                <div class="module-content">
+                    <h2 class="module-title">⚡ STAKING CHAMBER</h2>
+                    <div class="staking-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Staked:</span>
+                            <span class="stat-value" id="total-staked">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Your Stake:</span>
+                            <span class="stat-value" id="user-staked">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">APY:</span>
+                            <span class="stat-value" id="staking-apy">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="staking-interface">
+                        <input type="number" id="stake-amount" placeholder="Amount to stake" min="0" step="0.001">
+                        <button id="stake-tokens-btn" class="action-btn">⚡ STAKE TOKENS</button>
+                        <button id="unstake-tokens-btn" class="action-btn">📤 UNSTAKE</button>
+                    </div>
+                </div>
+            `);
+            loadStakingChamberData();
+        }
+        
+        function openGovernanceHub() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> ENTERING GOVERNANCE HUB...', 'success');
+            createModuleInterface('GOVERNANCE HUB', `
+                <div class="module-content">
+                    <h2 class="module-title">🏛️ GOVERNANCE HUB</h2>
+                    <div class="governance-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Active Proposals:</span>
+                            <span class="stat-value" id="active-proposals">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Your Voting Power:</span>
+                            <span class="stat-value" id="voting-power">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="proposals-list" id="proposals-list">
+                        <div class="loading">Loading proposals...</div>
+                    </div>
+                </div>
+            `);
+            loadGovernanceData();
+        }
+        
+        function openBL2PManager() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> LAUNCHING BL2P MANAGER...', 'success');
+            createModuleInterface('BL2P MANAGER', `
+                <div class="module-content">
+                    <h2 class="module-title">🌊 BL2P MANAGER</h2>
+                    <div class="bl2p-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Pool Liquidity:</span>
+                            <span class="stat-value" id="pool-liquidity">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Your LP Tokens:</span>
+                            <span class="stat-value" id="user-lp">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="bl2p-interface">
+                        <div class="liquidity-controls">
+                            <input type="number" id="add-liquidity-amount" placeholder="Amount" min="0" step="0.001">
+                            <button id="add-liquidity-btn" class="action-btn">➕ ADD LIQUIDITY</button>
+                            <button id="remove-liquidity-btn" class="action-btn">➖ REMOVE LIQUIDITY</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+            loadBL2PData();
+        }
+        
+        function openAdvertisementHub() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> LAUNCHING ADVERTISEMENT HUB...', 'success');
+            createModuleInterface('ADVERTISEMENT HUB', `
+                <div class="module-content">
+                    <h2 class="module-title">📢 ADVERTISEMENT HUB</h2>
+                    <div class="ad-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Ads:</span>
+                            <span class="stat-value" id="total-ads">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Your Ads:</span>
+                            <span class="stat-value" id="user-ads">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Last Posted:</span>
+                            <span class="stat-value" id="last-ad-time">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="ad-interface">
+                        <h3>📝 Post New Advertisement</h3>
+                        <textarea id="ad-message" placeholder="Enter your advertisement message..." rows="4" maxlength="280"></textarea>
+                        <div class="ad-controls">
+                            <button id="post-ad-btn" class="action-btn">📢 POST ADVERTISEMENT</button>
+                            <span class="char-counter" id="char-counter">0/280</span>
+                        </div>
+                    </div>
+                    <div class="ads-list">
+                        <h3>📰 Recent Advertisements</h3>
+                        <div id="advertisements-container">
+                            <div class="loading">Loading advertisements...</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            loadAdvertisementData();
+        }
+        
+        function createModuleInterface(moduleTitle, content) {
+            // Créer un overlay pour le module
+            const overlay = document.createElement('div');
+            overlay.className = 'module-overlay';
+            overlay.innerHTML = `
+                <div class="module-window">
+                    <div class="module-header">
+                        <span class="module-header-title">${moduleTitle}</span>
+                        <button class="close-module" onclick="closeModule()">×</button>
+                    </div>
+                    ${content}
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Animation d'apparition
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                overlay.style.transform = 'scale(1)';
+            }, 10);
+        }
+        
+        function closeModule() {
+            const overlay = document.querySelector('.module-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                overlay.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }
+            addLog('> MODULE CLOSED', 'info');
+        }
+        
+        // ====== FONCTIONS DE CHARGEMENT DES DONNÉES ======
+        
+        async function loadBurnPortalData() {
+            if (!contract || !userAccount) {
+                document.getElementById('total-burned').textContent = 'Not Connected';
+                document.getElementById('user-burned').textContent = 'Not Connected';
+                document.getElementById('burn-cycle').textContent = 'Not Connected';
+                return;
+            }
+            
+            try {
+                // Simuler le chargement des données de burn (adapt selon votre contrat)
+                document.getElementById('total-burned').textContent = formatNumber(state.totalBurned || 0) + ' TAAMS';
+                document.getElementById('user-burned').textContent = '0 TAAMS'; // À adapter
+                document.getElementById('burn-cycle').textContent = '1'; // À adapter
+                
+                // Ajouter l'event listener pour le bouton burn
+                const burnBtn = document.getElementById('burn-tokens-btn');
+                if (burnBtn) {
+                    burnBtn.addEventListener('click', async () => {
+                        const amount = document.getElementById('burn-amount').value;
+                        if (amount && amount > 0) {
+                            addLog(`> BURN FEATURE: ${amount} TAAMS`, 'info');
+                            showAlert('Burn feature will be implemented soon!', 'info');
+                        } else {
+                            showAlert('Please enter a valid amount to burn', 'warning');
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                addLog('> BURN PORTAL: ERROR LOADING DATA', 'error');
+                console.error('Burn portal data error:', error);
+            }
+        }
+        
+        async function loadStakingChamberData() {
+            if (!contract || !userAccount) {
+                document.getElementById('total-staked').textContent = 'Not Connected';
+                document.getElementById('user-staked').textContent = 'Not Connected';
+                document.getElementById('staking-apy').textContent = 'Not Connected';
+                return;
+            }
+            
+            try {
+                // Charger les données de staking
+                document.getElementById('total-staked').textContent = '0 TAAMS'; // À adapter
+                document.getElementById('user-staked').textContent = '0 TAAMS'; // À adapter
+                document.getElementById('staking-apy').textContent = '15%'; // À adapter
+                
+                // Event listeners pour les boutons
+                const stakeBtn = document.getElementById('stake-tokens-btn');
+                const unstakeBtn = document.getElementById('unstake-tokens-btn');
+                
+                if (stakeBtn) {
+                    stakeBtn.addEventListener('click', async () => {
+                        const amount = document.getElementById('stake-amount').value;
+                        if (amount && amount > 0) {
+                            addLog(`> STAKE FEATURE: ${amount} TAAMS`, 'info');
+                            showAlert('Staking feature will be implemented soon!', 'info');
+                        } else {
+                            showAlert('Please enter a valid amount to stake', 'warning');
+                        }
+                    });
+                }
+                
+                if (unstakeBtn) {
+                    unstakeBtn.addEventListener('click', async () => {
+                        addLog('> UNSTAKE FEATURE ACTIVATED', 'info');
+                        showAlert('Unstaking feature will be implemented soon!', 'info');
+                    });
+                }
+                
+            } catch (error) {
+                addLog('> STAKING CHAMBER: ERROR LOADING DATA', 'error');
+                console.error('Staking chamber data error:', error);
+            }
+        }
+        
+        async function loadGovernanceData() {
+            if (!contract || !userAccount) {
+                document.getElementById('active-proposals').textContent = 'Not Connected';
+                document.getElementById('voting-power').textContent = 'Not Connected';
+                return;
+            }
+            
+            try {
+                document.getElementById('active-proposals').textContent = '0';
+                document.getElementById('voting-power').textContent = formatNumber(state.taamBalance || 0);
+                
+                // Charger la liste des propositions
+                const proposalsList = document.getElementById('proposals-list');
+                proposalsList.innerHTML = '<div class="proposal-item">No active proposals at this time</div>';
+                
+            } catch (error) {
+                addLog('> GOVERNANCE HUB: ERROR LOADING DATA', 'error');
+                console.error('Governance data error:', error);
+            }
+        }
+        
+        async function loadBL2PData() {
+            if (!contract || !userAccount) {
+                document.getElementById('pool-liquidity').textContent = 'Not Connected';
+                document.getElementById('user-lp').textContent = 'Not Connected';
+                return;
+            }
+            
+            try {
+                document.getElementById('pool-liquidity').textContent = '0 TAAMS';
+                document.getElementById('user-lp').textContent = '0 LP';
+                
+                // Event listeners pour les boutons
+                const addBtn = document.getElementById('add-liquidity-btn');
+                const removeBtn = document.getElementById('remove-liquidity-btn');
+                
+                if (addBtn) {
+                    addBtn.addEventListener('click', async () => {
+                        const amount = document.getElementById('add-liquidity-amount').value;
+                        if (amount && amount > 0) {
+                            addLog(`> ADD LIQUIDITY: ${amount} TAAMS`, 'info');
+                            showAlert('Liquidity feature will be implemented soon!', 'info');
+                        } else {
+                            showAlert('Please enter a valid amount', 'warning');
+                        }
+                    });
+                }
+                
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', async () => {
+                        addLog('> REMOVE LIQUIDITY ACTIVATED', 'info');
+                        showAlert('Remove liquidity feature will be implemented soon!', 'info');
+                    });
+                }
+                
+            } catch (error) {
+                addLog('> BL2P MANAGER: ERROR LOADING DATA', 'error');
+                console.error('BL2P data error:', error);
+            }
+        }
+        
+        async function loadAdvertisementData() {
+            if (!contract || !userAccount) {
+                document.getElementById('total-ads').textContent = 'Not Connected';
+                document.getElementById('user-ads').textContent = 'Not Connected';
+                document.getElementById('last-ad-time').textContent = 'Not Connected';
+                return;
+            }
+            
+            try {
+                // Charger les données des advertisements depuis le contrat
+                const adCount = await contract.methods.advertisementCount().call();
+                document.getElementById('total-ads').textContent = adCount || '0';
+                document.getElementById('user-ads').textContent = '0'; // À calculer selon vos besoins
+                document.getElementById('last-ad-time').textContent = 'Never';
+                
+                // Charger les dernières advertisements
+                await loadRecentAdvertisements();
+                
+                // Event listeners pour poster une nouvelle ad
+                const postBtn = document.getElementById('post-ad-btn');
+                const adMessage = document.getElementById('ad-message');
+                const charCounter = document.getElementById('char-counter');
+                
+                if (adMessage && charCounter) {
+                    adMessage.addEventListener('input', () => {
+                        const length = adMessage.value.length;
+                        charCounter.textContent = `${length}/280`;
+                        if (length > 280) {
+                            charCounter.style.color = '#ff0066';
+                        } else {
+                            charCounter.style.color = '#00ff88';
+                        }
+                    });
+                }
+                
+                if (postBtn) {
+                    postBtn.addEventListener('click', async () => {
+                        const message = adMessage.value.trim();
+                        if (message && message.length <= 280) {
+                            await postAdvertisement(message);
+                        } else {
+                            showAlert('Please enter a valid message (max 280 characters)', 'warning');
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                addLog('> ADVERTISEMENT HUB: ERROR LOADING DATA', 'error');
+                console.error('Advertisement data error:', error);
+            }
+        }
+        
+        async function loadRecentAdvertisements() {
+            const container = document.getElementById('advertisements-container');
+            if (!container || !contract) return;
+            
+            try {
+                const adCount = await contract.methods.advertisementCount().call();
+                const totalAds = parseInt(adCount);
+                
+                if (totalAds === 0) {
+                    container.innerHTML = '<div class="no-ads">No advertisements posted yet</div>';
+                    return;
+                }
+                
+                // Charger les 10 dernières ads
+                const startIndex = Math.max(0, totalAds - 10);
+                const ads = [];
+                
+                for (let i = totalAds - 1; i >= startIndex; i--) {
+                    try {
+                        const ad = await contract.methods.advertisements(i).call();
+                        ads.push({
+                            id: ad.id,
+                            message: ad.message,
+                            postedBlock: ad.postedBlock
+                        });
+                    } catch (error) {
+                        console.error(`Error loading ad ${i}:`, error);
+                    }
+                }
+                
+                // Afficher les ads
+                container.innerHTML = ads.map(ad => `
+                    <div class="ad-item">
+                        <div class="ad-header">
+                            <span class="ad-id">Ad #${ad.id}</span>
+                            <span class="ad-block">Block ${ad.postedBlock}</span>
+                        </div>
+                        <div class="ad-message">${ad.message}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading advertisements</div>';
+                console.error('Error loading recent ads:', error);
+            }
+        }
+        
+        async function postAdvertisement(message) {
+            if (!contract || !userAccount) {
+                showAlert('Contract not available', 'error');
+                return;
+            }
+            
+            try {
+                addLog(`> POSTING ADVERTISEMENT...`, 'info');
+                const postBtn = document.getElementById('post-ad-btn');
+                postBtn.disabled = true;
+                postBtn.textContent = 'POSTING...';
+                
+                // Estimer le gas (cette méthode peut ne pas exister dans votre contrat)
+                // Vous devrez adapter selon les méthodes disponibles dans votre contrat
+                const gasEstimate = await contract.methods.postAdvertisement ? 
+                    contract.methods.postAdvertisement(message).estimateGas({ from: userAccount }) : 
+                    100000;
+                
+                // Si la méthode postAdvertisement existe
+                if (contract.methods.postAdvertisement) {
+                    const result = await contract.methods.postAdvertisement(message).send({
+                        from: userAccount,
+                        gas: gasEstimate
+                    });
+                    
+                    addLog(`> ADVERTISEMENT POSTED: ${result.transactionHash}`, 'success');
+                    showAlert('Advertisement posted successfully!', 'success');
+                    
+                    // Vider le champ de message
+                    document.getElementById('ad-message').value = '';
+                    document.getElementById('char-counter').textContent = '0/280';
+                    
+                    // Recharger les advertisements
+                    setTimeout(() => {
+                        loadRecentAdvertisements();
+                    }, 3000);
+                } else {
+                    addLog('> ADVERTISEMENT FEATURE NOT AVAILABLE IN CONTRACT', 'warning');
+                    showAlert('Advertisement posting feature will be available soon!', 'info');
+                }
+                
+            } catch (error) {
+                addLog('> ADVERTISEMENT POSTING FAILED', 'error');
+                console.error('Post advertisement error:', error);
+                showAlert('Failed to post advertisement. Please try again.', 'error');
+            } finally {
+                const postBtn = document.getElementById('post-ad-btn');
+                postBtn.disabled = false;
+                postBtn.textContent = '📢 POST ADVERTISEMENT';
+            }
+        }
+        
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', async function() {
+            const hasPersistedSession = loadPersistedState();
+            
+            await initializeApp();
+            setupEventListeners();
+            
+            if (hasPersistedSession) {
+                const isStillConnected = await checkWalletConnection();
+                if (isStillConnected) {
+                    addLog('> SESSION RESTORED SUCCESSFULLY', 'success');
+                    await initializeContract();
+                    if (state.connectionStable) {
+                        await checkRegistrationStatus();
+                        setupContractEvents();
+                        startConnectionMonitoring();
+                    }
+                } else {
+                    addLog('> PREVIOUS SESSION EXPIRED', 'warning');
+                    clearPersistedState();
+                    resetConnectionState();
+                }
+            }
+        });
+        
+        // Events MetaMask améliorés pour changement de wallet
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', function(accounts) {
+                if (accounts.length === 0) {
+                    addLog('> WALLET DISCONNECTED BY USER', 'warning');
+                    clearPersistedState();
+                    resetConnectionState();
+                    showAlert('Wallet disconnected. Please reconnect to continue.', 'warning');
+                } else if (accounts[0] !== userAccount) {
+                    addLog(`> WALLET CHANGED: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
+                    addLog('> LOADING NEW WALLET DATA...', 'info');
+                    showAlert('Wallet changed. Loading new wallet data...', 'info');
+                    
+                    // Mettre à jour immédiatement l'adresse
+                    const previousAccount = userAccount;
+                    userAccount = accounts[0];
+                    
+                    // Réinitialiser l'état pour le nouveau wallet
+                    state.registered = false;
+                    state.claimableAmount = 0;
+                    state.userClaimed = false;
+                    state.taamBalance = 0;
+                    state.maticBalance = 0;
+                    
+                    // Mettre à jour l'UI avec le nouveau wallet
+                    updateConnectedUI();
+                    
+                    // Charger toutes les données du nouveau wallet
+                    setTimeout(async () => {
+                        try {
+                            addLog(`> PREVIOUS WALLET: ${previousAccount ? previousAccount.slice(0, 6) + '...' + previousAccount.slice(-4) : 'None'}`, 'info');
+                            addLog(`> NEW WALLET: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                            
+                            // Charger toutes les données spécifiques au nouveau wallet
+                            await Promise.all([
+                                loadUserBalances(),
+                                checkRegistrationStatus()
+                            ]);
+                            
+                            // Mettre à jour l'interface
+                            updateUI();
+                            
+                            // Sauvegarder le nouvel état
+                            savePersistedState();
+                            
+                            addLog('> NEW WALLET DATA LOADED SUCCESSFULLY', 'success');
+                            showAlert(`Wallet data loaded for ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                            
+                        } catch (error) {
+                            addLog('> ERROR LOADING NEW WALLET DATA', 'error');
+                            console.error('Wallet change error:', error);
+                            showAlert('Error loading new wallet data. Please refresh.', 'error');
+                        }
+                    }, 1000);
+                }
+            });
+            
+            window.ethereum.on('chainChanged', function(chainId) {
+                addLog('> NETWORK CHANGED', 'info');
+                showAlert('Network changed. Reconnecting...', 'info');
+                setTimeout(async () => {
+                    if (state.connected && userAccount) {
+                        await initializeContract();
+                        if (state.connectionStable) {
+                            // Recharger les données spécifiques au wallet sur le nouveau réseau
+                            await Promise.all([
+                                loadUserBalances(),
+                                checkRegistrationStatus()
+                            ]);
+                            updateUI();
+                        }
+                    }
+                }, 1000);
+            });
+            
+            window.ethereum.on('disconnect', function() {
+                addLog('> ETHEREUM PROVIDER DISCONNECTED', 'error');
+                clearPersistedState();
+                resetConnectionState();
+                showAlert('Provider disconnected. Please reconnect.', 'error');
+            });
+        }
+        
+        // Fonction pour valider les changements de wallet et la mise à jour des données
+        function validateWalletStateTransition(previousWallet, newWallet) {
+            addLog('> VALIDATING WALLET STATE TRANSITION...', 'info');
+            
+            if (previousWallet && previousWallet !== newWallet) {
+                // Effacer les données de l'ancien wallet du localStorage
+                const oldStateKey = `taams_state_${previousWallet}`;
+                if (localStorage.getItem(oldStateKey)) {
+                    addLog(`> PRESERVING DATA FOR PREVIOUS WALLET: ${previousWallet.slice(0, 6)}...${previousWallet.slice(-4)}`, 'info');
+                }
+                
+                // Vérifier que le nouvel état est correctement initialisé
+                const newStateKey = `taams_state_${newWallet}`;
+                const newWalletState = localStorage.getItem(newStateKey);
+                
+                if (newWalletState) {
+                    addLog(`> LOADING EXISTING DATA FOR WALLET: ${newWallet.slice(0, 6)}...${newWallet.slice(-4)}`, 'info');
+                } else {
+                    addLog(`> INITIALIZING FRESH STATE FOR NEW WALLET: ${newWallet.slice(0, 6)}...${newWallet.slice(-4)}`, 'info');
+                }
+                
+                // Réinitialiser les données UI spécifiques au wallet
+                resetWalletSpecificUI();
+                
+                addLog('> WALLET STATE TRANSITION VALIDATED', 'success');
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Fonction pour réinitialiser l'UI spécifique au wallet
+        function resetWalletSpecificUI() {
+            // Réinitialiser les montants affichés
+            document.getElementById('matic-balance').textContent = '0.00';
+            document.getElementById('taams-balance').textContent = '0.00';
+            
+            // Réinitialiser le statut d'enregistrement
+            const registerBtn = document.getElementById('register-btn');
+            const claimBtn = document.getElementById('claim-btn');
+            
+            if (registerBtn) {
+                registerBtn.disabled = true;
+                registerBtn.textContent = 'CHECKING...';
+            }
+            
+            if (claimBtn) {
+                claimBtn.disabled = true;
+                claimBtn.textContent = 'CHECKING...';
+            }
+            
+            // Réinitialiser les indicateurs visuels
+            updateConnectionStatus();
+        }
+        
+        // Fonction pour tester le changement de wallet
+        async function testWalletChangeHandling() {
+            addLog('> TESTING WALLET CHANGE HANDLING...', 'info');
+            
+            if (!userAccount) {
+                addLog('> NO WALLET CONNECTED FOR TESTING', 'warning');
+                return;
+            }
+            
+            const currentWallet = userAccount;
+            addLog(`> CURRENT WALLET: ${currentWallet.slice(0, 6)}...${currentWallet.slice(-4)}`, 'info');
+            
+            // Vérifier l'état persistant pour ce wallet
+            const stateKey = `taams_state_${currentWallet}`;
+            const persistedState = localStorage.getItem(stateKey);
+            
+            if (persistedState) {
+                const parsedState = JSON.parse(persistedState);
+                addLog(`> WALLET STATE LOADED: Registration=${parsedState.walletSpecific?.registrationStatus || 'unknown'}`, 'info');
+                addLog(`> LAST UPDATED: ${new Date(parsedState.walletSpecific?.lastChecked || 0).toLocaleString()}`, 'info');
+            } else {
+                addLog(`> NO PREVIOUS STATE FOUND FOR WALLET`, 'info');
+            }
+            
+            addLog('> WALLET CHANGE HANDLING TEST COMPLETE', 'success');
+        }
+        
+        // Gestionnaire d'erreurs global
+        window.addEventListener('error', function(event) {
+            addLog('> CRITICAL ERROR DETECTED', 'error');
+            console.error('Critical error:', event.error);
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            addLog('> UNHANDLED PROMISE REJECTION', 'error');
+            console.error('Unhandled rejection:', event.reason);
+        });
+    </script>
+</body>
+</html>
