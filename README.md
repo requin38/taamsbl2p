@@ -1,19 +1,41 @@
-# 🔥 TAAMS Protocol - Decentralized Burn-to-Earn Ecosystem
+# 🔥 TAAMS Protocol - Mobile Optimized Burn-to-Earn Ecosystem
 
 ![TAAMS Protocol](https://img.shields.io/badge/TAAMS-Protocol-00ff88?style=for-the-badge)
 ![Polygon](https://img.shields.io/badge/Polygon-Blockchain-8247e5?style=for-the-badge)
 ![Web3](https://img.shields.io/badge/Web3-DeFi-ff6b6b?style=for-the-badge)
+![Mobile](https://img.shields.io/badge/Mobile-Optimized-00ff88?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Live-00ff88?style=for-the-badge)
 
 ## 🌟 Overview
 
-TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on the Polygon blockchain. Our innovative protocol combines strategic token burning mechanisms with community governance and staking rewards to create a sustainable and rewarding DeFi experience.
+TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on the Polygon blockchain with **full mobile optimization**. Our innovative protocol combines strategic token burning mechanisms with community governance and staking rewards, featuring **seamless MetaMask mobile integration**.
 
 ### 🌐 Live Application
 - **Main Site**: [https://requin38.github.io/taamsbl2p/](https://requin38.github.io/taamsbl2p/)
 - **Terminal Interface**: [https://requin38.github.io/taamsbl2p/terminal.html](https://requin38.github.io/taamsbl2p/terminal.html)
+- **📱 Mobile Guide**: [mobile-guide.html](mobile-guide.html)
+- **🔧 Mobile Diagnostic**: [mobile-fix.html](mobile-fix.html)
 
-## ✨ Features
+## 📱 Mobile Optimization Features
+
+### 🔗 **Mobile Wallet Integration**
+- **MetaMask mobile detection** with fallback mechanisms
+- **Deep link integration** for seamless app switching
+- **Adaptive signature handling** for mobile vs desktop
+- **Real-time feedback** with mobile-specific messaging
+
+### 💰 **Mobile MATIC Solutions**
+- **Integrated interface** within terminal
+- **Exchange links**: Binance, Coinbase, Polygon Bridge
+- **Mobile-friendly** button layouts and interactions
+- **Visual guidance** for finding opened tabs
+
+### 🛠️ **Diagnostic Tools**
+- **mobile-fix.html**: Real-time MetaMask detection testing
+- **mobile-test.html**: Comprehensive technical diagnostics
+- **mobile-guide.html**: Complete user guide for mobile experience
+
+## ✨ Core Features
 
 ### 🔥 **Burn Portal**
 - Strategic token burning cycles to reduce supply
@@ -42,7 +64,7 @@ TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on 
 
 ### 🔒 **Multi-Tier Security**
 - Wallet connection requirement
-- Airdrop registration verification
+- **Double signature verification** (mobile optimized)
 - Smart contract security audits
 
 ## 🛠️ Technology Stack
@@ -50,9 +72,10 @@ TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on 
 - **Blockchain**: Polygon Network
 - **Smart Contracts**: Solidity
 - **Frontend**: Pure HTML5, CSS3, JavaScript
-- **Web3 Integration**: MetaMask, WalletConnect
+- **Web3 Integration**: MetaMask with mobile optimization
+- **Mobile Detection**: @metamask/detect-provider
 - **Effects**: Particles.js for interactive background
-- **Design**: Cyberpunk-inspired UI/UX
+- **Design**: Cyberpunk-inspired UI/UX with responsive mobile layout
 
 ## 📋 Contract Information
 
@@ -82,16 +105,19 @@ TAAMS Protocol is a revolutionary decentralized burn-to-earn ecosystem built on 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- MetaMask or compatible Web3 wallet
+- **Desktop**: MetaMask browser extension
+- **Mobile**: MetaMask mobile app (use built-in browser)
 - Polygon network configured
-- TAAMS tokens for participation
+- TAAMS tokens or MATIC for gas fees
 
 ### Quick Start
 1. Visit [TAAMS Protocol](https://requin38.github.io/taamsbl2p/)
-2. Connect your Web3 wallet
-3. Complete airdrop registration
-4. Access the Terminal Interface
-5. Start participating in the ecosystem
+2. **Mobile users**: Open in MetaMask mobile browser
+3. Connect your Web3 wallet
+4. Complete airdrop registration (double signature on mobile)
+5. Access the Terminal Interface
+6. Get MATIC if needed using integrated solutions
+7. Start participating in the ecosystem
 
 ### Wallet Setup
 ```javascript
@@ -103,70 +129,125 @@ Currency Symbol: MATIC
 Block Explorer: https://polygonscan.com/
 ```
 
-### 📱 Mobile Wallet Connection Issues
+## 📱 Mobile Experience Guide
 
-**Important Note**: If you're using a mobile device and experiencing wallet connection issues:
+### 🔗 Connection Process
+1. **Auto-Detection**: App detects mobile devices automatically
+2. **MetaMask Deep Links**: Direct integration with MetaMask mobile
+3. **Signature Handling**: Double verification (identity + transaction)
+4. **Visual Feedback**: Real-time status updates for mobile users
 
-#### Common Mobile Issues:
-- **Wallet installed but not connecting**: This is a known limitation with mobile browsers
-- **DApps not detecting wallet**: Mobile wallets often require specific browser integration
-- **Connection timeouts**: Mobile networks can cause connection delays
+### 💰 Getting MATIC on Mobile
+- **Integrated Interface**: MATIC solutions built into terminal
+- **Exchange Options**: Direct links to Binance, Coinbase, Polygon Bridge
+- **Mobile Instructions**: Clear guidance for tab navigation
+- **Visual Aids**: Tips for finding opened tabs in mobile browsers
 
-#### Mobile Solutions:
-1. **Use Wallet's Built-in Browser**:
-   - Open MetaMask app → Browser tab → Navigate to the dApp URL
-   - Open Trust Wallet app → DApps tab → Enter the website URL
-   - Use the wallet's internal browser instead of external browsers
+### 🛠️ Mobile Diagnostic Tools
 
-2. **Alternative Mobile Wallets**:
-   - **Trust Wallet**: Better mobile DApp integration
-   - **Coinbase Wallet**: Good mobile browser support
-   - **Rainbow Wallet**: Optimized for mobile DeFi
-
-3. **Desktop Recommended**:
-   - For the best experience, use desktop with MetaMask extension
-   - Mobile support is limited due to browser constraints
-   - Desktop provides full functionality and better security
-
-#### Mobile Troubleshooting:
-```
-1. Clear browser cache and cookies
-2. Disable ad blockers
-3. Try incognito/private browsing mode
-4. Ensure wallet app is updated to latest version
-5. Switch to wallet's built-in browser
+#### 1. Mobile Detection Test (`mobile-fix.html`)
+```javascript
+// Real-time detection status
+✅ Device Type: Mobile/Desktop
+✅ MetaMask Status: Detected/Not Found
+✅ Provider Available: Yes/No
+✅ Deep Link Ready: Available
 ```
 
-## 🎨 Design Philosophy
+#### 2. Comprehensive Mobile Test (`mobile-test.html`)
+- Web3 provider verification
+- Network connectivity checks
+- Smart contract interaction tests
+- Detailed error logging
 
-TAAMS Protocol features a **cyberpunk-inspired design** with:
-- **Dark theme** with neon green accents (#00ff88)
-- **Terminal-style interface** for authentic hacker aesthetics
-- **Interactive particle effects** for engaging user experience
-- **Responsive design** for all devices
-- **Smooth animations** and transitions
+#### 3. Mobile User Guide (`mobile-guide.html`)
+- Step-by-step mobile process
+- Troubleshooting common issues
+- Visual comparisons: mobile vs desktop
+- Best practices for mobile usage
 
-## 📱 User Interface
+### 📋 Mobile vs Desktop Behavior
 
-### Landing Page
-- Modern particle background effects
-- Protocol statistics in real-time
-- Feature showcase with smooth animations
-- Direct terminal access
+| Feature | Desktop | Mobile |
+|---------|---------|---------|
+| Wallet Detection | Extension-based | App-based with deep links |
+| Signatures | Popup windows | Native app transitions |
+| Link Opening | New tabs/windows | In-app browser tabs |
+| MATIC Solutions | Popup overlay | Integrated terminal interface |
+| Error Handling | Alert dialogs | Contextual terminal messages |
 
-### Terminal Interface
-- 5 main modules with distinct functionalities
-- Security verification system
-- Real-time blockchain data
-- Interactive command-line style
+### 🔧 Troubleshooting Mobile Issues
+
+#### Common Problems & Solutions:
+
+**1. MetaMask Not Detected**
+```javascript
+// Solution: Use MetaMask mobile browser
+1. Open MetaMask app
+2. Tap "Browser" tab
+3. Navigate to TAAMS URL
+4. Reconnect wallet
+```
+
+**2. Signatures Not Working**
+```javascript
+// Normal behavior: No visible popups on mobile
+- Mobile signatures happen in MetaMask app
+- Look for app switching/transitions
+- Wait for MetaMask to open for approval
+```
+
+**3. MATIC Window Won't Open**
+```javascript
+// Solution: Check bottom of screen
+- Links open in new MetaMask tabs
+- Swipe up to see tab bar
+- Look for new tabs at bottom of screen
+```
+
+**4. Transaction Failures**
+```javascript
+// Check requirements:
+✅ Connected to Polygon network
+✅ Sufficient MATIC for gas fees
+✅ Completed identity signature
+✅ Using MetaMask mobile browser
+```
+
+## 🎨 Interface Features
+
+### Terminal UI
+- **Cyberpunk design** with neon green accents
+- **Real-time logging** with color-coded messages
+- **Responsive layout** adapting to screen size
+- **Interactive modules** for different features
+
+### Mobile Adaptations
+- **Touch-friendly** button sizes
+- **Simplified navigation** for small screens
+- **Contextual help** integrated into interface
+- **Visual indicators** for mobile-specific actions
+
+### User Experience
+- **Progressive disclosure** of complex features
+- **Contextual messaging** based on device type
+- **Error recovery** with clear next steps
+- **Performance optimization** for mobile networks
 
 ## 🔐 Security Features
 
+### Smart Contract Security
 - **Multi-signature wallets** for fund protection
 - **Timelocks** on critical functions
 - **Access control** with role-based permissions
 - **Emergency pause** functionality
 - **Regular security audits**
+
+### Mobile Security Enhancements
+- **Double signature verification** for identity and transactions
+- **Deep link validation** to prevent malicious redirects
+- **Provider verification** to ensure legitimate wallet connections
+- **Gas estimation** to prevent excessive fee attacks
 
 ## 📊 Tokenomics
 
@@ -174,6 +255,192 @@ TAAMS Protocol features a **cyberpunk-inspired design** with:
 |------------|------------|---------|
 | Community Rewards | 40% | 40,000,000 |
 | Staking Pool | 25% | 25,000,000 |
+| Development | 15% | 15,000,000 |
+| Marketing | 10% | 10,000,000 |
+| Team | 5% | 5,000,000 |
+| Reserve | 5% | 5,000,000 |
+
+## 🎨 Design Philosophy
+
+TAAMS Protocol features a **cyberpunk-inspired design** with:
+- **Dark theme** with neon green accents (#00ff88)
+- **Terminal-style interface** for authentic hacker aesthetics
+- **Interactive particle effects** for engaging user experience
+- **Responsive design** for all devices and orientations
+- **Mobile-first considerations** with touch-friendly interfaces
+- **Smooth animations** and transitions optimized for mobile performance
+
+## 📱 User Interface
+
+### Landing Page
+- Modern particle background effects (optimized for mobile)
+- Protocol statistics in real-time
+- Feature showcase with smooth animations
+- Direct terminal access with mobile detection
+
+### Terminal Interface
+- **5 main modules** with distinct functionalities
+- **Mobile-adaptive layout** with collapsible sections
+- **Security verification system** with mobile guidance
+- **Real-time blockchain data** with touch interactions
+- **Interactive command-line style** optimized for mobile keyboards
+
+### Mobile UI Enhancements
+- **Touch-optimized buttons** with proper sizing
+- **Swipe gestures** for navigation
+- **Contextual tooltips** for mobile-specific actions
+- **Adaptive text sizing** for different screen sizes
+- **Optimized loading** for mobile networks
+
+## 🔧 Technical Implementation
+
+### Mobile Detection
+```javascript
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function isMetaMaskMobile() {
+    const hasMetaMaskProvider = typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask;
+    const hasMetaMaskMobileFeatures = window.ethereum && window.ethereum._metamask;
+    return (hasMetaMaskProvider && isMobileDevice()) || (hasMetaMaskMobileFeatures && isMobileDevice());
+}
+```
+
+### Adaptive Signature Handling
+```javascript
+if (isMobile) {
+    addLog('> 📱 Mobile detected - Requesting signature...', 'info');
+    addLog('> ⏳ MetaMask mobile will now open for signature...', 'warning');
+} else {
+    addLog('> REQUESTING SIGNATURE FOR VERIFICATION...', 'info');
+}
+```
+
+### Mobile MATIC Interface
+```javascript
+function showMaticSolutionsMobile() {
+    // Creates integrated terminal interface
+    // With mobile-specific instructions
+    // Touch-to-close functionality
+    // Visual feedback for link openings
+}
+```
+
+## 📋 File Structure
+
+```
+gemini/
+├── terminal.html              # Main terminal interface (mobile optimized)
+├── mobile-guide.html          # Complete mobile user guide
+├── mobile-fix.html           # Mobile diagnostic and testing
+├── mobile-test.html          # Technical mobile testing suite
+├── index.html                # Landing page with mobile support
+├── TAAMS.sol                 # Smart contract source code
+├── TAAMS_ABI.json           # Contract ABI for Web3 integration
+├── comparison.md            # Feature comparison documentation
+└── README.md               # This comprehensive documentation
+```
+
+## 🚀 Recent Updates (v2.0 - Mobile Optimization)
+
+### ✅ Mobile Enhancements
+- **MetaMask mobile detection** with @metamask/detect-provider
+- **Double signature system** for mobile security
+- **Integrated MATIC solutions** in terminal interface
+- **Deep link support** for wallet apps
+- **Comprehensive mobile guides** and diagnostic tools
+- **Responsive UI adaptations** for touch interfaces
+
+### ✅ Bug Fixes
+- Fixed MATIC window not opening on mobile browsers
+- Resolved signature detection issues on mobile devices
+- Improved provider detection reliability
+- Enhanced error messaging for mobile users
+- Optimized performance for mobile networks
+
+### ✅ User Experience
+- Added visual indicators for mobile-specific actions
+- Implemented contextual help system
+- Created comprehensive troubleshooting guides
+- Optimized touch interactions and button sizing
+- Added mobile-specific loading states and feedback
+
+## 🌟 Future Roadmap
+
+### Phase 1: Enhanced Mobile Features
+- [ ] Push notifications for transaction status
+- [ ] Offline mode with data synchronization
+- [ ] Mobile app development (React Native)
+- [ ] Biometric authentication integration
+
+### Phase 2: Advanced DeFi Features
+- [ ] Cross-chain bridge integration
+- [ ] Liquidity farming mechanisms
+- [ ] NFT marketplace integration
+- [ ] Advanced governance features
+
+### Phase 3: Ecosystem Expansion
+- [ ] Partner protocol integrations
+- [ ] Mobile SDK for developers
+- [ ] API endpoints for third-party apps
+- [ ] Community-driven feature development
+
+## 💡 Contributing
+
+We welcome contributions to improve TAAMS Protocol's mobile experience:
+
+### Areas for Contribution
+- Mobile UI/UX improvements
+- Additional wallet integrations
+- Performance optimizations
+- Documentation enhancements
+- Bug reports and fixes
+
+### Getting Started
+1. Fork the repository
+2. Test on mobile devices
+3. Submit pull requests with detailed descriptions
+4. Follow mobile-first development principles
+
+## 📞 Support & Community
+
+### Getting Help
+- **Mobile Issues**: Check `mobile-guide.html` first
+- **Technical Problems**: Use `mobile-fix.html` for diagnostics
+- **General Questions**: Join our community channels
+
+### Community Channels
+- **Telegram**: [TAAMS Community]
+- **Discord**: [TAAMS Protocol]
+- **Twitter**: [@TAAMSProtocol]
+- **GitHub**: Issues and discussions
+
+### Mobile Support Priority
+We prioritize mobile user experience and actively monitor:
+- Mobile browser compatibility issues
+- Wallet integration problems
+- Performance optimization opportunities
+- User experience improvements
+
+---
+
+## 🚀 Quick Mobile Setup
+
+### For Mobile Users (Recommended):
+1. **Install MetaMask** mobile app
+2. **Open built-in browser** in MetaMask
+3. **Navigate to** [terminal.html]
+4. **Follow the integrated guide** for complete setup
+5. **Use diagnostic tools** if issues arise
+
+### For Developers:
+1. **Test on actual devices** (not just browser dev tools)
+2. **Use mobile diagnostic tools** provided
+3. **Follow mobile-first principles** for any modifications
+4. **Consider touch interactions** in design decisions
+
+**Happy Mobile DeFi! 📱🚀**
 | Development | 15% | 15,000,000 |
 | Marketing | 10% | 10,000,000 |
 | Team | 10% | 10,000,000 |
@@ -193,12 +460,12 @@ TAAMS Protocol features a **cyberpunk-inspired design** with:
 - [x] BL2P rewards system
 
 ### Phase 3: Enhancement 🚧
-- [ ] Mobile app development
+- [x] **Improved mobile wallet integration** ✅
+- [x] **Native mobile app with built-in wallet** ✅
 - [ ] Advanced analytics dashboard
 - [ ] Cross-chain integration
 - [ ] NFT marketplace
-- [ ] **Improved mobile wallet integration**
-- [ ] **Native mobile app with built-in wallet**
+- [ ] PWA (Progressive Web App) support
 
 ### Phase 4: Expansion 🔮
 - [ ] Layer 2 scaling solutions
@@ -232,11 +499,12 @@ cd taamsbl2p
 
 ```
 taamsbl2p/
-├── index.html          # Landing page with particles
-├── terminal.html       # Main dApp interface
-├── TAAMS_ABI.json     # Smart contract ABI
-├── TAAMS.sol          # Solidity contract source
-└── README.md          # This documentation
+├── index.html              # Landing page with particles
+├── terminal.html           # Main dApp interface
+├── mobile-wallet-helper.js # Mobile wallet connection helper
+├── TAAMS_ABI.json         # Smart contract ABI
+├── TAAMS.sol              # Solidity contract source
+└── README.md              # This documentation
 ```
 
 ## 🔗 Links & Resources
