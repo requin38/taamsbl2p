@@ -1305,17 +1305,20 @@
                 
                 if (!window.ethereum) {
                     if (isMobile) {
-                        addLog('> MOBILE DEVICE DETECTED - WALLET APP REQUIRED', 'warning');
-                        addLog('> USE WALLET\'S BUILT-IN BROWSER FOR BEST EXPERIENCE', 'info');
+                        addLog('> MOBILE DEVICE DETECTED - SETUP REQUIRED', 'warning');
+                        addLog('> LAUNCHING SMART WALLET SETUP...', 'info');
                         
-                        // Show mobile-specific options
-                        if (window.mobileWalletHelper) {
-                            setTimeout(() => {
-                                window.mobileWalletHelper.showMobileWalletOptions();
+                        // Utiliser la nouvelle méthode smart setup
+                        if (window.MobileWalletHelper) {
+                            setTimeout(async () => {
+                                const result = await window.MobileWalletHelper.autoConnectWallet();
+                                if (!result) {
+                                    addLog('> FOLLOW THE SETUP GUIDE ABOVE', 'info');
+                                }
                             }, 1000);
                         }
                         
-                        showAlert('Mobile Wallet Required\n\nPlease:\n1. Open your wallet app (MetaMask, Trust Wallet, etc.)\n2. Use the built-in browser\n3. Navigate to this dApp\n\nOr click the wallet options that will appear below.', 'error');
+                        showAlert('🚀 Configuration Wallet Mobile\n\nUn guide de configuration va s\'afficher.\nSuivez les étapes simples pour vous connecter !', 'info');
                         return;
                     } else {
                         showAlert('MetaMask is required to access the TAAMS Protocol', 'error');
