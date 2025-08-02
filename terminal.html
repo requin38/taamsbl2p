@@ -1300,9 +1300,27 @@
         
         async function connectWallet() {
             try {
+                // Check for mobile device first
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
                 if (!window.ethereum) {
-                    showAlert('MetaMask is required to access the TAAMS Protocol', 'error');
-                    return;
+                    if (isMobile) {
+                        addLog('> MOBILE DEVICE DETECTED - WALLET APP REQUIRED', 'warning');
+                        addLog('> USE WALLET\'S BUILT-IN BROWSER FOR BEST EXPERIENCE', 'info');
+                        
+                        // Show mobile-specific options
+                        if (window.mobileWalletHelper) {
+                            setTimeout(() => {
+                                window.mobileWalletHelper.showMobileWalletOptions();
+                            }, 1000);
+                        }
+                        
+                        showAlert('Mobile Wallet Required\n\nPlease:\n1. Open your wallet app (MetaMask, Trust Wallet, etc.)\n2. Use the built-in browser\n3. Navigate to this dApp\n\nOr click the wallet options that will appear below.', 'error');
+                        return;
+                    } else {
+                        showAlert('MetaMask is required to access the TAAMS Protocol', 'error');
+                        return;
+                    }
                 }
                 
                 addLog('> REQUESTING WALLET CONNECTION...', 'info');
@@ -1310,16 +1328,29 @@
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECTING...';
                 connectBtn.disabled = true;
+
+                // Extended timeout for mobile connections
+                const connectionTimeout = isMobile ? 10000 : 5000;
                 
-                const accounts = await window.ethereum.request({
+                const connectPromise = window.ethereum.request({
                     method: 'eth_requestAccounts'
                 });
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Connection timeout')), connectionTimeout)
+                );
+                
+                const accounts = await Promise.race([connectPromise, timeoutPromise]);
                 
                 userAccount = accounts[0];
                 state.connected = true;
                 
                 updateConnectedUI();
                 addLog(`> WALLET CONNECTED: ${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`, 'success');
+                
+                if (isMobile) {
+                    addLog('> MOBILE CONNECTION SUCCESSFUL', 'success');
+                }
                 
                 await Promise.all([
                     initializeContract(),
@@ -2764,34 +2795,38 @@
     <script src="mobile-wallet-helper.js"></script>
     
     <script>
-        // Enhanced mobile wallet connection for terminal
+        // Enhanced mobile detection and user guidance for terminal
         document.addEventListener('DOMContentLoaded', function() {
-            // Override the original connectWallet function for mobile
-            const originalConnectWallet = window.connectWallet;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            window.connectWallet = async function() {
-                if (window.mobileWalletHelper && window.mobileWalletHelper.isMobile && !window.ethereum) {
-                    addLog('> MOBILE DEVICE DETECTED - WALLET REQUIRED', 'warning');
-                    window.mobileWalletHelper.showMobileWalletOptions();
-                    return;
-                }
+            if (isMobile && window.mobileWalletHelper) {
+                // Add mobile-specific UI enhancements
+                addLog('> MOBILE DEVICE DETECTED', 'info');
+                addLog('> FOR BEST EXPERIENCE, USE WALLET\'S BUILT-IN BROWSER', 'warning');
                 
-                // Use mobile-optimized connection
-                if (window.MobileWalletHelper) {
-                    const account = await window.MobileWalletHelper.connectMobileWallet();
-                    if (account) {
-                        userAccount = account;
-                        addLog(`> WALLET CONNECTED: ${account}`, 'success');
-                        updateConnectionStatus();
-                        return;
+                // Add mobile notice to the UI
+                setTimeout(() => {
+                    const terminalContainer = document.querySelector('.container');
+                    if (terminalContainer) {
+                        const mobileNotice = document.createElement('div');
+                        mobileNotice.style.cssText = `
+                            background: rgba(255, 102, 0, 0.9);
+                            color: white;
+                            padding: 15px;
+                            border-radius: 8px;
+                            margin-bottom: 20px;
+                            text-align: center;
+                            border: 1px solid rgba(255, 102, 0, 0.5);
+                            font-family: 'JetBrains Mono', monospace;
+                        `;
+                        mobileNotice.innerHTML = `
+                            📱 <strong>Mobile Device Detected</strong><br>
+                            <small>Use your wallet's built-in browser for best connection</small>
+                        `;
+                        terminalContainer.insertBefore(mobileNotice, terminalContainer.firstChild);
                     }
-                }
-                
-                // Fallback to original method
-                if (originalConnectWallet) {
-                    return originalConnectWallet();
-                }
-            };
+                }, 2000);
+            }
         });
     </script>
 </body>
