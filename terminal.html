@@ -1508,15 +1508,86 @@
 
         // Détection MetaMask mobile browser
         function isMetaMaskMobile() {
-            return /MetaMaskMobile/i.test(navigator.userAgent) || 
-                   (window.ethereum && window.ethereum.isMetaMask && isMobileDevice());
+            // Vérifier le user agent MetaMask mobile
+            const isMetaMaskUA = /MetaMaskMobile/i.test(navigator.userAgent);
+            
+            // Vérifier si on est dans l'app MetaMask (provider disponible et mobile)
+            const hasMetaMaskProvider = window.ethereum && window.ethereum.isMetaMask;
+            
+            // Vérifier d'autres indicateurs MetaMask mobile
+            const hasMetaMaskMobileFeatures = window.ethereum && 
+                (window.ethereum._metamask || window.ethereum.selectedAddress);
+            
+            return isMetaMaskUA || 
+                   (hasMetaMaskProvider && isMobileDevice()) ||
+                   (hasMetaMaskMobileFeatures && isMobileDevice());
         }
 
         // Fonction d'aide pour guider les utilisateurs mobiles
         function showMobileGuidance() {
-            if (isMobileDevice() && !isMetaMaskMobile()) {
-                addLog('> 📱 MOBILE DETECTED - Use MetaMask mobile browser for best experience', 'info');
-                addLog('> Open MetaMask app → Browser → Enter this URL', 'info');
+            if (isMobileDevice()) {
+                if (!window.ethereum) {
+                    addLog('> 📱 POUR UTILISER TAAMS SUR MOBILE:', 'info');
+                    addLog('> 1️⃣ Téléchargez MetaMask mobile app', 'info');
+                    addLog('> 2️⃣ Ouvrez MetaMask → onglet "Navigateur"', 'info');
+                    addLog('> 3️⃣ Allez sur votre site TAAMS', 'info');
+                    addLog('> 4️⃣ MetaMask sera automatiquement détecté', 'success');
+                    
+                    // Ajouter un bouton pour ouvrir directement dans MetaMask
+                    setTimeout(() => {
+                        const terminal = document.querySelector('.terminal-content');
+                        if (terminal && !document.querySelector('.mobile-help-banner')) {
+                            const helpBanner = document.createElement('div');
+                            helpBanner.className = 'mobile-help-banner';
+                            helpBanner.style.cssText = `
+                                background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+                                color: white;
+                                padding: 15px;
+                                margin: 15px 0;
+                                border-radius: 12px;
+                                text-align: center;
+                                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+                                border: 2px solid rgba(255, 255, 255, 0.2);
+                                animation: pulse 2s infinite;
+                            `;
+                            helpBanner.innerHTML = `
+                                <div style="font-size: 18px; margin-bottom: 8px;">📱 MOBILE DETECTED</div>
+                                <div style="font-size: 14px; margin-bottom: 12px;">Pour connecter votre wallet sur mobile :</div>
+                                <button onclick="openInMetaMaskMobile()" style="
+                                    background: linear-gradient(45deg, #00ff88, #00cc66);
+                                    color: #000;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 6px;
+                                    font-weight: bold;
+                                    font-size: 14px;
+                                    cursor: pointer;
+                                    margin: 5px;
+                                ">🚀 OUVRIR DANS METAMASK</button>
+                                <div style="font-size: 11px; margin-top: 8px; opacity: 0.9;">
+                                    Ou ouvrez MetaMask → Navigateur → Entrez cette URL
+                                </div>
+                            `;
+                            
+                            // Ajouter l'animation CSS
+                            const style = document.createElement('style');
+                            style.textContent = `
+                                @keyframes pulse {
+                                    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); }
+                                    50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5); }
+                                    100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); }
+                                }
+                            `;
+                            document.head.appendChild(style);
+                            
+                            terminal.appendChild(helpBanner);
+                        }
+                    }, 2000);
+                } else if (isMetaMaskMobile()) {
+                    addLog('> ✅ MetaMask mobile détecté ! Vous pouvez connecter votre wallet.', 'success');
+                } else {
+                    addLog('> ⚠️  Pour une meilleure expérience, utilisez le navigateur MetaMask mobile', 'warning');
+                }
             }
         }
 
@@ -1708,22 +1779,96 @@
         window.showQuickHelp = showQuickHelp;
         window.closeMobileModule = closeMobileModule;
         
+        // Fonction pour ouvrir dans MetaMask mobile
+        function openInMetaMaskMobile() {
+            const currentUrl = window.location.href;
+            const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+            const metamaskUrl = `https://metamask.app.link/dapp/${cleanUrl}`;
+            
+            addLog('> 🚀 TENTATIVE D\'OUVERTURE DANS METAMASK...', 'info');
+            window.open(metamaskUrl, '_blank');
+            
+            // Proposer aussi le lien manuel
+            setTimeout(() => {
+                addLog('> 📋 OU COPIEZ CE LIEN DANS METAMASK:', 'info');
+                addLog(`> ${currentUrl}`, 'success');
+            }, 1000);
+        }
+        
+        // Ajouter la fonction au contexte global
+        window.openInMetaMaskMobile = openInMetaMaskMobile;
+        
         async function connectWallet() {
             try {
                 addLog('> DETECTING METAMASK PROVIDER...', 'info');
                 
-                // Utilise le détecteur officiel MetaMask pour mobile et desktop
-                const provider = await detectEthereumProvider({
-                    mustBeMetaMask: true,
-                    silent: false,
-                    timeout: 3000
-                });
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                // Sur mobile, attendre plus longtemps et gérer l'injection asynchrone
+                let provider;
+                if (isMobile) {
+                    addLog('> MOBILE DETECTED - Using enhanced detection...', 'info');
+                    
+                    // Première tentative : détection directe
+                    provider = await detectEthereumProvider({
+                        mustBeMetaMask: false, // Plus flexible sur mobile
+                        silent: false,
+                        timeout: 5000 // Plus de temps sur mobile
+                    });
+                    
+                    // Si pas trouvé, essayer d'attendre l'événement ethereum#initialized
+                    if (!provider && !window.ethereum) {
+                        addLog('> Waiting for ethereum provider injection...', 'info');
+                        
+                        await new Promise((resolve) => {
+                            function handleEthereum() {
+                                if (window.ethereum) {
+                                    window.removeEventListener('ethereum#initialized', handleEthereum);
+                                    resolve();
+                                }
+                            }
+                            
+                            window.addEventListener('ethereum#initialized', handleEthereum, {
+                                once: true,
+                            });
+                            
+                            // Timeout après 3 secondes supplémentaires
+                            setTimeout(resolve, 3000);
+                        });
+                        
+                        provider = window.ethereum;
+                    }
+                    
+                    // Dernière tentative sur mobile
+                    if (!provider && window.ethereum) {
+                        provider = window.ethereum;
+                    }
+                } else {
+                    // Desktop : détection standard
+                    provider = await detectEthereumProvider({
+                        mustBeMetaMask: true,
+                        silent: false,
+                        timeout: 3000
+                    });
+                }
                 
                 if (!provider) {
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    
                     if (isMobile) {
-                        showAlert('❌ MetaMask non détecté.\n\n📱 SOLUTION MOBILE:\n1. Téléchargez MetaMask mobile\n2. Ouvrez MetaMask\n3. Menu → Navigateur\n4. Tapez cette URL\n5. Cliquez CONNECT WALLET', 'error');
+                        // Instructions spécifiques mobile
+                        addLog('> ❌ METAMASK MOBILE NON DÉTECTÉ', 'error');
+                        addLog('> 📱 OUVREZ CETTE PAGE DANS METAMASK MOBILE:', 'info');
+                        addLog('> 1️⃣ Ouvrez l\'app MetaMask', 'info');
+                        addLog('> 2️⃣ Tapez sur l\'onglet "Navigateur" en bas', 'info');
+                        addLog('> 3️⃣ Copiez/collez cette URL:', 'info');
+                        addLog(`> ${window.location.href}`, 'success');
+                        addLog('> 4️⃣ Cliquez à nouveau sur CONNECT WALLET', 'info');
+                        
+                        // Proposer d'ouvrir directement dans MetaMask
+                        const openInMetaMask = confirm('Voulez-vous essayer d\'ouvrir cette page directement dans MetaMask mobile ?');
+                        if (openInMetaMask) {
+                            const metamaskUrl = `https://metamask.app.link/dapp/${window.location.href.replace('https://', '').replace('http://', '')}`;
+                            window.open(metamaskUrl, '_blank');
+                        }
                     } else {
                         showAlert('❌ MetaMask non détecté.\n\n💻 SOLUTION DESKTOP:\n1. Installez MetaMask extension\n2. Actualisez cette page\n3. Cliquez CONNECT WALLET', 'error');
                     }
@@ -3120,6 +3265,39 @@
         
         // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', async function() {
+            // Gestion spéciale pour mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                addLog('> 📱 MOBILE DEVICE DETECTED', 'info');
+                
+                // Attendre l'injection du provider sur mobile
+                if (!window.ethereum) {
+                    addLog('> Waiting for MetaMask provider injection...', 'info');
+                    
+                    // Écouter l'événement ethereum#initialized
+                    window.addEventListener('ethereum#initialized', () => {
+                        addLog('> ✓ MetaMask provider injected successfully', 'success');
+                    }, { once: true });
+                    
+                    // Aussi écouter quand window.ethereum devient disponible
+                    let checkCount = 0;
+                    const checkInterval = setInterval(() => {
+                        checkCount++;
+                        if (window.ethereum) {
+                            addLog('> ✓ MetaMask provider available', 'success');
+                            clearInterval(checkInterval);
+                        } else if (checkCount > 10) { // Arrêter après 5 secondes
+                            addLog('> ⚠️  MetaMask not detected. Open this page in MetaMask mobile browser.', 'warning');
+                            clearInterval(checkInterval);
+                        }
+                    }, 500);
+                }
+                
+                // Guidance mobile
+                showMobileGuidance();
+            }
+            
             const hasPersistedSession = loadPersistedState();
             
             await initializeApp();
