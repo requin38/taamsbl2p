@@ -931,6 +931,12 @@
                 <div class="nav-description">Post and view advertisements</div>
             </div>
             
+            <div class="nav-item locked" id="nav-referral">
+                <div class="lock-icon">🔒</div>
+                <div class="nav-title">REFERRAL HUB</div>
+                <div class="nav-description">Parrainage & bonus système</div>
+            </div>
+            
             <div class="nav-item support-link" onclick="handleSupportClick()">
                 <div class="lock-icon">🛠️</div>
                 <div class="nav-title">SUPPORT CENTER</div>
@@ -2844,6 +2850,9 @@
                             case 'ADVERTISEMENT HUB':
                                 openAdvertisementHub();
                                 break;
+                            case 'REFERRAL HUB':
+                                openReferralHub();
+                                break;
                             default:
                                 addLog(`> MODULE ${navTitle} NOT IMPLEMENTED YET`, 'warning');
                         }
@@ -3037,6 +3046,24 @@
             
             addLog('> LAUNCHING ADVERTISEMENT HUB...', 'success');
             window.open('ads.html', '_blank');
+        }
+        
+        function openReferralHub() {
+            // Vérifier si l'utilisateur est connecté et enregistré
+            if (!state.connected || !userAccount) {
+                addLog('> ACCESS DENIED: WALLET NOT CONNECTED', 'error');
+                showAlert('Please connect your wallet first', 'warning');
+                return;
+            }
+            
+            if (!state.registered) {
+                addLog('> ACCESS DENIED: NOT REGISTERED FOR AIRDROP', 'error');
+                showAlert('You must be registered for the Ignition Airdrop to access this feature', 'warning');
+                return;
+            }
+            
+            addLog('> LAUNCHING REFERRAL HUB...', 'success');
+            window.open('referral.html', '_blank');
         }
         
         function createModuleInterface(moduleTitle, content) {
