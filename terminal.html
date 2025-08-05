@@ -909,55 +909,52 @@
         </div>
         
         <div class="navigation">
-            <div class="nav-item locked" id="nav-burn">
+            <div class="nav-item locked" id="nav-burn" onclick="navigateTo('burn.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">BURN PORTAL</div>
                 <div class="nav-description">Participate in token burning cycles</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-stake">
+            <div class="nav-item locked" id="nav-stake" onclick="navigateTo('staking.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">STAKING CHAMBER</div>
                 <div class="nav-description">Stake tokens for rewards</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-governance">
+            <div class="nav-item locked" id="nav-governance" onclick="navigateTo('governance.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">GOVERNANCE HUB</div>
-                <div class="nav-description">Vote on protocol proposals</div>
+                <div class="nav-description">Vote & manage proposals</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-bl2p">
+            <div class="nav-item locked" id="nav-bl2p" onclick="navigateTo('bl2p.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">BL2P MANAGER</div>
-                <div class="nav-description">Manage your BL2P tokens</div>
+                <div class="nav-description">Liquidity pool management</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-delegation">
+            <div class="nav-item locked" id="nav-delegation" onclick="navigateTo('delegation.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">DELEGATION HUB</div>
-                <div class="nav-description">Delegate voting power & earn rewards</div>
+                <div class="nav-description">Delegate voting power</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-ads">
+            <div class="nav-item locked" id="nav-ads" onclick="navigateTo('ads.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">ADVERTISEMENT HUB</div>
-                <div class="nav-description">Post and view advertisements</div>
+                <div class="nav-description">Post & view ads</div>
             </div>
-            
-            <div class="nav-item locked" id="nav-referral">
+            <div class="nav-item locked" id="nav-referral" onclick="navigateTo('referral.html')">
                 <div class="lock-icon">🔒</div>
                 <div class="nav-title">REFERRAL HUB</div>
                 <div class="nav-description">Parrainage & bonus système</div>
             </div>
-            
-            <div class="nav-item support-link" onclick="handleSupportClick()">
+            <div class="nav-item support-link" onclick="navigateTo('support.html')">
                 <div class="lock-icon">🛠️</div>
                 <div class="nav-title">SUPPORT CENTER</div>
                 <div class="nav-description">Help, issues & community experiences</div>
             </div>
-            <!-- Ajout du lien vers la page Landing -->
-            <div class="nav-item" id="nav-price" onclick="window.location.href='landing.html'">
+            <div class="nav-item" id="nav-faq" onclick="navigateTo('faq.html')">
+                <div class="lock-icon">❓</div>
+                <div class="nav-title">FAQ</div>
+                <div class="nav-description">Questions fréquentes & guide utilisateur</div>
+            </div>
+            <div class="nav-item" id="nav-price" onclick="navigateTo('landing.html')">
                 <div class="lock-icon">💱</div>
                 <div class="nav-title">TAAMS/MATIC PRICES</div>
                 <div class="nav-description">Prix en temps réel & informations de marché</div>
