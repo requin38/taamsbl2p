@@ -422,13 +422,12 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🏛️ TAAMS GOVERNANCE HUB</h1>
-            <p>Participate in protocol democracy and shape the future</p>
-            
-            <!-- Navigation Back -->
+            <h1>🏛️ HUB DE GOUVERNANCE TAAMS</h1>
+            <p>Participez à la démocratie du protocole et façonnez l’avenir</p>
+            <!-- Navigation Retour -->
             <div class="back-nav">
                 <button onclick="goBackToTerminal()" class="back-btn">
-                    ↩️ BACK TO TERMINAL
+                    ↩️ Retour au terminal
                 </button>
             </div>
         </div>
@@ -436,37 +435,37 @@
         <!-- Wallet Info (Auto-detected from terminal) -->
         <div class="wallet-section">
             <div id="wallet-info" class="wallet-info">
-                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
-                <p>� TAAMS: <span id="taams-balance">Loading...</span></p>
-                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
-                <p>�🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
-                <p>💪 Voting Power: <span id="voting-power">Loading...</span></p>
+                <p>🔗 Connecté : <span id="wallet-address">Détection...</span></p>
+                <p>💰 TAAMS : <span id="taams-balance">Chargement...</span></p>
+                <p>🔺 MATIC : <span id="matic-balance">Chargement...</span></p>
+                <p>🗳️ BL2P : <span id="bl2p-balance">Chargement...</span></p>
+                <p>💪 Pouvoir de vote : <span id="voting-power">Chargement...</span></p>
             </div>
         </div>
 
         <!-- Statistics Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="proposal-count">Loading...</div>
-                <div class="stat-label">Total Proposals</div>
+                <div class="stat-number" id="proposal-count">Chargement...</div>
+                <div class="stat-label">Propositions totales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="quorum">Loading...</div>
-                <div class="stat-label">Quorum Threshold</div>
+                <div class="stat-number" id="quorum">Chargement...</div>
+                <div class="stat-label">Seuil de quorum</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="vote-threshold">Loading...</div>
-                <div class="stat-label">Vote Threshold</div>
+                <div class="stat-number" id="vote-threshold">Chargement...</div>
+                <div class="stat-label">Seuil de vote</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="active-proposals">Loading...</div>
-                <div class="stat-label">Active Proposals</div>
+                <div class="stat-number" id="active-proposals">Chargement...</div>
+                <div class="stat-label">Propositions actives</div>
             </div>
         </div>
 
         <!-- Real-time Network Stats -->
         <div class="network-stats-panel">
-            <h4>⚡ TAAMS Network Status</h4>
+            <h4>⚡ Statut du réseau TAAMS</h4>
             <div class="network-stats">
                 <div class="stat-item">
                     <span class="stat-label">Current Block:</span>
@@ -489,42 +488,37 @@
 
         <!-- Governance Section -->
         <div class="governance-section">
-            <!-- Submit Proposal -->
+            <!-- Soumettre une proposition -->
             <div class="governance-panel">
-                <h2>📝 Submit Proposal</h2>
+                <h2>📝 Soumettre une proposition</h2>
                 <div class="info-box">
-                    <h4>🎯 Proposal Guidelines</h4>
-                    <p>Submit proposals to change protocol parameters, add features, or modify governance rules. Requires minimum voting power.</p>
+                    <h4>🎯 Conseils pour les propositions</h4>
+                    <p>Soumettez des propositions pour modifier les paramètres du protocole, ajouter des fonctionnalités ou ajuster les règles de gouvernance. Un minimum de pouvoir de vote est requis.</p>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Proposal Description:</label>
-                    <textarea id="proposal-description" class="governance-input" placeholder="Describe your proposal..." rows="3"></textarea>
+                    <label class="input-label">Description de la proposition :</label>
+                    <textarea id="proposal-description" class="governance-input" placeholder="Décrivez votre proposition..." rows="3"></textarea>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Proposal Type:</label>
+                    <label class="input-label">Type de proposition :</label>
                     <select id="proposal-type" class="governance-input">
-                        <option value="0">Parameter Update</option>
-                        <option value="1">Contract Upgrade</option>
-                        <option value="2">Feature Addition</option>
-                        <option value="3">Emergency Action</option>
+                        <option value="0">Mise à jour d’un paramètre</option>
+                        <option value="1">Mise à niveau du contrat</option>
+                        <option value="2">Ajout de fonctionnalité</option>
+                        <option value="3">Action d’urgence</option>
                     </select>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">New Value (if applicable):</label>
-                    <input type="number" id="proposal-value" class="governance-input" placeholder="Enter new value">
+                    <label class="input-label">Nouvelle valeur (si applicable) :</label>
+                    <input type="number" id="proposal-value" class="governance-input" placeholder="Saisissez la nouvelle valeur">
                 </div>
-                
-                <button id="submit-proposal-btn" class="governance-btn" disabled>📝 SUBMIT PROPOSAL</button>
+                <button id="submit-proposal-btn" class="governance-btn" disabled>📝 SOUMETTRE LA PROPOSITION</button>
             </div>
-
-            <!-- Proposals List -->
+            <!-- Liste des propositions -->
             <div class="governance-panel">
-                <h2>🗳️ Active Proposals</h2>
+                <h2>🗳️ Propositions actives</h2>
                 <div class="proposals-list" id="proposals-list">
-                    <div class="log-entry log-info">📊 Loading proposals from blockchain...</div>
+                    <div class="log-entry log-info">📊 Chargement des propositions depuis la blockchain...</div>
                 </div>
             </div>
         </div>

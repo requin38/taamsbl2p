@@ -523,23 +523,29 @@ TAAMS Protocol is an experimental DeFi project. Please understand the risks:
 - Do your own research (DYOR)
 
 ### 📱 Mobile Compatibility Notice
-- **Mobile wallet connections may be limited** due to browser restrictions
-- **Desktop experience recommended** for full functionality
-- Use wallet's built-in browser on mobile for better compatibility
-- Some features may not work properly on mobile browsers
+### 📱 Compatibilité mobile
+- **Les connexions de portefeuille mobile peuvent être limitées** à cause des restrictions des navigateurs
+- **Expérience sur ordinateur recommandée** pour toutes les fonctionnalités
+Utilisez le navigateur intégré du portefeuille sur mobile pour une meilleure compatibilité
+Certaines fonctionnalités peuvent être limitées sur les navigateurs mobiles
 
-## 📞 Support & Community
-
-- **Issues**: Report bugs via GitHub Issues
+## 📞 Support & Communauté
+- **Problèmes** : Signalez les bugs via GitHub Issues
+- **Questions** : Utilisez GitHub Discussions pour toute question
+- **Sécurité** : Envoyez les problèmes de sécurité par email à l’équipe
 - **Discussions**: Use GitHub Discussions for questions
-- **Security**: Email security issues to the team
+## 📜 Licence
+Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
+## 🏆 Remerciements
+- Polygon Network pour l’infrastructure blockchain évolutive
+- OpenZeppelin pour les bibliothèques de contrats intelligents sécurisés
+- Particles.js pour les effets de fond interactifs
+- Contributeurs et soutiens de la communauté
 ## 🏆 Acknowledgments
+**Développé avec ❤️ par l’équipe TAAMS Protocol**
 
+*Décentraliser le futur, un burn à la fois* 🔥
 - Polygon Network for scalable blockchain infrastructure
 - OpenZeppelin for secure smart contract libraries
 - Particles.js for interactive background effects

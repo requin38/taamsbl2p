@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💰 TAAMS BL2P Hub - Token Management Portal</title>
+    <title>💰 TAAMS BL2P Hub - Portail de gestion des jetons</title>
     <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
@@ -420,154 +420,145 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>💰 TAAMS BL2P HUB</h1>
-            <p>Manage your BL2P tokens, transfers, and maturity tracking</p>
-            
-            <!-- Navigation Back -->
+            <h1>💰 HUB TAAMS BL2P</h1>
+            <p>Gérez vos jetons BL2P, transferts et suivi de maturité</p>
+            <!-- Navigation Retour -->
             <div class="back-nav">
                 <button onclick="goBackToTerminal()" class="back-btn">
-                    ↩️ BACK TO TERMINAL
+                    ↩️ RETOUR AU TERMINAL
                 </button>
             </div>
         </div>
 
-        <!-- Wallet Info (Auto-detected from terminal) -->
+        <!-- Infos du portefeuille (auto-détecté depuis le terminal) -->
         <div class="wallet-section">
             <div id="wallet-info" class="wallet-info">
-                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
-                <p>💰 TAAMS: <span id="taams-balance">Loading...</span></p>
-                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
-                <p>🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+                <p>🔗 Connecté : <span id="wallet-address">Détection...</span></p>
+                <p>💰 TAAMS : <span id="taams-balance">Chargement...</span></p>
+                <p>🔺 MATIC : <span id="matic-balance">Chargement...</span></p>
+                <p>🗳️ BL2P : <span id="bl2p-balance">Chargement...</span></p>
             </div>
         </div>
 
-        <!-- Statistics Grid -->
+        <!-- Statistiques -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="total-bl2p">Loading...</div>
-                <div class="stat-label">Total BL2P Supply</div>
+                <div class="stat-number" id="total-bl2p">Chargement...</div>
+                <div class="stat-label">BL2P en circulation</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="valid-bl2p">Loading...</div>
-                <div class="stat-label">Your Valid BL2P</div>
+                <div class="stat-number" id="valid-bl2p">Chargement...</div>
+                <div class="stat-label">Vos BL2P valides</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="maturing-bl2p">Loading...</div>
-                <div class="stat-label">Maturing BL2P</div>
+                <div class="stat-number" id="maturing-bl2p">Chargement...</div>
+                <div class="stat-label">BL2P en maturation</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="expired-bl2p">Loading...</div>
-                <div class="stat-label">Expired BL2P</div>
+                <div class="stat-number" id="expired-bl2p">Chargement...</div>
+                <div class="stat-label">BL2P expirés</div>
             </div>
         </div>
 
-        <!-- Real-time Network Stats -->
+        <!-- Statut réseau en temps réel -->
         <div class="network-stats-panel">
-            <h4>⚡ TAAMS Network Status</h4>
+            <h4>⚡ Statut du réseau TAAMS</h4>
             <div class="network-stats">
                 <div class="stat-item">
-                    <span class="stat-label">Current Block:</span>
-                    <span class="stat-value" id="current-block">Loading...</span>
+                    <span class="stat-label">Bloc actuel :</span>
+                    <span class="stat-value" id="current-block">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Network:</span>
+                    <span class="stat-label">Réseau :</span>
                     <span class="stat-value">🔺 Polygon</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Gas Price:</span>
-                    <span class="stat-value" id="gas-price">Loading...</span>
+                    <span class="stat-label">Prix du gas :</span>
+                    <span class="stat-value" id="gas-price">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Status:</span>
-                    <span class="stat-value" id="network-status">🟢 Active</span>
+                    <span class="stat-label">Statut :</span>
+                    <span class="stat-value" id="network-status">🟢 Actif</span>
                 </div>
             </div>
         </div>
 
-        <!-- BL2P Management Section -->
+        <!-- Gestion des BL2P -->
         <div class="bl2p-section">
-            <!-- Transfer BL2P -->
+            <!-- Transférer des BL2P -->
             <div class="bl2p-panel">
-                <h2>📤 Transfer BL2P</h2>
+                <h2>📤 Transférer des BL2P</h2>
                 <div class="info-box">
-                    <h4>🔄 BL2P Transfer</h4>
-                    <p>Transfer your BL2P tokens to other addresses. BL2P tokens maintain their maturity status during transfers.</p>
+                    <h4>🔄 Transfert BL2P</h4>
+                    <p>Transférez vos jetons BL2P vers d'autres adresses. Les jetons conservent leur statut de maturité lors du transfert.</p>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Recipient Address:</label>
+                    <label class="input-label">Adresse du destinataire :</label>
                     <input type="text" id="transfer-address" class="bl2p-input" placeholder="0x...">
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Amount to Transfer:</label>
+                    <label class="input-label">Montant à transférer :</label>
                     <div class="percentage-buttons">
                         <button class="percentage-btn" onclick="setTransferPercentage(25)">25%</button>
                         <button class="percentage-btn" onclick="setTransferPercentage(50)">50%</button>
                         <button class="percentage-btn" onclick="setTransferPercentage(75)">75%</button>
                         <button class="percentage-btn" onclick="setTransferPercentage(100)">MAX</button>
                     </div>
-                    <input type="number" id="transfer-amount" class="bl2p-input" placeholder="Enter BL2P amount" step="0.001">
+                    <input type="number" id="transfer-amount" class="bl2p-input" placeholder="Saisissez le montant BL2P" step="0.001">
                 </div>
-                
-                <button id="transfer-btn" class="bl2p-btn" disabled>📤 TRANSFER BL2P</button>
+                <button id="transfer-btn" class="bl2p-btn" disabled>📤 TRANSFÉRER BL2P</button>
             </div>
-
-            <!-- BL2P Portfolio -->
+            <!-- Portefeuille BL2P -->
             <div class="bl2p-panel">
-                <h2>💼 BL2P Portfolio</h2>
+                <h2>💼 Portefeuille BL2P</h2>
                 <div class="bl2p-list" id="bl2p-list">
-                    <div class="log-entry log-info">📊 Loading your BL2P portfolio...</div>
+                    <div class="log-entry log-info">📊 Nous récupérons les détails de votre portefeuille BL2P, un instant...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Advanced BL2P Operations -->
+        <!-- Opérations avancées BL2P -->
         <div class="bl2p-section">
-            <!-- Claim Mature BL2P -->
+            <!-- Réclamer BL2P matures -->
             <div class="bl2p-panel">
-                <h2>⏰ Maturity Management</h2>
+                <h2>⏰ Gestion de la maturité</h2>
                 <div class="info-box">
-                    <h4>🔄 BL2P Maturity</h4>
-                    <p>BL2P tokens mature over time. Mature tokens provide full voting power and can be used for all protocol functions.</p>
+                    <h4>🔄 Maturité BL2P</h4>
+                    <p>Vos jetons BL2P évoluent avec le temps. Une fois matures, ils vous donnent tous les droits de vote et d’utilisation sur le protocole.</p>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Maturity Status:</label>
+                    <label class="input-label">Statut de maturité :</label>
                     <div id="maturity-status" class="bl2p-input" style="min-height: 60px; display: flex; align-items: center; justify-content: center;">
-                        Loading maturity information...
+                        Nous vérifions la progression de maturité de vos jetons BL2P...
                     </div>
                 </div>
-                
-                <button id="claim-mature-btn" class="bl2p-btn" disabled>⏰ CLAIM MATURE BL2P</button>
-                <button id="refresh-maturity-btn" class="bl2p-btn">🔄 REFRESH MATURITY</button>
+                <button id="claim-mature-btn" class="bl2p-btn" disabled>⏰ RÉCLAMER BL2P MATURES</button>
+                <button id="refresh-maturity-btn" class="bl2p-btn">🔄 ACTUALISER LA MATURITÉ</button>
             </div>
-
-            <!-- BL2P Analytics -->
+            <!-- Analytics BL2P -->
             <div class="bl2p-panel">
-                <h2>📊 BL2P Analytics</h2>
+                <h2>📊 Analytics BL2P</h2>
                 <div class="info-box">
-                    <h4>📈 Portfolio Analytics</h4>
-                    <p>Track your BL2P token performance, maturity progression, and historical data.</p>
+                    <h4>📈 Analytics du portefeuille</h4>
+                    <p>Suivez la performance de vos jetons BL2P, la progression de maturité et l’historique.</p>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Portfolio Summary:</label>
+                    <label class="input-label">Résumé du portefeuille :</label>
                     <div id="portfolio-summary" class="bl2p-input" style="min-height: 120px; display: block; padding: 15px;">
-                        <div style="margin-bottom: 10px;">📊 Loading portfolio analytics...</div>
+                        <div style="margin-bottom: 10px;">📊 Chargement des analytics du portefeuille...</div>
                     </div>
                 </div>
-                
-                <button id="export-data-btn" class="bl2p-btn">📋 EXPORT PORTFOLIO DATA</button>
+                <button id="analyze-btn" class="bl2p-btn">🔍 ANALYSE AVANCÉE</button>
+                <button id="export-data-btn" class="bl2p-btn">📋 EXPORTER LES DONNÉES</button>
             </div>
         </div>
 
-        <!-- Logs Section -->
+        <!-- Section des logs -->
         <div class="logs-section">
-            <h3 class="logs-title">🔍 BL2P Portal Logs</h3>
+            <h3 class="logs-title">🔍 Journaux du portail BL2P</h3>
             <div id="logs-container">
-                <div class="log-entry log-info">💰 BL2P Portal initialized</div>
-                <div class="log-entry log-info">📊 Loading BL2P statistics...</div>
+                <div class="log-entry log-info">💰 Portail BL2P initialisé</div>
+                <div class="log-entry log-info">📊 Chargement des statistiques BL2P...</div>
             </div>
         </div>
     </div>
@@ -628,6 +619,7 @@
             document.getElementById('transfer-btn').onclick = transferBL2P;
             document.getElementById('claim-mature-btn').onclick = claimMatureBL2P;
             document.getElementById('refresh-maturity-btn').onclick = refreshMaturityStatus;
+            document.getElementById('analyze-btn').onclick = loadAdvancedAnalytics;
             document.getElementById('export-data-btn').onclick = exportPortfolioData;
             
             // Input validation
@@ -669,6 +661,7 @@
                             updateConnectedUI();
                             await loadBL2PStatistics();
                             await loadPortfolioData();
+                            await loadAdvancedAnalytics();
                             await updateNetworkStats();
                             
                             addLog('✅ Wallet data updated for new account', 'success');
@@ -751,6 +744,7 @@
                 updateConnectedUI();
                 await loadBL2PStatistics();
                 await loadBL2PPortfolio();
+                await loadAdvancedAnalytics();
                 
                 // Update network stats with real data
                 await updateNetworkStats();
@@ -843,7 +837,31 @@
             try {
                 addLog('📊 Loading real BL2P statistics...', 'info');
                 
-                // Get real blockchain data
+                // Vérifier d'abord si les BL2P sont révélés
+                const bl2pRevealed = await bl2pState.contract.methods.bl2pRevealed().call();
+                
+                if (!bl2pRevealed) {
+                    // BL2P pas encore révélés - affichage par défaut
+                    addLog('🔒 BL2P not revealed yet - showing default values', 'warning');
+                    
+                    bl2pState.bl2pBalance = 0;
+                    bl2pState.validBL2P = 0;
+                    bl2pState.maturingBL2P = 0;
+                    bl2pState.expiredBL2P = 0;
+                    bl2pState.totalBL2PSupply = 0;
+                    
+                    // Update UI with zero values
+                    document.getElementById('total-bl2p').textContent = '0';
+                    document.getElementById('valid-bl2p').textContent = '0';
+                    document.getElementById('maturing-bl2p').textContent = '0';
+                    document.getElementById('expired-bl2p').textContent = '0';
+                    document.getElementById('bl2p-balance').textContent = '0 BL2P';
+                    
+                    addLog('🔒 BL2P are not revealed yet - all values set to 0', 'warning');
+                    return;
+                }
+                
+                // Get real blockchain data only if BL2P are revealed
                 const [
                     bl2pBalance,
                     validBL2P,
@@ -1201,6 +1219,269 @@
                 await loadBL2PPortfolio();
             }
         }, 30000);
+
+        // ====== NOUVELLES FONCTIONS DU CONTRAT ======
+        
+        // Vérification de l'intégrité des BL2P
+        async function verifyBL2PIntegrity() {
+            if (!bl2pState.contract || !bl2pState.userAccount) {
+                addLog('❌ Contract not available for integrity verification', 'error');
+                return null;
+            }
+            
+            try {
+                addLog('🔍 Verifying BL2P integrity...', 'info');
+                
+                // Appeler la fonction verifyBL2PIntegrity du contrat avec un tableau d'utilisateurs
+                const integrityData = await bl2pState.contract.methods
+                    .verifyBL2PIntegrity([bl2pState.userAccount])
+                    .call();
+                
+                const integrity = {
+                    isValid: integrityData.isValid,
+                    totalChecked: parseInt(integrityData.totalBL2P),
+                    validCount: integrityData.isValid ? 1 : 0,
+                    invalidCount: integrityData.isValid ? 0 : 1,
+                    corruptedCount: integrityData.isValid ? 0 : 1,
+                    integrityScore: integrityData.isValid ? 100 : 0
+                };
+                
+                addLog(`✅ Integrity verification complete: ${integrity.integrityScore.toFixed(1)}% valid`, 'success');
+                addLog(`📊 Total BL2P checked: ${integrity.totalChecked}`, 'info');
+                addLog(`✅ Valid: ${integrity.validCount} | ❌ Invalid: ${integrity.invalidCount} | 🔧 Corrupted: ${integrity.corruptedCount}`, 'info');
+                
+                return integrity;
+                
+            } catch (error) {
+                addLog('❌ Failed to verify BL2P integrity: ' + error.message, 'error');
+                return null;
+            }
+        }
+        
+        // Analyse de la durée de vie des BL2P
+        async function getBL2PLifetime() {
+            if (!bl2pState.contract || !bl2pState.userAccount) {
+                addLog('❌ Contract not available for lifetime analysis', 'error');
+                return null;
+            }
+            
+            try {
+                addLog('⏱️ Analyzing BL2P lifetime data...', 'info');
+                
+                // Appeler la fonction getBL2PLifetime du contrat
+                const lifetimeData = await bl2pState.contract.methods
+                    .getBL2PLifetime(bl2pState.userAccount)
+                    .call();
+                
+                const birthBlock = parseInt(lifetimeData.birthBlock);
+                const expiryBlock = parseInt(lifetimeData.expiryBlock);
+                const currentBlock = await bl2pState.web3.eth.getBlockNumber();
+                
+                // Calculer la durée de vie en blocs (approximativement 2 secondes par bloc sur Polygon)
+                const totalLifetimeBlocks = expiryBlock - birthBlock;
+                const totalLifetimeSeconds = totalLifetimeBlocks * 2; // 2 secondes par bloc approximatif
+                const remainingBlocks = Math.max(0, expiryBlock - currentBlock);
+                const remainingSeconds = remainingBlocks * 2;
+                
+                // Obtenir les BL2P valides et totaux pour calculer la maturité
+                const [validBL2P, totalBL2P] = await Promise.all([
+                    bl2pState.contract.methods.getRemainingValidBL2P(bl2pState.userAccount).call(),
+                    bl2pState.contract.methods.balanceOf(bl2pState.userAccount).call()
+                ]);
+                
+                const validBL2PEther = parseFloat(bl2pState.web3.utils.fromWei(validBL2P, 'ether'));
+                const totalBL2PEther = parseFloat(bl2pState.web3.utils.fromWei(totalBL2P, 'ether'));
+                const matureBL2P = validBL2PEther;
+                const immatureBL2P = Math.max(0, totalBL2PEther - validBL2PEther);
+                const maturityRate = totalBL2PEther > 0 ? (matureBL2P / totalBL2PEther) * 100 : 0;
+                
+                const lifetime = {
+                    totalLifetime: totalLifetimeSeconds,
+                    averageLifetime: totalLifetimeSeconds, // Pour un seul utilisateur, c'est la même chose
+                    shortestLifetime: totalLifetimeSeconds,
+                    longestLifetime: totalLifetimeSeconds,
+                    matureBL2P: Math.floor(matureBL2P),
+                    immatureBL2P: Math.floor(immatureBL2P),
+                    maturityRate: maturityRate,
+                    birthBlock: birthBlock,
+                    expiryBlock: expiryBlock,
+                    remainingSeconds: remainingSeconds
+                };
+                
+                // Convertir les secondes en format lisible
+                const formatTime = (seconds) => {
+                    const days = Math.floor(seconds / 86400);
+                    const hours = Math.floor((seconds % 86400) / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    return `${days}d ${hours}h ${minutes}m`;
+                };
+                
+                addLog(`⏱️ Lifetime analysis complete`, 'success');
+                addLog(`📊 Average lifetime: ${formatTime(lifetime.averageLifetime)}`, 'info');
+                addLog(`⚡ Shortest: ${formatTime(lifetime.shortestLifetime)} | 🐌 Longest: ${formatTime(lifetime.longestLifetime)}`, 'info');
+                addLog(`🎯 Maturity rate: ${lifetime.maturityRate.toFixed(1)}%`, 'info');
+                addLog(`🟢 Mature: ${lifetime.matureBL2P} | 🟡 Immature: ${lifetime.immatureBL2P}`, 'info');
+                
+                return lifetime;
+                
+            } catch (error) {
+                addLog('❌ Failed to analyze BL2P lifetime: ' + error.message, 'error');
+                return null;
+            }
+        }
+        
+        // Dashboard d'analytics avancé
+        async function loadAdvancedAnalytics() {
+            try {
+                addLog('📈 Loading advanced BL2P analytics...', 'info');
+                
+                // Vérifier d'abord si les BL2P sont révélés
+                const bl2pRevealed = await bl2pState.contract.methods.bl2pRevealed().call();
+                
+                if (!bl2pRevealed) {
+                    // BL2P pas encore révélés - affichage par défaut
+                    const portfolioSummary = document.getElementById('portfolio-summary');
+                    if (portfolioSummary) {
+                        portfolioSummary.innerHTML = `
+                            <div style="margin-bottom: 15px; padding: 20px; border: 1px solid #ffc107; border-radius: 5px; text-align: center;">
+                                <h5 style="color: #ffc107; margin-bottom: 15px;">🔒 BL2P NOT REVEALED YET</h5>
+                                <div style="color: #999; margin-bottom: 10px;">BL2P tokens have not been revealed by the protocol yet.</div>
+                                <div style="color: #999; margin-bottom: 15px;">All analytics will be available once BL2P are activated.</div>
+                                <div style="color: #ffc107;">⏳ Please wait for the official BL2P reveal...</div>
+                            </div>
+                        `;
+                    }
+                    addLog('🔒 BL2P not revealed yet - analytics unavailable', 'warning');
+                    return;
+                }
+                
+                // Paralléliser les appels pour de meilleures performances
+                const [integrityData, lifetimeData] = await Promise.all([
+                    verifyBL2PIntegrity(),
+                    getBL2PLifetime()
+                ]);
+                
+                // Construire le rapport d'analytics
+                let analyticsReport = '';
+                
+                if (integrityData) {
+                    analyticsReport += `
+                        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ffc107; border-radius: 5px;">
+                            <h5 style="color: #ffc107; margin-bottom: 10px;">🔍 INTEGRITY ANALYSIS</h5>
+                            <div>Integrity Score: <span style="color: ${integrityData.integrityScore >= 95 ? '#00ff88' : integrityData.integrityScore >= 80 ? '#ffc107' : '#ff0066'}">${integrityData.integrityScore.toFixed(1)}%</span></div>
+                            <div>Total BL2P: ${integrityData.totalChecked}</div>
+                            <div>✅ Valid: ${integrityData.validCount} | ❌ Invalid: ${integrityData.invalidCount}</div>
+                            <div>🔧 Corrupted: ${integrityData.corruptedCount}</div>
+                        </div>
+                    `;
+                }
+                
+                if (lifetimeData) {
+                    const formatTime = (seconds) => {
+                        const days = Math.floor(seconds / 86400);
+                        const hours = Math.floor((seconds % 86400) / 3600);
+                        return days > 0 ? `${days}d ${hours}h` : `${hours}h`;
+                    };
+                    
+                    analyticsReport += `
+                        <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #00ff88; border-radius: 5px;">
+                            <h5 style="color: #00ff88; margin-bottom: 10px;">⏱️ LIFETIME ANALYSIS</h5>
+                            <div>Average Lifetime: ${formatTime(lifetimeData.averageLifetime)}</div>
+                            <div>Range: ${formatTime(lifetimeData.shortestLifetime)} → ${formatTime(lifetimeData.longestLifetime)}</div>
+                            <div>Maturity Rate: <span style="color: ${lifetimeData.maturityRate >= 80 ? '#00ff88' : '#ffc107'}">${lifetimeData.maturityRate.toFixed(1)}%</span></div>
+                            <div>🟢 Mature: ${lifetimeData.matureBL2P} | 🟡 Immature: ${lifetimeData.immatureBL2P}</div>
+                        </div>
+                    `;
+                }
+                
+                // Ajouter des recommandations basées sur les données
+                if (integrityData && lifetimeData) {
+                    let recommendations = '<div style="margin-top: 15px; padding: 10px; border: 1px solid #00aaff; border-radius: 5px;"><h5 style="color: #00aaff; margin-bottom: 10px;">💡 RECOMMENDATIONS</h5>';
+                    
+                    if (integrityData.integrityScore < 90) {
+                        recommendations += '<div>• Consider reviewing corrupted BL2P tokens</div>';
+                    }
+                    
+                    if (lifetimeData.maturityRate < 70) {
+                        recommendations += '<div>• Allow more time for BL2P maturation</div>';
+                    }
+                    
+                    if (lifetimeData.immatureBL2P > lifetimeData.matureBL2P) {
+                        recommendations += '<div>• Large portion of BL2P still maturing</div>';
+                    }
+                    
+                    if (integrityData.integrityScore >= 95 && lifetimeData.maturityRate >= 80) {
+                        recommendations += '<div style="color: #00ff88;">• Portfolio in excellent condition! 🎉</div>';
+                    }
+                    
+                    recommendations += '</div>';
+                    analyticsReport += recommendations;
+                }
+                
+                // Mettre à jour l'affichage
+                const portfolioSummary = document.getElementById('portfolio-summary');
+                if (portfolioSummary) {
+                    portfolioSummary.innerHTML = analyticsReport || '<div>📊 No analytics data available</div>';
+                }
+                
+                addLog('✅ Advanced analytics loaded successfully', 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to load advanced analytics: ' + error.message, 'error');
+                const portfolioSummary = document.getElementById('portfolio-summary');
+                if (portfolioSummary) {
+                    portfolioSummary.innerHTML = '<div style="color: #ff0066;">❌ Analytics unavailable</div>';
+                }
+            }
+        }
+        
+        // Fonction d'export des données de portfolio
+        async function exportPortfolioData() {
+            try {
+                addLog('📋 Exporting portfolio data...', 'info');
+                
+                const [integrityData, lifetimeData] = await Promise.all([
+                    verifyBL2PIntegrity(),
+                    getBL2PLifetime()
+                ]);
+                
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    wallet: bl2pState.userAccount,
+                    balances: {
+                        bl2p: bl2pState.bl2pBalance,
+                        taams: bl2pState.taamasBalance,
+                        matic: bl2pState.maticBalance
+                    },
+                    integrity: integrityData,
+                    lifetime: lifetimeData,
+                    statistics: {
+                        totalBL2P: bl2pState.totalBL2P,
+                        validBL2P: bl2pState.validBL2P,
+                        maturingBL2P: bl2pState.maturingBL2P,
+                        expiredBL2P: bl2pState.expiredBL2P
+                    }
+                };
+                
+                // Créer et télécharger le fichier JSON
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `taams-bl2p-portfolio-${Date.now()}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                addLog('✅ Portfolio data exported successfully', 'success');
+                
+            } catch (error) {
+                addLog('❌ Failed to export portfolio data: ' + error.message, 'error');
+            }
+        }
 
         // Navigation function
         function goBackToTerminal() {

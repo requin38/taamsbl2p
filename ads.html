@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📢 TAAMS Ads Hub - Blockchain Advertisement Portal</title>
+    <title>📢 TAAMS Ads Hub - Portail d'Annonces Blockchain</title>
     <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
@@ -431,130 +431,123 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📢 TAAMS ADS HUB</h1>
-            <p>Decentralized blockchain advertisement platform</p>
-            
-            <!-- Navigation Back -->
+            <h1>📢 HUB D'ANNONCES TAAMS</h1>
+            <p>Plateforme d'annonces blockchain décentralisée</p>
+            <!-- Navigation Retour -->
             <div class="back-nav">
                 <button onclick="goBackToTerminal()" class="back-btn">
-                    ↩️ BACK TO TERMINAL
+                    ↩️ RETOUR AU TERMINAL
                 </button>
             </div>
         </div>
 
-        <!-- Wallet Info (Auto-detected from terminal) -->
+        <!-- Infos du portefeuille (auto-détecté depuis le terminal) -->
         <div class="wallet-section">
             <div id="wallet-info" class="wallet-info">
-                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
-                <p>💰 TAAMS: <span id="taams-balance">Loading...</span></p>
-                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
-                <p>🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+                <p>🔗 Connecté : <span id="wallet-address">Détection...</span></p>
+                <p>💰 TAAMS : <span id="taams-balance">Chargement...</span></p>
+                <p>🔺 MATIC : <span id="matic-balance">Chargement...</span></p>
+                <p>🗳️ BL2P : <span id="bl2p-balance">Chargement...</span></p>
             </div>
         </div>
 
-        <!-- Statistics Grid -->
+        <!-- Statistiques -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="total-ads">Loading...</div>
-                <div class="stat-label">Total Advertisements</div>
+                <div class="stat-number" id="total-ads">Chargement...</div>
+                <div class="stat-label">Annonces totales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="active-ads">Loading...</div>
-                <div class="stat-label">Active Ads</div>
+                <div class="stat-number" id="active-ads">Chargement...</div>
+                <div class="stat-label">Annonces actives</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="total-views">Loading...</div>
-                <div class="stat-label">Total Views</div>
+                <div class="stat-number" id="total-views">Chargement...</div>
+                <div class="stat-label">Vues totales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="ad-revenue">Loading...</div>
-                <div class="stat-label">Total Revenue (TAAMS)</div>
+                <div class="stat-number" id="ad-revenue">Chargement...</div>
+                <div class="stat-label">Revenus totaux (TAAMS)</div>
             </div>
         </div>
 
-        <!-- Real-time Network Stats -->
+        <!-- Statut réseau en temps réel -->
         <div class="network-stats-panel">
-            <h4>⚡ TAAMS Network Status</h4>
+            <h4>⚡ Statut du réseau TAAMS</h4>
             <div class="network-stats">
                 <div class="stat-item">
-                    <span class="stat-label">Current Block:</span>
-                    <span class="stat-value" id="current-block">Loading...</span>
+                    <span class="stat-label">Bloc actuel :</span>
+                    <span class="stat-value" id="current-block">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Network:</span>
+                    <span class="stat-label">Réseau :</span>
                     <span class="stat-value">🔺 Polygon</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Gas Price:</span>
-                    <span class="stat-value" id="gas-price">Loading...</span>
+                    <span class="stat-label">Prix du gas :</span>
+                    <span class="stat-value" id="gas-price">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Status:</span>
-                    <span class="stat-value" id="network-status">🟢 Active</span>
+                    <span class="stat-label">Statut :</span>
+                    <span class="stat-value" id="network-status">🟢 Actif</span>
                 </div>
             </div>
         </div>
 
-        <!-- Advertisement Section -->
+        <!-- Section des annonces -->
         <div class="ads-section">
-            <!-- Post Advertisement -->
+            <!-- Publier une annonce -->
             <div class="ads-panel">
-                <h2>📝 Post Advertisement</h2>
+                <h2>📝 Publier une annonce</h2>
                 <div class="info-box">
-                    <h4>🎯 Advertisement Guidelines</h4>
-                    <p>Post ads on the blockchain. Cost depends on duration and visibility. All ads are immutable once posted.</p>
+                    <h4>🎯 Règles d'annonce</h4>
+                    <p>Publiez vos annonces sur la blockchain. Le coût dépend de la durée et de la visibilité. Toutes les annonces sont immuables une fois publiées.</p>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Advertisement Title:</label>
-                    <input type="text" id="ad-title" class="ads-input" placeholder="Enter advertisement title" maxlength="100">
+                    <label class="input-label">Titre de l'annonce :</label>
+                    <input type="text" id="ad-title" class="ads-input" placeholder="Saisissez le titre de l'annonce" maxlength="100">
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Advertisement Content:</label>
-                    <textarea id="ad-content" class="ads-input" placeholder="Describe your advertisement..." rows="4" maxlength="500"></textarea>
+                    <label class="input-label">Contenu de l'annonce :</label>
+                    <textarea id="ad-content" class="ads-input" placeholder="Décrivez votre annonce..." rows="4" maxlength="500"></textarea>
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Website URL (optional):</label>
-                    <input type="url" id="ad-url" class="ads-input" placeholder="https://example.com">
+                    <label class="input-label">URL du site web (optionnel) :</label>
+                    <input type="url" id="ad-url" class="ads-input" placeholder="https://exemple.com">
                 </div>
-                
                 <div class="input-group">
-                    <label class="input-label">Advertisement Duration:</label>
+                    <label class="input-label">Durée de l'annonce :</label>
                     <div class="duration-buttons">
-                        <button class="duration-btn" onclick="selectDuration(7, 50)">7 Days<br>50 TAAMS</button>
-                        <button class="duration-btn" onclick="selectDuration(30, 180)">30 Days<br>180 TAAMS</button>
-                        <button class="duration-btn" onclick="selectDuration(90, 500)">90 Days<br>500 TAAMS</button>
+                        <button class="duration-btn" onclick="selectDuration(7, 50)">7 jours<br>50 TAAMS</button>
+                        <button class="duration-btn" onclick="selectDuration(30, 180)">30 jours<br>180 TAAMS</button>
+                        <button class="duration-btn" onclick="selectDuration(90, 500)">90 jours<br>500 TAAMS</button>
                     </div>
                     <input type="hidden" id="ad-duration" value="">
                     <input type="hidden" id="ad-cost" value="">
                 </div>
-                
-                <button id="post-ad-btn" class="ads-btn" disabled>📝 POST ADVERTISEMENT</button>
+                <button id="post-ad-btn" class="ads-btn" disabled>📝 PUBLIER L'ANNONCE</button>
             </div>
-
-            <!-- Active Advertisements -->
+            <!-- Annonces actives -->
             <div class="ads-panel">
-                <h2>📢 Live Advertisements</h2>
+                <h2>📢 Annonces en ligne</h2>
                 <div class="ads-list" id="ads-list">
-                    <div class="log-entry log-info">📊 Loading advertisements from blockchain...</div>
+                    <div class="log-entry log-info">📊 Chargement des annonces depuis la blockchain...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Logs Section -->
+        <!-- Section des logs -->
         <div class="logs-section">
-            <h3 class="logs-title">🔍 Advertisement Portal Logs</h3>
+            <h3 class="logs-title">🔍 Journaux du portail d'annonces</h3>
             <div id="logs-container">
-                <div class="log-entry log-info">📢 Advertisement Portal initialized</div>
-                <div class="log-entry log-info">📊 Loading advertisement statistics...</div>
+                <div class="log-entry log-info">📢 Portail d'annonces initialisé</div>
+                <div class="log-entry log-info">📊 Chargement des statistiques d'annonces...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // State management
+        // Gestion d'état
         let adsState = {
             connected: false,
             userAccount: null,
@@ -571,50 +564,46 @@
             selectedCost: 0
         };
 
-        // Contract configuration
+        // Configuration du contrat
         const TAAMS_CONTRACT = {
             address: '0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef',
-            abi: null // Will be loaded from TAAMS_ABI.json
+            abi: null // Sera chargé depuis TAAMS_ABI.json
         };
 
-        // Initialize on page load
+        // Initialisation au chargement de la page
         document.addEventListener('DOMContentLoaded', async function() {
-            addLog('📢 TAAMS Advertisement Portal loading...', 'info');
+            addLog('📢 Chargement du portail d’annonces TAAMS...', 'info');
             await loadContractABI();
             initializeNetworkStats();
             setupEventListeners();
-            
-            // Auto-detect wallet from terminal
+            // Auto-détection du portefeuille depuis le terminal
             await initializeWalletFromTerminal();
-            
-            addLog('✅ Advertisement Portal ready!', 'success');
+            addLog('✅ Portail d’annonces prêt !', 'success');
         });
 
-        // Load contract ABI
+        // Charger l’ABI du contrat
         async function loadContractABI() {
             try {
                 const response = await fetch('./TAAMS_ABI.json');
                 TAAMS_CONTRACT.abi = await response.json();
-                addLog('📋 Contract ABI loaded', 'success');
+                addLog('📋 ABI du contrat chargée', 'success');
             } catch (error) {
-                addLog('❌ Failed to load contract ABI: ' + error.message, 'error');
+                addLog('❌ Échec du chargement de l’ABI du contrat : ' + error.message, 'error');
             }
         }
 
-        // Mobile device detection
+        // Détection mobile
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
 
-        // Setup event listeners
+        // Écouteurs d’événements
         function setupEventListeners() {
             document.getElementById('post-ad-btn').onclick = postAdvertisement;
-            
-            // Input validation
+            // Validation des champs
             document.getElementById('ad-title').oninput = validateAdForm;
             document.getElementById('ad-content').oninput = validateAdForm;
-            
-            // Setup wallet change detection
+            // Détection du changement de portefeuille
             setupWalletChangeDetection();
         }
 
@@ -1193,17 +1182,15 @@
             }
         }
 
-        // Add log entry
+        // Ajouter une entrée de log
         function addLog(message, type = 'info') {
             const logsContainer = document.getElementById('logs-container');
             const logEntry = document.createElement('div');
             logEntry.className = `log-entry log-${type}`;
             logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            
             logsContainer.appendChild(logEntry);
             logsContainer.scrollTop = logsContainer.scrollHeight;
-            
-            // Limit to 50 log entries
+            // Limite à 50 entrées
             while (logsContainer.children.length > 50) {
                 logsContainer.removeChild(logsContainer.firstChild);
             }

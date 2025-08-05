@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAAMS Protocol - Price Dashboard</title>
+    <title>TAAMS Protocole - Tableau des prix</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -131,34 +131,34 @@
 </head>
 <body>
     <div class="container">
-        <h1>TAAMS Price Dashboard</h1>
+        <h1>Tableau des prix TAAMS</h1>
         <!-- Section NFT Showcase (smaller, above price grid) -->
         <div class="nft-section">
             <img src="uniswap-nft.svg" alt="Uniswap NFT">
-            <div class="nft-title">NFT Uniswap</div>
-            <a href="https://opensea.io/collection/uniswap-v3-positions" target="_blank" rel="noopener" class="nft-link">Voir sur OpenSea</a>
-            <a href="terminal.html" class="btn">Retour au terminal</a>
+        <div class="nft-title">NFT Uniswap</div>
+        <a href="https://opensea.io/collection/uniswap-v3-positions" target="_blank" rel="noopener" class="nft-link">Voir sur OpenSea</a>
+        <a href="terminal.html" class="btn">Retour au terminal</a>
         </div>
         <div class="price-grid">
             <div class="price-card">
                 <div class="price-label">MATIC / USD</div>
-                <div class="price-value" id="matic-price">Loading...</div>
+                <div class="price-value" id="matic-price">Chargement...</div>
                 <div class="price-status" id="matic-status"></div>
             </div>
             <div class="price-card">
                 <div class="price-label">TAAMS / POL</div>
-                <div class="price-value" id="taams-price">192,296 TAAMS = 1 POL</div>
+                <div class="price-value" id="taams-price">192 296 TAAMS = 1 POL</div>
                 <div class="price-status" id="taams-status">Prix du pool Uniswap</div>
             </div>
         </div>
         <div class="info">
             Le prix MATIC/USD est mis à jour en temps réel.<br>
-            Le prix TAAMS/POL sera affiché dès qu'un pool de liquidité sera créé sur Uniswap.
+            Le prix TAAMS/POL s’affichera dès qu’un pool de liquidité sera créé sur Uniswap.
         </div>
 
         <div class="liquidity-section" style="margin-top:2rem; text-align:center;">
-            <h2 style="color:#00ff88; font-size:1.2rem; margin-bottom:1rem;">Ajouter de la liquidité TAAMS/POL sur Uniswap</h2>
-            <p style="color:#ccc; margin-bottom:1rem;">Pour que le prix TAAMS/POL soit affiché et tradable, vous pouvez créer ou ajouter de la liquidité sur Uniswap.</p>
+            <h2 style="color:#00ff88; font-size:1.2rem; margin-bottom:1rem;">Ajoutez de la liquidité TAAMS/POL sur Uniswap</h2>
+            <p style="color:#ccc; margin-bottom:1rem;">Pour que le prix TAAMS/POL soit affiché et échangeable, vous pouvez créer ou ajouter de la liquidité sur Uniswap.</p>
             <a href="https://app.uniswap.org/explore/pools/polygon/0xdb8e230e4797106509810210c84949e542811df77666c2b526ec033a6022c4ae" target="_blank" rel="noopener" class="btn" style="margin-bottom:1rem; background:linear-gradient(45deg,#2172e5,#00ff88); color:#fff;">Ajouter sur Uniswap</a>
             <p style="color:#888; font-size:0.95rem;">Adresse du contrat TAAMS : <span style="color:#00ff88;">0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef</span></p>
             <div style="margin-top:1.5rem;">

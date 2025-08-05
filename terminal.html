@@ -818,18 +818,18 @@
 <body>
     <div class="matrix-bg"></div>
     <div class="connection-indicator" id="connection-indicator"></div>
-    <div class="reload-button" id="reload-button" title="Refresh Connection">🔄</div>
+    <div class="reload-button" id="reload-button" title="Rafraîchir la connexion">🔄</div>
     
     <div class="container">
         <div class="terminal-header">
-            <div class="logo">TAAMS PROTOCOL</div>
-            <div class="subtitle typing-effect">// IGNITION TERMINAL ACCESS //</div>
+            <div class="logo">PROTOCOLE TAAMS</div>
+            <div class="subtitle typing-effect">// ACCÈS AU TERMINAL IGNITION //</div>
             
             <div class="status-bar">
-                <div class="status-item">NETWORK: <span id="network-status">DISCONNECTED</span></div>
-                <div class="status-item">BLOCK: <span id="current-block">---</span></div>
-                <div class="status-item">STATUS: <span id="user-status">UNAUTHORIZED</span></div>
-                <div class="status-item">AIRDROP: <span id="airdrop-status">DISCONNECTED</span></div>
+                <div class="status-item">RÉSEAU : <span id="network-status">DÉCONNECTÉ</span></div>
+                <div class="status-item">BLOC : <span id="current-block">---</span></div>
+                <div class="status-item">STATUT : <span id="user-status">NON AUTORISÉ</span></div>
+                <div class="status-item">AIRDROP : <span id="airdrop-status">DÉCONNECTÉ</span></div>
             </div>
             
             <!-- Indicateur de loading global -->
@@ -844,20 +844,20 @@
                 font-family: monospace;
                 color: #00ff88;
                 animation: pulse 1.5s ease-in-out infinite alternate;
-            ">⏳ Loading...</div>
+            ">⏳ Chargement...</div>
         </div>
         
         <div class="main-content">
             <div class="terminal-panel">
-                <div class="panel-header">IGNITION AIRDROP</div>
+                <div class="panel-header">AIRDROP IGNITION</div>
                 
                 <div class="wallet-section">
-                    <button class="btn" id="connect-wallet">CONNECT WALLET</button>
+                    <button class="btn" id="connect-wallet">CONNECTER LE WALLET</button>
                     <div class="wallet-address" id="wallet-address" style="display: none;"></div>
                 </div>
                 
                 <div class="airdrop-info">
-                    <div class="stat-label">CLAIMABLE AMOUNT</div>
+                    <div class="stat-label">MONTANT RÉCLAMABLE</div>
                     <div class="airdrop-amount" id="claimable-amount">0 TAAMS</div>
                     
                     <div class="progress-bar">
@@ -865,8 +865,8 @@
                     </div>
                     
                     <div id="airdrop-actions">
-                        <button class="btn" id="register-btn" disabled>REGISTER FOR AIRDROP</button>
-                        <button class="btn" id="claim-btn" disabled>CLAIM AIRDROP</button>
+                        <button class="btn" id="register-btn" disabled>S'INSCRIRE À L'AIRDROP</button>
+                        <button class="btn" id="claim-btn" disabled>RÉCLAMER L'AIRDROP</button>
                     </div>
                 </div>
                 
@@ -877,30 +877,30 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="max-participants">1000</div>
-                        <div class="stat-label">MAX SLOTS</div>
+                        <div class="stat-label">PLACES MAX</div>
                     </div>
                 </div>
             </div>
             
             <div class="terminal-panel">
-                <div class="panel-header">PROTOCOL STATS</div>
+                <div class="panel-header">STATISTIQUES DU PROTOCOLE</div>
                 
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value" id="total-supply">0</div>
-                        <div class="stat-label">TOTAL SUPPLY</div>
+                        <div class="stat-label">SUPPLY TOTALE</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="burn-phase">INACTIVE</div>
-                        <div class="stat-label">BURN PHASE</div>
+                        <div class="stat-value" id="burn-phase">INACTIF</div>
+                        <div class="stat-label">PHASE DE BURN</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="total-burned">0</div>
-                        <div class="stat-label">TOTAL BURNED</div>
+                        <div class="stat-label">TOTAL BRÛLÉ</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="bl2p-revealed">NO</div>
-                        <div class="stat-label">BL2P REVEALED</div>
+                        <div class="stat-value" id="bl2p-revealed">NON</div>
+                        <div class="stat-label">BL2P RÉVÉLÉ</div>
                     </div>
                 </div>
                 
@@ -912,43 +912,43 @@
         <div class="navigation">
             <div class="nav-item locked" id="nav-burn" onclick="navigateTo('burn.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">BURN PORTAL</div>
-                <div class="nav-description">Participate in token burning cycles</div>
+                <div class="nav-title">PORTAIL DE BURN</div>
+                <div class="nav-description">Participez aux cycles de brûlage de tokens</div>
             </div>
             <div class="nav-item locked" id="nav-stake" onclick="navigateTo('staking.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">STAKING CHAMBER</div>
-                <div class="nav-description">Stake tokens for rewards</div>
+                <div class="nav-title">CHAMBRE DE STAKING</div>
+                <div class="nav-description">Mettez vos tokens en staking pour des récompenses</div>
             </div>
             <div class="nav-item locked" id="nav-governance" onclick="navigateTo('governance.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">GOVERNANCE HUB</div>
-                <div class="nav-description">Vote & manage proposals</div>
+                <div class="nav-title">HUB DE GOUVERNANCE</div>
+                <div class="nav-description">Votez et gérez les propositions</div>
             </div>
             <div class="nav-item locked" id="nav-bl2p" onclick="navigateTo('bl2p.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">BL2P MANAGER</div>
-                <div class="nav-description">Liquidity pool management</div>
+                <div class="nav-title">GESTIONNAIRE BL2P</div>
+                <div class="nav-description">Gestion du pool de liquidité</div>
             </div>
             <div class="nav-item locked" id="nav-delegation" onclick="navigateTo('delegation.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">DELEGATION HUB</div>
-                <div class="nav-description">Delegate voting power</div>
+                <div class="nav-title">HUB DE DÉLÉGATION</div>
+                <div class="nav-description">Déléguez votre pouvoir de vote</div>
             </div>
             <div class="nav-item locked" id="nav-ads" onclick="navigateTo('ads.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">ADVERTISEMENT HUB</div>
-                <div class="nav-description">Post & view ads</div>
+                <div class="nav-title">HUB PUBLICITAIRE</div>
+                <div class="nav-description">Publiez et consultez des annonces</div>
             </div>
             <div class="nav-item locked" id="nav-referral" onclick="navigateTo('referral.html')">
                 <div class="lock-icon">🔒</div>
-                <div class="nav-title">REFERRAL HUB</div>
-                <div class="nav-description">Parrainage & bonus système</div>
+                <div class="nav-title">HUB DE PARRAINAGE</div>
+                <div class="nav-description">Système de parrainage et bonus</div>
             </div>
             <div class="nav-item support-link" onclick="navigateTo('support.html')">
                 <div class="lock-icon">🛠️</div>
-                <div class="nav-title">SUPPORT CENTER</div>
-                <div class="nav-description">Help, issues & community experiences</div>
+                <div class="nav-title">CENTRE DE SUPPORT</div>
+                <div class="nav-description">Aide, problèmes & expériences communautaires</div>
             </div>
             <div class="nav-item" id="nav-faq" onclick="navigateTo('faq.html')">
                 <div class="lock-icon">❓</div>
@@ -957,14 +957,14 @@
             </div>
             <div class="nav-item" id="nav-price" onclick="navigateTo('landing.html')">
                 <div class="lock-icon">💱</div>
-                <div class="nav-title">TAAMS/MATIC PRICES</div>
-                <div class="nav-description">Prix en temps réel & informations de marché</div>
+                <div class="nav-title">PRIX TAAMS/MATIC</div>
+                <div class="nav-description">Prix en temps réel & infos de marché</div>
             </div>
         </div>
         
         <div class="footer">
-            <p>TAAMS PROTOCOL © 2025 | DECENTRALIZED BURN-TO-EARN ECOSYSTEM</p>
-            <p>CONTRACT: 0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef | SECURE • DECENTRALIZED • REVOLUTIONARY</p>
+            <p>PROTOCOLE TAAMS © 2025 | ÉCOSYSTÈME DÉCENTRALISÉ BURN-TO-EARN</p>
+            <p>CONTRAT : 0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef | SÉCURISÉ • DÉCENTRALISÉ • RÉVOLUTIONNAIRE</p>
         </div>
     </div>
 
