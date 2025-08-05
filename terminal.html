@@ -972,8 +972,8 @@
     <script>
     // Global navigation function for MetaMask mobile compatibility
     function navigateTo(url) {
-        // Use assign to avoid opening externally
-        window.location.assign(url);
+        // Use href for best MetaMask mobile compatibility
+        window.location.href = url;
     }
     window.navigateTo = navigateTo;
     </script>
