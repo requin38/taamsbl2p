@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAAMS Protocol - Détails & Paramètres</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 60px auto 0 auto;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0,255,136,0.2);
+        }
+        h1 {
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        h2 {
+            color: #00ff88;
+            margin-top: 2rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+        }
+        .param-list {
+            background: rgba(0,255,136,0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .param-list li {
+            margin-bottom: 0.5rem;
+        }
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border: none;
+            color: #000;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 2rem;
+        }
+        .btn:hover {
+            background: linear-gradient(45deg, #00cc66, #00aa55);
+            box-shadow: 0 4px 8px rgba(0,255,136,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TAAMS Protocol&nbsp;: Démarrage & Fonctionnement</h1>
+
+        <div class="section">
+            <h2>1. Démarrage du Système&nbsp;: Airdrop Ignition</h2>
+            <ul class="param-list">
+                <li><strong>Ignition Airdrop Pool :</strong> 500 000 000 TAAMS</li>
+                <li><strong>Early Adopter Limit :</strong> 1000 participants</li>
+            </ul>
+            <p>L'airdrop d'ignition est la clé du démarrage du protocole TAAMS. Tant que les 500 000 000 TAAMS de l'airdrop ne sont pas distribués, le système reste « éteint ». L'inscription est ouverte tant que <strong>ignitionRegistrationOpen</strong> est true et se ferme automatiquement dès que 1000 participants sont inscrits. Les premiers inscrits reçoivent des bonus.</p>
+        </div>
+
+        <div class="section">
+            <h2>2. Activation du Protocole</h2>
+            <ul class="param-list">
+                <li><strong>Activation Threshold :</strong> 1 000 000 000 TAAMS en circulation</li>
+            </ul>
+            <p>Après la distribution de l'airdrop, le protocole n'est pas encore pleinement activé. Il faut qu'au moins 1 000 000 000 TAAMS soient en circulation pour que la première phase du système démarre réellement. Une fois ce seuil atteint et le système stable, le propriétaire renoncera à la propriété du contrat, rendant le protocole 100% autonome et géré par la gouvernance on-chain.</p>
+            <p><em>Note&nbsp;: La distribution de TAAMS supplémentaire pour atteindre le seuil d'activation dépendra d'une action communautaire ou d'une décision de la gouvernance. Elle n'est pas automatisée par le contrat et pourra prendre la forme d'une opération spéciale, d'une campagne ou d'une récompense liée à la participation.</em></p>
+        </div>
+
+        <div class="section">
+            <h2>3. Fonctionnement du Protocole</h2>
+            <ul class="param-list">
+                <li><strong>Max Supply :</strong> 10 000 000 000 TAAMS</li>
+                <li><strong>Locked Reserve :</strong> 7 000 000 000 TAAMS</li>
+                <li><strong>Burn Target :</strong> 1 000 000 000 TAAMS</li>
+                <li><strong>BL2P Max Supply :</strong> 1 000 000 000 BL2P</li>
+                <li><strong>Staking Min Amount :</strong> 1000 TAAMS</li>
+            </ul>
+            <h3>Cycles de Burn</h3>
+            <p>Le burn fonctionne par cycles annuels. Chaque cycle a une durée fixe et un objectif de burn. Quand le burn total atteint le <strong>Burn Target</strong>, les BL2P sont révélés et distribués.</p>
+            <h3>Staking & Boost BL2P</h3>
+            <ul class="param-list">
+                <li>Montant minimum pour staker : 1000 TAAMS</li>
+                <li>Le boost BL2P est limité à 10% du montant staké</li>
+            </ul>
+            <h3>Bonus Early Adopter</h3>
+            <p>Les 1000 premiers participants au burn reçoivent un bonus BL2P lors du claim.</p>
+            <h3>Parrainage</h3>
+            <p>Un système de parrainage permet au parrain de recevoir un bonus BL2P lors du claim du filleul.</p>
+            <h3>BL2P : Maturité & Expiration</h3>
+            <p>Les BL2P ont une durée de vie et une période de maturation. Ils expirent après un certain nombre de blocs.</p>
+            <h3>Pause d'Urgence</h3>
+            <p>Le protocole peut être mis en pause temporairement pour sécurité (emergencyPaused).</p>
+        </div>
+
+        <div class="section">
+            <h2>4. Gouvernance & Autonomie</h2>
+            <ul class="param-list">
+                <li>Quorum : 10 000 000 TAAMS</li>
+                <li>Threshold de vote : 50</li>
+                <li>Cooldown des propositions : 30 jours</li>
+                <li>Propositions, votes et paramètres sont gérés on-chain</li>
+            </ul>
+            <p>Après renonciation à la propriété, la gouvernance devient entièrement on-chain et autonome.</p>
+        </div>
+
+        <div class="section">
+            <h2>Contrat & Documentation</h2>
+            <p>Adresse du contrat : <a href="https://polygonscan.com/address/0xbAC8aC29CddD32997D7dDA8cc27DAB261327e1Ef" target="_blank" rel="noopener">PolygonScan</a></p>
+            <p>Documentation complète sur GitHub et dans le README du projet.</p>
+            <p><a href="TAAMS.sol.txt" target="_blank" rel="noopener">Voir le code source du contrat (TAAMS.sol.txt)</a></p>
+        </div>
+        <a href="index.html" class="btn">Retour à l’accueil</a>
+    </div>
+</body>
+</html>
