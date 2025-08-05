@@ -364,13 +364,13 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>💰 TAAMS STAKING CHAMBER</h1>
-            <p>Stake TAAMS tokens to earn rewards and BL2P</p>
+            <h1>💰 CHAMBRE DE STAKING TAAMS</h1>
+            <p>Déposez vos tokens TAAMS pour gagner des récompenses et des BL2P</p>
             
-            <!-- Navigation Back -->
+            <!-- Navigation Retour -->
             <div class="back-nav">
                 <button onclick="goBackToTerminal()" class="back-btn">
-                    ↩️ BACK TO TERMINAL
+                    ↩️ RETOUR AU TERMINAL
                 </button>
             </div>
         </div>
@@ -378,52 +378,52 @@
         <!-- Wallet Info (Auto-detected from terminal) -->
         <div class="wallet-section">
             <div id="wallet-info" class="wallet-info">
-                <p>🔗 Connected: <span id="wallet-address">Detecting...</span></p>
-                <p>💰 TAAMS: <span id="taams-balance">Loading...</span></p>
-                <p>🔺 MATIC: <span id="matic-balance">Loading...</span></p>
-                <p>🗳️ BL2P: <span id="bl2p-balance">Loading...</span></p>
+                <p>🔗 Connecté : <span id="wallet-address">Détection...</span></p>
+                <p>💰 TAAMS : <span id="taams-balance">Chargement...</span></p>
+                <p>🔺 MATIC : <span id="matic-balance">Chargement...</span></p>
+                <p>🗳️ BL2P : <span id="bl2p-balance">Chargement...</span></p>
             </div>
         </div>
 
         <!-- Statistics Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="total-staked">Loading...</div>
-                <div class="stat-label">Total Staked</div>
+                <div class="stat-number" id="total-staked">Chargement...</div>
+                <div class="stat-label">Total Déposé</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="staking-reward-rate">Loading...</div>
-                <div class="stat-label">Reward Rate</div>
+                <div class="stat-number" id="staking-reward-rate">Chargement...</div>
+                <div class="stat-label">Taux de Récompense</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="user-stake">Loading...</div>
-                <div class="stat-label">Your Stake</div>
+                <div class="stat-number" id="user-stake">Chargement...</div>
+                <div class="stat-label">Votre Dépôt</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="pending-rewards">Loading...</div>
-                <div class="stat-label">Pending Rewards</div>
+                <div class="stat-number" id="pending-rewards">Chargement...</div>
+                <div class="stat-label">Récompenses en Attente</div>
             </div>
         </div>
 
         <!-- Real-time Network Stats -->
         <div class="network-stats-panel">
-            <h4>⚡ TAAMS Network Status</h4>
+            <h4>⚡ Statut du Réseau TAAMS</h4>
             <div class="network-stats">
                 <div class="stat-item">
-                    <span class="stat-label">Current Block:</span>
-                    <span class="stat-value" id="current-block">Loading...</span>
+                    <span class="stat-label">Bloc Actuel :</span>
+                    <span class="stat-value" id="current-block">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Network:</span>
+                    <span class="stat-label">Réseau :</span>
                     <span class="stat-value">🔺 Polygon</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Gas Price:</span>
-                    <span class="stat-value" id="gas-price">Loading...</span>
+                    <span class="stat-label">Prix du Gas :</span>
+                    <span class="stat-value" id="gas-price">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Status:</span>
-                    <span class="stat-value" id="network-status">🟢 Active</span>
+                    <span class="stat-label">Statut :</span>
+                    <span class="stat-value" id="network-status">🟢 Actif</span>
                 </div>
             </div>
         </div>
@@ -432,20 +432,20 @@
         <div class="staking-section">
             <!-- Stake Tokens -->
             <div class="staking-panel">
-                <h2>💰 Stake TAAMS</h2>
+                <h2>💰 Déposer des TAAMS</h2>
                 <div class="reward-info">
-                    <h4>🎯 Staking Benefits</h4>
-                    <p>Earn TAAMS rewards and BL2P tokens by staking. BL2P can be used for governance voting and additional rewards.</p>
+                    <h4>🎯 Avantages du Staking</h4>
+                    <p>Gagnez des récompenses TAAMS et des tokens BL2P en déposant. Les BL2P servent au vote de gouvernance et à des récompenses supplémentaires.</p>
                 </div>
                 
                 <div class="balance-info">
-                    <span class="balance-available">Available Balance:</span>
+                    <span class="balance-available">Solde Disponible :</span>
                     <span class="balance-value" id="available-balance">0 TAAMS</span>
                 </div>
                 
                 <div class="input-group">
-                    <label class="input-label">Amount to Stake:</label>
-                    <input type="number" id="stake-amount" class="staking-input" placeholder="Enter TAAMS amount" min="0" step="0.01">
+                    <label class="input-label">Montant à déposer :</label>
+                    <input type="number" id="stake-amount" class="staking-input" placeholder="Entrez le montant de TAAMS" min="0" step="0.01">
                 </div>
                 
                 <div class="percentage-buttons">
@@ -455,35 +455,35 @@
                     <button class="percentage-btn" onclick="setStakePercentage(100)">100%</button>
                 </div>
                 
-                <button id="stake-btn" class="staking-btn" disabled>💰 STAKE TOKENS</button>
+                <button id="stake-btn" class="staking-btn" disabled>💰 DÉPOSER LES TOKENS</button>
             </div>
 
             <!-- Unstake & Rewards -->
             <div class="staking-panel">
-                <h2>🏆 Manage Stake</h2>
+                <h2>🏆 Gérer le Dépôt</h2>
                 <div class="reward-info">
-                    <h4>🎁 Current Stake Info</h4>
-                    <p>Your staked amount: <span id="staked-amount">0 TAAMS</span></p>
-                    <p>Stake start block: <span id="stake-start-block">---</span></p>
-                    <p>BL2P boost: <span id="bl2p-boost">0</span></p>
+                    <h4>🎁 Infos sur le Dépôt Actuel</h4>
+                    <p>Votre montant déposé : <span id="staked-amount">0 TAAMS</span></p>
+                    <p>Bloc de début du dépôt : <span id="stake-start-block">---</span></p>
+                    <p>Boost BL2P : <span id="bl2p-boost">0</span></p>
                 </div>
                 
                 <div class="balance-info">
-                    <span class="balance-available">Claimable Rewards:</span>
+                    <span class="balance-available">Récompenses à réclamer :</span>
                     <span class="balance-value" id="claimable-rewards">0 TAAMS</span>
                 </div>
                 
-                <button id="claim-rewards-btn" class="staking-btn claim-btn" disabled>🎁 CLAIM REWARDS</button>
-                <button id="unstake-btn" class="staking-btn" disabled>📤 UNSTAKE ALL</button>
+                <button id="claim-rewards-btn" class="staking-btn claim-btn" disabled>🎁 RÉCLAMER LES RÉCOMPENSES</button>
+                <button id="unstake-btn" class="staking-btn" disabled>📤 RETIRER TOUT</button>
             </div>
         </div>
 
         <!-- Logs Section -->
         <div class="logs-section">
-            <h3 class="logs-title">🔍 Staking Portal Logs</h3>
+            <h3 class="logs-title">🔍 Journaux du Portail de Staking</h3>
             <div id="logs-container">
-                <div class="log-entry log-info">💰 Staking Portal initialized</div>
-                <div class="log-entry log-info">📊 Loading staking statistics...</div>
+                <div class="log-entry log-info">💰 Portail de Staking initialisé</div>
+                <div class="log-entry log-info">📊 Chargement des statistiques de staking...</div>
             </div>
         </div>
     </div>
@@ -512,13 +512,21 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {
             addLog('💰 TAAMS Staking Portal loading...', 'info');
-            await loadContractABI();
+            let abiLoaded = await loadContractABI();
+            if (!abiLoaded) {
+                const header = document.querySelector('.header');
+                if (header && !document.getElementById('abi-error')) {
+                    const abiError = document.createElement('div');
+                    abiError.id = 'abi-error';
+                    abiError.style = 'color:#ff4757;background:rgba(255,71,87,0.1);padding:10px;margin:10px 0;border-radius:6px;font-weight:bold;';
+                    abiError.textContent = '❌ Erreur : Impossible de charger le fichier TAAMS_ABI.json. Vérifiez que le fichier existe à la racine et qu’il est accessible.';
+                    header.appendChild(abiError);
+                }
+            }
             initializeNetworkStats();
             setupEventListeners();
-            
             // Auto-detect wallet from terminal
             await initializeWalletFromTerminal();
-            
             addLog('✅ Staking Portal ready!', 'success');
         });
 
@@ -526,10 +534,13 @@
         async function loadContractABI() {
             try {
                 const response = await fetch('./TAAMS_ABI.json');
+                if (!response.ok) throw new Error('Fichier introuvable ou inaccessible');
                 TAAMS_CONTRACT.abi = await response.json();
-                addLog('📋 Contract ABI loaded', 'success');
+                addLog('📋 ABI du contrat chargée', 'success');
+                return true;
             } catch (error) {
-                addLog('❌ Failed to load contract ABI: ' + error.message, 'error');
+                addLog('❌ Échec du chargement de l’ABI : ' + error.message, 'error');
+                return false;
             }
         }
 
@@ -778,21 +789,14 @@
                 stakingState.userStake = parseFloat(stakingState.web3.utils.fromWei(userStakeData.amount, 'ether'));
                 stakingState.currentBlock = currentBlock;
                 
-                // Calculate pending rewards using real contract method if available
+                // Calcul fallback des récompenses (la méthode getPendingRewards n'existe pas dans l'ABI)
                 let pendingRewards = 0;
-                try {
-                    // Try to get real pending rewards from contract
-                    const rewardsWei = await stakingState.contract.methods.getPendingRewards(stakingState.userAccount).call();
-                    pendingRewards = parseFloat(stakingState.web3.utils.fromWei(rewardsWei, 'ether'));
-                } catch (error) {
-                    // Fallback calculation if contract method doesn't exist
-                    const blocksSinceStake = stakingState.currentBlock - parseInt(userStakeData.startBlock);
-                    if (blocksSinceStake > 0 && stakingState.userStake > 0) {
-                        pendingRewards = (stakingState.userStake * stakingState.stakingRewardRate * blocksSinceStake) / 1000000;
-                    }
-                    addLog('⚠️ Using estimated rewards calculation', 'warning');
+                const blocksSinceStake = stakingState.currentBlock - parseInt(userStakeData.startBlock);
+                if (blocksSinceStake > 0 && stakingState.userStake > 0) {
+                    pendingRewards = (stakingState.userStake * stakingState.stakingRewardRate * blocksSinceStake) / 1000000;
                 }
                 stakingState.pendingRewards = pendingRewards;
+                addLog('Note : Les récompenses affichées sont une estimation calculée à partir des données du contrat.', 'info');
                 
                 // Update UI with real data
                 document.getElementById('total-staked').textContent = stakingState.totalStaked.toLocaleString();
@@ -809,27 +813,67 @@
                 // Enable/disable buttons based on staking state
                 const claimBtn = document.getElementById('claim-rewards-btn');
                 const unstakeBtn = document.getElementById('unstake-btn');
+               const stakeBtn = document.getElementById('stake-btn');
                 
-                if (stakingState.userStake > 0) {
+                // Nouvelle logique : désactive les boutons si staking non actif ou montant insuffisant
+                let isActive = false;
+                if (typeof userStakeData.active !== 'undefined') {
+                    isActive = userStakeData.active;
+                }
+                if (!isActive || stakingState.userStake < 1000) {
+                    claimBtn.disabled = true;
+                    unstakeBtn.disabled = true;
+                } else {
                     unstakeBtn.disabled = false;
-                    
                     if (stakingState.pendingRewards > 0) {
                         claimBtn.disabled = false;
+                    } else {
+                        claimBtn.disabled = true;
                     }
                 }
-                
+                // Le bouton stake est activé seulement si le wallet est connecté et le solde >= 1000
+                if (!stakingState.connected || stakingState.taamasBalance < 1000) {
+                    stakeBtn.disabled = true;
+                } else {
+                    stakeBtn.disabled = false;
+                }
+
                 addLog('📊 Real staking statistics loaded successfully', 'success');
+
+                // Affichage état staking
+                if (!isActive) {
+                    addLog('❌ Staking non actif selon le contrat. Veuillez déposer au moins le minimum requis.', 'warning');
+                } else {
+                    addLog('✅ Staking actif selon le contrat.', 'success');
+                }
+                // Affichage minimum requis
+                if (stakingState.userStake < 1000) {
+                    addLog('⚠️ Le montant déposé est inférieur au minimum requis (1000 TAAMS). Augmentez votre dépôt pour activer le staking.', 'warning');
+                }
+                // Affichage conditions générales
+                if (stakingState.userStake <= 0 || stakingState.pendingRewards <= 0) {
+                    addLog('ℹ️ Le staking n’est pas actif ou les conditions ne sont pas remplies. Veuillez vérifier votre dépôt et attendre la génération des récompenses.', 'warning');
+                }
                 addLog(`📈 Total Staked: ${stakingState.totalStaked.toLocaleString()} TAAMS`, 'info');
                 addLog(`💰 Your Stake: ${stakingState.userStake.toLocaleString()} TAAMS`, 'info');
                 addLog(`🎁 Pending Rewards: ${stakingState.pendingRewards.toFixed(6)} TAAMS`, 'info');
                 
             } catch (error) {
-                addLog('❌ Failed to load real staking statistics: ' + error.message, 'error');
+                addLog('❌ Échec du chargement des statistiques : ' + error.message, 'error');
                 // Set error state
-                document.getElementById('total-staked').textContent = 'Error';
-                document.getElementById('staking-reward-rate').textContent = 'Error';
-                document.getElementById('user-stake').textContent = 'Error';
-                document.getElementById('pending-rewards').textContent = 'Error';
+                document.getElementById('total-staked').textContent = 'Erreur';
+                document.getElementById('staking-reward-rate').textContent = 'Erreur';
+                document.getElementById('user-stake').textContent = 'Erreur';
+                document.getElementById('pending-rewards').textContent = 'Erreur';
+                // Affichage d'une alerte visible dans la grille des stats
+                let statsGrid = document.querySelector('.stats-grid');
+                if (statsGrid && !document.getElementById('stats-error')) {
+                    let errorDiv = document.createElement('div');
+                    errorDiv.id = 'stats-error';
+                    errorDiv.style = 'grid-column: 1 / -1; color:#ff4757; background:rgba(255,71,87,0.1); padding:12px; margin:10px 0; border-radius:8px; font-weight:bold; text-align:center;';
+                    errorDiv.textContent = '❌ Erreur : Impossible de charger les statistiques de staking. Vérifiez la connexion au wallet, le réseau Polygon, et le fichier ABI.';
+                    statsGrid.appendChild(errorDiv);
+                }
             }
         }
 
@@ -872,15 +916,29 @@
             }
 
             const amount = parseFloat(document.getElementById('stake-amount').value);
-            
-            if (isNaN(amount) || amount <= 0) {
-                addLog('⚠️ Please enter a valid amount', 'warning');
+            // Vérification du montant minimum
+            if (isNaN(amount) || amount < 1000) {
+                addLog('❌ Le montant à déposer doit être au moins 1000 TAAMS.', 'error');
                 return;
             }
-
             if (amount > stakingState.taamasBalance) {
-                addLog('❌ Insufficient balance', 'error');
+                addLog('❌ Solde insuffisant.', 'error');
                 return;
+            }
+            // Vérification de l'état du staking (doit être actif)
+            if (typeof stakingState.userStake !== 'undefined' && typeof stakingState.contract !== 'undefined') {
+                // On récupère les données du staking utilisateur
+                let userStakeData;
+                try {
+                    userStakeData = await stakingState.contract.methods.stakes(stakingState.userAccount).call();
+                } catch (e) {
+                    addLog('❌ Impossible de vérifier l’état du staking utilisateur.', 'error');
+                    return;
+                }
+                if (typeof userStakeData.active !== 'undefined' && !userStakeData.active) {
+                    addLog('❌ Le staking n’est pas actif pour cet utilisateur. Veuillez vérifier les conditions du contrat.', 'error');
+                    return;
+                }
             }
 
             try {
@@ -912,7 +970,7 @@
                 addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
                 
                 // Update balance and statistics
-                await loadUserBalance();
+                await loadWalletBalances();
                 await loadStakingStatistics();
                 
                 // Reset form
@@ -958,7 +1016,7 @@
                 addLog('🎁 REWARDS CLAIMED SUCCESSFULLY!', 'success');
                 addLog('🔗 Transaction: https://polygonscan.com/tx/' + result.transactionHash, 'info');
                 
-                await loadUserBalance();
+                await loadWalletBalances();
                 await loadStakingStatistics();
 
             } catch (error) {
@@ -998,7 +1056,7 @@
                 addLog('📤 UNSTAKING SUCCESSFUL!', 'success');
                 addLog('🔗 Transaction: https://polygonscan.com/tx/' + result.transactionHash, 'info');
                 
-                await loadUserBalance();
+                await loadWalletBalances();
                 await loadStakingStatistics();
 
             } catch (error) {
