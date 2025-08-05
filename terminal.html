@@ -968,6 +968,15 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.10.0/web3.min.js"></script>
+
+    <script>
+    // Global navigation function for MetaMask mobile compatibility
+    function navigateTo(url) {
+        // Use assign to avoid opening externally
+        window.location.assign(url);
+    }
+    window.navigateTo = navigateTo;
+    </script>
     <script src="https://unpkg.com/@metamask/detect-provider/dist/detect-provider.min.js"></script>
     <script>
         // Configuration du contrat avec ABI complet
