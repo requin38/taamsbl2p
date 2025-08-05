@@ -830,6 +830,20 @@
                 <div class="status-item">STATUS: <span id="user-status">UNAUTHORIZED</span></div>
                 <div class="status-item">AIRDROP: <span id="airdrop-status">DISCONNECTED</span></div>
             </div>
+            
+            <!-- Indicateur de loading global -->
+            <div id="global-loading" style="
+                display: none;
+                background: rgba(0, 255, 136, 0.1);
+                border: 1px solid #00ff88;
+                border-radius: 5px;
+                padding: 10px;
+                margin: 10px 0;
+                text-align: center;
+                font-family: monospace;
+                color: #00ff88;
+                animation: pulse 1.5s ease-in-out infinite alternate;
+            ">⏳ Loading...</div>
         </div>
         
         <div class="main-content">
@@ -942,6 +956,12 @@
                 <div class="nav-title">SUPPORT CENTER</div>
                 <div class="nav-description">Help, issues & community experiences</div>
             </div>
+            <!-- Ajout du lien vers la page Landing -->
+            <div class="nav-item" id="nav-price" onclick="window.location.href='landing.html'">
+                <div class="lock-icon">💱</div>
+                <div class="nav-title">TAAMS/MATIC PRICES</div>
+                <div class="nav-description">Prix en temps réel & informations de marché</div>
+            </div>
         </div>
         
         <div class="footer">
@@ -964,8 +984,130 @@
         let web3;
         let contract;
         let userAccount;
-        let connectionCheckInterval;
-        let blockUpdateInterval;
+        
+        // Gestion centralisée des timers pour éviter les memory leaks
+        const timers = {
+            connectionCheck: null,
+            blockUpdate: null,
+            loadingRefresh: null,
+            reconnectionAttempt: null
+        };
+        
+        // Système de notification toast avancé
+        function createToast(message, type = 'info', duration = 5000) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            // Icône selon le type
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#00ff88' : type === 'error' ? '#ff6b6b' : type === 'warning' ? '#ffa500' : '#00aaff'};
+                color: #000;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-family: monospace;
+                font-weight: bold;
+                z-index: 10000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
+                max-width: 350px;
+                word-wrap: break-word;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            `;
+            
+            toast.innerHTML = `${icons[type]} ${message}`;
+            
+            document.body.appendChild(toast);
+            
+            // Animation d'entrée
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Suppression automatique
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+            
+            return toast;
+        }
+        
+        // Système de loading states amélioré
+        const loadingStates = {
+            wallet: false,
+            contract: false,
+            balances: false,
+            registration: false
+        };
+        
+        function updateLoadingState(component, isLoading, progress = null) {
+            loadingStates[component] = isLoading;
+            
+            // Afficher un indicateur de progression global
+            const globalLoading = Object.values(loadingStates).some(state => state);
+            const loadingIndicator = document.getElementById('global-loading');
+            
+            if (loadingIndicator) {
+                if (globalLoading) {
+                    loadingIndicator.style.display = 'block';
+                    if (progress !== null) {
+                        loadingIndicator.textContent = `⏳ Loading... ${progress}%`;
+                    } else {
+                        loadingIndicator.textContent = `⏳ Loading ${component}...`;
+                    }
+                } else {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+        }
+        
+        // Cache intelligent pour optimiser les performances
+        const cache = {
+            blockNumber: null,
+            contractData: null,
+            userBalances: null,
+            lastUpdate: 0,
+            validityPeriod: 30000 // 30 secondes
+        };
+        
+        // Fonction pour vérifier si le cache est valide
+        function isCacheValid() {
+            return (Date.now() - cache.lastUpdate) < cache.validityPeriod;
+        }
+        
+        // Fonction pour invalider le cache
+        function invalidateCache() {
+            cache.blockNumber = null;
+            cache.contractData = null;
+            cache.userBalances = null;
+            cache.lastUpdate = 0;
+            addLog('> CACHE INVALIDATED', 'info');
+        }
+        
+        // Fonction pour nettoyer tous les timers
+        function clearAllTimers() {
+            Object.keys(timers).forEach(key => {
+                if (timers[key]) {
+                    clearInterval(timers[key]);
+                    timers[key] = null;
+                }
+            });
+            addLog('> ALL BACKGROUND TIMERS CLEARED', 'info');
+        }
         
         // État de l'application avec persistance améliorée
         const state = {
@@ -1260,15 +1402,8 @@
             updateConnectionIndicator(false);
             updateUI();
             
-            // Arrêter les intervalles
-            if (connectionCheckInterval) {
-                clearInterval(connectionCheckInterval);
-                connectionCheckInterval = null;
-            }
-            if (blockUpdateInterval) {
-                clearInterval(blockUpdateInterval);
-                blockUpdateInterval = null;
-            }
+            // Nettoyer tous les timers
+            clearAllTimers();
         }
         
         function disconnectWallet() {
@@ -1979,6 +2114,7 @@
         
         async function connectWallet() {
             try {
+                updateLoadingState('wallet', true);
                 addLog('> DETECTING METAMASK PROVIDER...', 'info');
                 
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -2121,6 +2257,10 @@
                     updateUI();
                     showAlert('✅ Connexion réussie ! Wallet authentifié.', 'success');
                     
+                    // Démarrer le monitoring des connexions
+                    setupContractEvents();
+                    startConnectionMonitoring();
+                    
                 } catch (signError) {
                     if (signError.code === 4001) {
                         addLog('> SIGNATURE CANCELLED BY USER', 'warning');
@@ -2153,6 +2293,8 @@
                 const connectBtn = document.getElementById('connect-wallet');
                 connectBtn.textContent = 'CONNECT WALLET';
                 connectBtn.disabled = false;
+            } finally {
+                updateLoadingState('wallet', false);
             }
         }
 
@@ -2684,23 +2826,30 @@
         
         // Monitoring de connexion amélioré avec gestion multi-wallet
         function startConnectionMonitoring() {
+            // Nettoyer les anciens timers avant d'en créer de nouveaux
+            clearAllTimers();
+            
             addLog('> STARTING REAL-TIME BLOCKCHAIN MONITORING...', 'info');
             
             // Vérification de la connexion et changements de wallet toutes les 10 secondes
-            connectionCheckInterval = setInterval(async () => {
+            timers.connectionCheck = setInterval(async () => {
                 if (state.connected && userAccount) {
-                    const isStillConnected = await checkWalletConnection();
-                    if (!isStillConnected) {
-                        addLog('> BLOCKCHAIN CONNECTION LOST', 'error');
-                        clearPersistedState();
-                        resetConnectionState();
-                        showAlert('Blockchain connection lost. Please reconnect your wallet.', 'error');
+                    try {
+                        const isStillConnected = await checkWalletConnection();
+                        if (!isStillConnected) {
+                            addLog('> BLOCKCHAIN CONNECTION LOST', 'error');
+                            clearPersistedState();
+                            resetConnectionState();
+                            showAlert('Blockchain connection lost. Please reconnect your wallet.', 'error');
+                        }
+                    } catch (error) {
+                        addLog('> CONNECTION CHECK FAILED', 'warning');
                     }
                 }
             }, 10000);
             
             // Mise à jour des données blockchain temps réel toutes les 20 secondes
-            blockUpdateInterval = setInterval(async () => {
+            timers.blockUpdate = setInterval(async () => {
                 if (web3 && state.connectionStable && userAccount) {
                     try {
                         const currentBlock = await web3.eth.getBlockNumber();
@@ -2722,13 +2871,32 @@
                         
                     } catch (error) {
                         addLog('> ERROR REFRESHING WALLET BLOCKCHAIN DATA', 'error');
-                        console.error('Wallet blockchain refresh error:', error);
+                        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                            console.error('Wallet blockchain refresh error:', error);
+                        }
                     }
                 }
             }, 20000);
             
             addLog('> REAL-TIME MULTI-WALLET MONITORING ACTIVE', 'success');
         }
+        
+        // Nettoyage automatique des timers au déchargement de la page
+        window.addEventListener('beforeunload', function() {
+            addLog('> CLEANING UP RESOURCES...', 'info');
+            clearAllTimers();
+        });
+        
+        // Nettoyage automatique en cas de visibilité cachée (mobile)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                addLog('> PAGE HIDDEN - PAUSING TIMERS...', 'info');
+                clearAllTimers();
+            } else if (state.connected && userAccount) {
+                addLog('> PAGE VISIBLE - RESUMING MONITORING...', 'info');
+                startConnectionMonitoring();
+            }
+        });
         
         async function checkWalletConnection() {
             // Utilise le détecteur pour s'assurer qu'on a MetaMask
@@ -3659,15 +3827,36 @@
             addLog('> WALLET CHANGE HANDLING TEST COMPLETE', 'success');
         }
         
-        // Gestionnaire d'erreurs global
+        // Gestionnaire d'erreurs global amélioré
         window.addEventListener('error', function(event) {
             addLog('> CRITICAL ERROR DETECTED', 'error');
-            console.error('Critical error:', event.error);
+            
+            // Log détaillé seulement en développement
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.error('Critical error:', event.error);
+            }
+            
+            // Tentative de récupération automatique
+            if (event.error?.message?.includes('provider') || event.error?.message?.includes('wallet')) {
+                addLog('> ATTEMPTING WALLET RECONNECTION...', 'warning');
+                setTimeout(() => {
+                    if (window.ethereum) {
+                        connectWallet();
+                    }
+                }, 2000);
+            }
         });
         
         window.addEventListener('unhandledrejection', function(event) {
             addLog('> UNHANDLED PROMISE REJECTION', 'error');
-            console.error('Unhandled rejection:', event.reason);
+            
+            // Log détaillé seulement en développement  
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.error('Unhandled rejection:', event.reason);
+            }
+            
+            // Prévenir le crash de l'application
+            event.preventDefault();
         });
     </script>
     
