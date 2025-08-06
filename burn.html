@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 TAAMS Burn Portal - Deflationary Mechanism</title>
+    <title>🔥 Portail de Brûlage TAAMS - Mécanisme Déflationniste</title>
     <script src="https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/detect-provider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <link rel="stylesheet" href="burn-styles.css">
@@ -430,7 +430,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🔥 TAAMS BURN PORTAL</h1>
+            <h1>🔥 PORTAIL DE BRÛLAGE TAAMS</h1>
             <p>Mécanisme de réduction des jetons par brûlage</p>
             <div class="fire-animation">🔥</div>
             
@@ -459,60 +459,60 @@
                 <div class="stat-label">Quantité totale</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="total-burned">Loading...</div>
-                <div class="stat-label">Total Burned</div>
+                <div class="stat-number" id="total-burned">Chargement...</div>
+                <div class="stat-label">Total brûlé</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="burn-events">Loading...</div>
-                <div class="stat-label">Burn Events</div>
+                <div class="stat-number" id="burn-events">Chargement...</div>
+                <div class="stat-label">Événements de brûlage</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="deflation-rate">Loading...</div>
-                <div class="stat-label">Deflation Rate</div>
+                <div class="stat-number" id="deflation-rate">Chargement...</div>
+                <div class="stat-label">Taux de déflation</div>
             </div>
         </div>
 
         <!-- Real-time Network Stats -->
         <div class="countdown-timer">
-            <h4>⚡ TAAMS Network Status</h4>
+            <h4>⚡ Statut du réseau TAAMS</h4>
             <div class="network-stats">
                 <div class="stat-item">
-                    <span class="stat-label">Current Block:</span>
-                    <span class="stat-value" id="current-block">Loading...</span>
+                    <span class="stat-label">Bloc actuel :</span>
+                    <span class="stat-value" id="current-block">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Network:</span>
+                    <span class="stat-label">Réseau :</span>
                     <span class="stat-value">🔺 Polygon</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Gas Price:</span>
-                    <span class="stat-value" id="gas-price">Loading...</span>
+                    <span class="stat-label">Prix du gaz :</span>
+                    <span class="stat-value" id="gas-price">Chargement...</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Status:</span>
-                    <span class="stat-value" id="network-status">🟢 Active</span>
+                    <span class="stat-label">Statut :</span>
+                    <span class="stat-value" id="network-status">🟢 Actif</span>
                 </div>
             </div>
         </div>
 
         <!-- Burn Section -->
         <div class="burn-section">
-            <!-- Personal Burn -->
+            <!-- Brûlage personnel -->
             <div class="burn-panel">
-                <h2>🔥 Personal Burn</h2>
+                <h2>🔥 Brûlage personnel</h2>
                 <div class="deflationary-info">
-                    <h4>🎯 Why Burn?</h4>
-                    <p>Burning tokens permanently removes them from circulation, making remaining tokens more scarce and potentially more valuable.</p>
+                    <h4>🎯 Pourquoi brûler ?</h4>
+                    <p>Brûler des jetons les retire définitivement de la circulation, rendant les jetons restants plus rares et potentiellement plus précieux.</p>
                 </div>
                 
                 <div class="balance-info">
-                    <span class="balance-available">Available Balance:</span>
+                    <span class="balance-available">Solde disponible :</span>
                     <span class="balance-value" id="available-balance">0 TAAMS</span>
                 </div>
                 
                 <div class="input-group">
-                    <label class="input-label">Amount to Burn:</label>
-                    <input type="number" id="burn-amount" class="burn-input" placeholder="Enter TAAMS amount" min="0" step="0.01">
+                    <label class="input-label">Montant à brûler :</label>
+                    <input type="number" id="burn-amount" class="burn-input" placeholder="Entrez le montant de TAAMS" min="0" step="0.01">
                 </div>
                 
                 <div class="percentage-buttons">
@@ -526,25 +526,25 @@
                     <div class="progress-fill" id="burn-progress"></div>
                 </div>
                 
-                <button id="burn-btn" class="burn-btn" disabled>🔥 BURN TOKENS</button>
+                <button id="burn-btn" class="burn-btn" disabled>🔥 BRÛLER LES JETONS</button>
             </div>
 
-            <!-- Community Burn -->
+            <!-- Brûlage communautaire -->
             <div class="burn-panel">
-                <h2>🌍 Community Burn</h2>
+                <h2>🌍 Brûlage communautaire</h2>
                 <div class="deflationary-info">
-                    <h4>🤝 Collective Action</h4>
-                    <p>Join the community burn event! Higher participation = bigger rewards for all participants.</p>
+                    <h4>🤝 Action collective</h4>
+                    <p>Participez à l'événement de brûlage communautaire ! Plus la participation est élevée, plus les récompenses sont importantes pour tous les participants.</p>
                 </div>
                 
                 <div class="balance-info">
-                    <span class="balance-available">Community Pool:</span>
+                    <span class="balance-available">Pool communautaire :</span>
                     <span class="balance-value" id="community-pool">0 TAAMS</span>
                 </div>
                 
                 <div class="input-group">
-                    <label class="input-label">Contribute to Community Burn:</label>
-                    <input type="number" id="community-amount" class="burn-input" placeholder="Enter contribution" min="0" step="0.01">
+                    <label class="input-label">Contribuer au brûlage communautaire :</label>
+                    <input type="number" id="community-amount" class="burn-input" placeholder="Entrez votre contribution" min="0" step="0.01">
                 </div>
                 
                 <div class="percentage-buttons">
@@ -558,24 +558,24 @@
                     <div class="progress-fill" id="community-progress"></div>
                 </div>
                 
-                <button id="community-burn-btn" class="burn-btn" disabled>🤝 CONTRIBUTE TO BURN</button>
+                <button id="community-burn-btn" class="burn-btn" disabled>🤝 CONTRIBUER AU BRÛLAGE</button>
             </div>
         </div>
 
         <!-- Burn History -->
         <div class="burn-history">
-            <h3>📜 Recent Burn Events</h3>
+            <h3>📜 Événements récents de brûlage</h3>
             <div id="burn-history-list">
-                <div class="log-entry log-info">� Loading burn history from blockchain...</div>
+                <div class="log-entry log-info">� Chargement de l'historique de brûlage depuis la blockchain...</div>
             </div>
         </div>
 
         <!-- Logs Section -->
         <div class="logs-section">
-            <h3 class="logs-title">🔍 Burn Portal Logs</h3>
+            <h3 class="logs-title">🔍 Journaux du portail de brûlage</h3>
             <div id="logs-container">
-                <div class="log-entry log-info">🔥 Burn Portal initialized</div>
-                <div class="log-entry log-info">📊 Loading burn statistics...</div>
+                <div class="log-entry log-info">🔥 Portail de brûlage initialisé</div>
+                <div class="log-entry log-info">📊 Chargement des statistiques de brûlage...</div>
             </div>
         </div>
     </div>
@@ -608,14 +608,31 @@
             await loadContractABI();
             initializeNetworkStats();
             setupEventListeners();
-            
+
             // Setup wallet change detection
             setupWalletChangeDetection();
-            
+
             // Auto-detect wallet from terminal
             await initializeWalletFromTerminal();
-            
+
+            // Vérifie la phase de burn au démarrage
+            await checkBurnPhaseActive();
+
             addLog('✅ Burn Portal ready!', 'success');
+        // Vérifie si la phase de burn est active et stocke le résultat dans burnState
+        async function checkBurnPhaseActive() {
+            try {
+                if (!burnState.contract) return;
+                const active = await burnState.contract.methods.burnPhaseActive().call();
+                burnState.burnPhaseActiveChecked = active;
+                if (!active) {
+                    addLog('⏳ La phase de brûlage n\'est pas encore active. Le seuil d\'activation (ACTIVATION_THRESHOLD) doit être atteint pour activer le burn.', 'warning');
+                }
+            } catch (e) {
+                burnState.burnPhaseActiveChecked = false;
+                addLog('⚠️ Impossible de vérifier le statut de la phase de burn.', 'warning');
+            }
+        }
         });
 
         // Load contract ABI
@@ -924,7 +941,7 @@
         async function loadBurnStatistics() {
             try {
                 addLog('📊 Loading real blockchain statistics...', 'info');
-                
+
                 // Get real blockchain data
                 const [
                     totalSupply,
@@ -937,25 +954,26 @@
                     burnState.contract.methods.MAX_SUPPLY().call(),
                     burnState.web3.eth.getBlockNumber()
                 ]);
-                
+
                 // Update state with real data
                 burnState.totalSupply = parseFloat(burnState.web3.utils.fromWei(totalSupply, 'ether'));
                 burnState.totalBurned = parseFloat(burnState.web3.utils.fromWei(totalBurned, 'ether'));
                 burnState.maxSupply = parseFloat(burnState.web3.utils.fromWei(maxSupply, 'ether'));
                 burnState.currentBlock = currentBlock;
-                
+
                 // Calculate real deflation rate
-                const deflationRate = burnState.maxSupply > 0 ? 
+                const deflationRate = burnState.maxSupply > 0 ?
                     ((burnState.totalBurned / burnState.maxSupply) * 100).toFixed(2) : '0.00';
-                
+
                 // Update UI with real data
                 document.getElementById('total-supply').textContent = burnState.totalSupply.toLocaleString();
                 document.getElementById('total-burned').textContent = burnState.totalBurned.toLocaleString();
                 document.getElementById('deflation-rate').textContent = deflationRate + '%';
-                
-                // Get burn events count from blockchain events
+
+                // Get burn events count from blockchain events (TokensBurned)
+                let burnEvents = [];
                 try {
-                    const burnEvents = await burnState.contract.getPastEvents('Burn', {
+                    burnEvents = await burnState.contract.getPastEvents('TokensBurned', {
                         fromBlock: 0,
                         toBlock: 'latest'
                     });
@@ -967,13 +985,27 @@
                     document.getElementById('burn-events').textContent = burnState.burnEvents.toLocaleString();
                     addLog('⚠️ Using estimated burn events count', 'warning');
                 }
-                
+
+                // Calculer la somme des 10 derniers burns (tous types confondus, car il n'y a pas de pool séparé)
+                let communitySum = 0;
+                if (burnEvents.length > 0) {
+                    // Trie par block le plus récent
+                    burnEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+                    const recent = burnEvents.slice(0, 10);
+                    for (const event of recent) {
+                        // On considère tous les burns comme communautaires (pas de distinction possible)
+                        const amount = parseFloat(burnState.web3.utils.fromWei(event.returnValues.amount || event.returnValues.value || '0', 'ether'));
+                        communitySum += amount;
+                    }
+                }
+                document.getElementById('community-pool').textContent = communitySum.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' TAAMS';
+
                 addLog('📊 Real blockchain statistics loaded successfully', 'success');
                 addLog(`📈 Total Supply: ${burnState.totalSupply.toLocaleString()} TAAMS`, 'info');
                 addLog(`🔥 Total Burned: ${burnState.totalBurned.toLocaleString()} TAAMS`, 'info');
                 addLog(`📉 Deflation Rate: ${deflationRate}%`, 'info');
                 addLog(`🔢 Block: ${currentBlock}`, 'info');
-                
+
             } catch (error) {
                 addLog('❌ Failed to load real statistics: ' + error.message, 'error');
                 // Set error state
@@ -981,6 +1013,7 @@
                 document.getElementById('total-burned').textContent = 'Error';
                 document.getElementById('burn-events').textContent = 'Error';
                 document.getElementById('deflation-rate').textContent = 'Error';
+                document.getElementById('community-pool').textContent = 'Error';
             }
         }
 
@@ -988,63 +1021,53 @@
         async function loadBurnHistory() {
             try {
                 addLog('📜 Loading real burn history from blockchain...', 'info');
-                
                 const historyList = document.getElementById('burn-history-list');
                 historyList.innerHTML = '<div class="log-entry log-info">📊 Loading burn events...</div>';
-                
-                // Get recent burn events from blockchain
-                const burnEvents = await burnState.contract.getPastEvents('Burn', {
-                    fromBlock: Math.max(0, burnState.currentBlock - 10000), // Last ~10k blocks
+
+                // Utilise l'event TokensBurned (nom correct du smart contract)
+                const burnEvents = await burnState.contract.getPastEvents('TokensBurned', {
+                    fromBlock: Math.max(0, burnState.currentBlock - 10000), // Derniers ~10k blocks
                     toBlock: 'latest'
                 });
-                
+
                 if (burnEvents.length === 0) {
                     historyList.innerHTML = '<div class="log-entry log-info">📝 No recent burn events found</div>';
                     addLog('📜 No recent burn events in blockchain history', 'info');
                     return;
                 }
-                
-                // Sort by block number (most recent first)
+
+                // Trie par block le plus récent
                 burnEvents.sort((a, b) => b.blockNumber - a.blockNumber);
-                
-                // Clear loading message
                 historyList.innerHTML = '';
-                
-                // Display last 10 burn events
+
+                // Affiche les 10 derniers burns
                 const recentEvents = burnEvents.slice(0, 10);
                 let eventsProcessed = 0;
-                
                 for (const event of recentEvents) {
                     try {
                         const block = await burnState.web3.eth.getBlock(event.blockNumber);
+                        // L'event TokensBurned a probablement : (address burner, uint256 amount, uint256 totalBurned, uint256 cycle)
                         const amount = parseFloat(burnState.web3.utils.fromWei(event.returnValues.amount || event.returnValues.value || '0', 'ether'));
-                        const burnedBy = event.returnValues.account || event.returnValues.from || 'Unknown';
+                        const burnedBy = event.returnValues.burner || event.returnValues.account || event.returnValues.from || 'Unknown';
                         const timestamp = new Date(block.timestamp * 1000);
                         const timeAgo = getTimeAgo(timestamp);
-                        
                         const eventDiv = document.createElement('div');
                         eventDiv.className = 'burn-event';
                         eventDiv.innerHTML = `
                             <span class="burn-amount">🔥 ${amount.toLocaleString()} TAAMS</span>
                             <span class="burn-time">${timeAgo}</span>
+                            <span class="burn-time" style="font-size:0.8em;color:#888;">par ${burnedBy.slice(0, 6)}...${burnedBy.slice(-4)}</span>
                         `;
                         historyList.appendChild(eventDiv);
-                        
                         eventsProcessed++;
-                        
-                        // Add small delay to avoid rate limiting
                         if (eventsProcessed % 3 === 0) {
                             await new Promise(resolve => setTimeout(resolve, 100));
                         }
-                        
                     } catch (blockError) {
                         console.warn('Error processing burn event:', blockError);
-                        // Skip this event and continue
                     }
                 }
-                
                 addLog(`📜 Loaded ${eventsProcessed} recent burn events from blockchain`, 'success');
-                
             } catch (error) {
                 addLog('❌ Failed to load burn history: ' + error.message, 'error');
                 const historyList = document.getElementById('burn-history-list');
@@ -1099,15 +1122,23 @@
                 progress.style.width = '0%';
                 return;
             }
-            
+
             if (amount > burnState.taamasBalance) {
                 burnBtn.disabled = true;
                 progress.style.width = '100%';
                 progress.style.background = 'linear-gradient(90deg, #ff4757, #ff3742)';
-                addLog('⚠️ Insufficient balance', 'warning');
+                addLog('⚠️ Solde insuffisant', 'warning');
                 return;
             }
-            
+
+            // Vérifie la phase de burn
+            if (typeof burnState.burnPhaseActiveChecked === 'boolean' && !burnState.burnPhaseActiveChecked) {
+                burnBtn.disabled = true;
+                progress.style.width = '0%';
+                addLog('⏳ La phase de brûlage n\'est pas encore active. Le seuil d\'activation (ACTIVATION_THRESHOLD) doit être atteint pour activer le burn.', 'warning');
+                return;
+            }
+
             burnBtn.disabled = false;
             const percentage = (amount / burnState.taamasBalance) * 100;
             progress.style.width = percentage + '%';
@@ -1147,7 +1178,7 @@
             }
 
             const amount = parseFloat(document.getElementById('burn-amount').value);
-            
+
             if (isNaN(amount) || amount <= 0) {
                 addLog('⚠️ Please enter a valid amount', 'warning');
                 return;
@@ -1158,51 +1189,94 @@
                 return;
             }
 
+            // Check burn phase status et deadline
             try {
-                addLog('🔥 Initiating token burn...', 'info');
-                
+                const burnPhaseActive = typeof burnState.burnPhaseActiveChecked === 'boolean' ? burnState.burnPhaseActiveChecked : await burnState.contract.methods.burnPhaseActive().call();
+                const burnDeadline = await burnState.contract.methods.burnDeadlineTimestamp().call();
+                const now = Math.floor(Date.now() / 1000);
+                if (!burnPhaseActive) {
+                    addLog('⏳ La phase de brûlage n\'est pas encore active. Le seuil d\'activation (ACTIVATION_THRESHOLD) doit être atteint pour activer le burn.', 'error');
+                    return;
+                }
+                if (now > parseInt(burnDeadline)) {
+                    addLog('⏳ La deadline de brûlage est dépassée. Attendez le prochain cycle.', 'error');
+                    return;
+                }
+            } catch (err) {
+                addLog('⚠️ Impossible de vérifier le statut de la phase de burn : ' + (err && err.message ? err.message : err), 'warning');
+            }
+
+            try {
+                addLog('🔥 Démarrage du brûlage de jetons...', 'info');
+
+                // Récupérer le solde BL2P avant le burn
+                let bl2pBefore = 0;
+                try {
+                    bl2pBefore = await burnState.contract.methods.getRemainingValidBL2P(burnState.userAccount).call();
+                    bl2pBefore = parseFloat(burnState.web3.utils.fromWei(bl2pBefore, 'ether'));
+                } catch (e) {}
+
                 const burnBtn = document.getElementById('burn-btn');
                 burnBtn.disabled = true;
-                burnBtn.textContent = 'BURNING...';
+                burnBtn.textContent = 'BRÛLAGE...';
 
                 const amountWei = burnState.web3.utils.toWei(amount.toString(), 'ether');
-                
-                // Estimate gas
-                const gasEstimate = await burnState.contract.methods.burn(amountWei).estimateGas({ from: burnState.userAccount });
-                
-                addLog('⛽ Gas estimated: ' + gasEstimate.toLocaleString(), 'info');
-                
-                if (isMobileDevice()) {
-                    addLog('📱 MetaMask mobile will open for transaction approval', 'info');
-                    addLog('⏳ Please approve the burn transaction...', 'warning');
-                }
 
-                // Execute burn transaction
-                const result = await burnState.contract.methods.burn(amountWei).send({
+                // Estimation du gas
+                const gasEstimate = await burnState.contract.methods.participateInBurn(amountWei).estimateGas({ from: burnState.userAccount });
+                addLog('⛽ Gaz estimé : ' + gasEstimate.toLocaleString(), 'info');
+                if (isMobileDevice()) {
+                    addLog('📱 MetaMask mobile va s’ouvrir pour valider la transaction', 'info');
+                    addLog('⏳ Merci de valider le brûlage dans MetaMask...', 'warning');
+                }
+                // Exécution du burn
+                const result = await burnState.contract.methods.participateInBurn(amountWei).send({
                     from: burnState.userAccount,
                     gas: Math.floor(gasEstimate * 1.2)
                 });
+                addLog('🔥 BRÛLAGE RÉUSSI ! Hash : ' + result.transactionHash, 'success');
+                addLog('🔗 Voir sur PolygonScan : https://polygonscan.com/tx/' + result.transactionHash, 'info');
 
-                addLog('🔥 BURN SUCCESSFUL! Hash: ' + result.transactionHash, 'success');
-                addLog('🔗 View on PolygonScan: https://polygonscan.com/tx/' + result.transactionHash, 'info');
-                
-                // Update balance and statistics
+                // Récupérer le solde BL2P après le burn
+                let bl2pAfter = 0;
+                try {
+                    bl2pAfter = await burnState.contract.methods.getRemainingValidBL2P(burnState.userAccount).call();
+                    bl2pAfter = parseFloat(burnState.web3.utils.fromWei(bl2pAfter, 'ether'));
+                } catch (e) {}
+
+                // Calculer le gain de BL2P
+                const bl2pGain = bl2pAfter - bl2pBefore;
+                if (bl2pGain > 0.00001) {
+                    addLog(`🎉 Vous avez gagné ${bl2pGain.toLocaleString()} BL2P grâce au brûlage !`, 'success');
+                } else {
+                    addLog('ℹ️ Aucun BL2P supplémentaire reçu pour ce brûlage.', 'info');
+                    addLog('ℹ️ Le BL2P n\'est distribué qu\'après avoir atteint l\'objectif total de brûlage (burn target). Vous pourrez réclamer vos BL2P via la fonction "Réclamer BL2P" quand le burn target sera atteint.', 'warning');
+                }
+
+                // Mise à jour des soldes et stats
                 await loadUserBalance();
                 await loadBurnStatistics();
-                
-                // Add to burn history
-                addBurnToHistory(amount, 'Personal Burn');
-                
-                // Reset form
+
+                // Ajout à l’historique
+                addBurnToHistory(amount, 'Brûlage personnel');
+
+                // Réinitialiser le formulaire
                 document.getElementById('burn-amount').value = '';
                 validateBurnAmount();
 
             } catch (error) {
-                addLog('❌ Burn failed: ' + error.message, 'error');
+                // Essayer d’extraire la raison du revert
+                let reason = error && error.message ? error.message : String(error);
+                if (error && error.data && error.data.message) {
+                    reason = error.data.message;
+                } else if (error && error.data && error.data.reason) {
+                    reason = error.data.reason;
+                }
+                addLog('❌ Brûlage échoué : ' + reason, 'error');
             } finally {
                 const burnBtn = document.getElementById('burn-btn');
                 burnBtn.disabled = false;
-                burnBtn.textContent = '🔥 BURN TOKENS';
+                burnBtn.textContent = '🔥 BRÛLER LES JETONS';
             }
         }
 
@@ -1229,18 +1303,15 @@
 
                 const amountWei = burnState.web3.utils.toWei(amount.toString(), 'ether');
                 
-                // For now, use the same burn function (can be extended with community logic)
-                const gasEstimate = await burnState.contract.methods.burn(amountWei).estimateGas({ from: burnState.userAccount });
-                
+                // Use participateInBurn for community burn
+                const gasEstimate = await burnState.contract.methods.participateInBurn(amountWei).estimateGas({ from: burnState.userAccount });
                 if (isMobileDevice()) {
                     addLog('📱 MetaMask mobile will open for transaction approval', 'info');
                 }
-
-                const result = await burnState.contract.methods.burn(amountWei).send({
+                const result = await burnState.contract.methods.participateInBurn(amountWei).send({
                     from: burnState.userAccount,
                     gas: Math.floor(gasEstimate * 1.2)
                 });
-
                 addLog('🤝 COMMUNITY BURN CONTRIBUTION SUCCESSFUL!', 'success');
                 addLog('🔗 Transaction: https://polygonscan.com/tx/' + result.transactionHash, 'info');
                 
@@ -1307,30 +1378,41 @@
                 if (!burnState.web3) {
                     document.getElementById('current-block').textContent = 'Not connected';
                     document.getElementById('gas-price').textContent = 'Not connected';
-                    document.getElementById('network-status').textContent = '🔴 Disconnected';
+                    document.getElementById('network-status').textContent = '🔴 Déconnecté';
                     return;
                 }
 
                 // Get current block number
                 const currentBlock = await burnState.web3.eth.getBlockNumber();
                 document.getElementById('current-block').textContent = currentBlock.toLocaleString();
-                
+
                 // Get current gas price
                 const gasPrice = await burnState.web3.eth.getGasPrice();
                 const gasPriceGwei = burnState.web3.utils.fromWei(gasPrice, 'gwei');
                 document.getElementById('gas-price').textContent = parseFloat(gasPriceGwei).toFixed(1) + ' Gwei';
-                
-                // Update network status
-                document.getElementById('network-status').textContent = '🟢 Active';
-                
+
+                // Vérifie le statut de la phase de burn
+                let burnPhaseActive = false;
+                try {
+                    if (burnState.contract) {
+                        burnPhaseActive = await burnState.contract.methods.burnPhaseActive().call();
+                    }
+                } catch (e) {}
+
+                if (burnPhaseActive) {
+                    document.getElementById('network-status').textContent = '🟢 PHASE DE BURN ACTIVE';
+                } else {
+                    document.getElementById('network-status').textContent = '🟡 EN ATTENTE DU SEUIL';
+                }
+
                 // Update state
                 burnState.currentBlock = currentBlock;
-                
+
             } catch (error) {
                 console.warn('Network stats update error:', error);
                 document.getElementById('current-block').textContent = 'Error';
                 document.getElementById('gas-price').textContent = 'Error';
-                document.getElementById('network-status').textContent = '🟡 Error';
+                document.getElementById('network-status').textContent = '🟡 Erreur';
             }
         }
 
