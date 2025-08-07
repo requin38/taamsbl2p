@@ -504,28 +504,27 @@
                     <h4>🎯 Pourquoi brûler ?</h4>
                     <p>Brûler des jetons les retire définitivement de la circulation, rendant les jetons restants plus rares et potentiellement plus précieux.</p>
                 </div>
-                
                 <div class="balance-info">
                     <span class="balance-available">Solde disponible :</span>
                     <span class="balance-value" id="available-balance">0 TAAMS</span>
                 </div>
-                
+                <div class="balance-info">
+                    <span class="balance-available">Total brûlé personnel :</span>
+                    <span class="balance-value" id="personal-burned">Chargement...</span>
+                </div>
                 <div class="input-group">
                     <label class="input-label">Montant à brûler :</label>
                     <input type="number" id="burn-amount" class="burn-input" placeholder="Entrez le montant de TAAMS" min="0" step="0.01">
                 </div>
-                
                 <div class="percentage-buttons">
                     <button class="percentage-btn" onclick="setBurnPercentage(25)">25%</button>
                     <button class="percentage-btn" onclick="setBurnPercentage(50)">50%</button>
                     <button class="percentage-btn" onclick="setBurnPercentage(75)">75%</button>
                     <button class="percentage-btn" onclick="setBurnPercentage(100)">100%</button>
                 </div>
-                
                 <div class="progress-bar">
                     <div class="progress-fill" id="burn-progress"></div>
                 </div>
-                
                 <button id="burn-btn" class="burn-btn" disabled>🔥 BRÛLER LES JETONS</button>
             </div>
 
@@ -563,7 +562,7 @@
         </div>
 
         <!-- Burn History -->
-        <div class="burn-history">
+        <div class="burn-history" style="max-height: 220px; overflow-y: auto;">
             <h3>📜 Événements récents de brûlage</h3>
             <div id="burn-history-list">
                 <div class="log-entry log-info">� Chargement de l'historique de brûlage depuis la blockchain...</div>
@@ -894,7 +893,6 @@
         async function loadWalletBalances() {
             try {
                 addLog('💰 Loading wallet balances...', 'info');
-                
                 // Get balances in parallel
                 const [
                     tAAMSBalance,
@@ -907,27 +905,43 @@
                         burnState.contract.methods.getRemainingValidBL2P(burnState.userAccount).call() :
                         burnState.contract.methods.balanceOf(burnState.userAccount).call() // Fallback
                 ]);
-                
                 // Convert and display balances
                 const tAAMSFormatted = parseFloat(burnState.web3.utils.fromWei(tAAMSBalance, 'ether')).toLocaleString();
                 const maticFormatted = parseFloat(burnState.web3.utils.fromWei(maticBalance, 'ether')).toFixed(4);
                 const bl2pFormatted = parseFloat(burnState.web3.utils.fromWei(bl2pBalance, 'ether')).toLocaleString();
-                
                 document.getElementById('taams-balance').textContent = tAAMSFormatted + ' TAAMS';
                 document.getElementById('matic-balance').textContent = maticFormatted + ' MATIC';
                 document.getElementById('bl2p-balance').textContent = bl2pFormatted + ' BL2P';
-                
                 // Update internal state and available balance
                 burnState.taamasBalance = burnState.web3.utils.fromWei(tAAMSBalance, 'ether');
                 document.getElementById('available-balance').textContent = tAAMSFormatted + ' TAAMS';
-                
+
+                // Load personal burned amount
+                let personalBurned = 0;
+                try {
+                    // Get all TokensBurned events for this user, supporting multiple possible field names
+                    const events = await burnState.contract.getPastEvents('TokensBurned', {
+                        fromBlock: 0,
+                        toBlock: 'latest'
+                    });
+                    for (const event of events) {
+                        const burner = event.returnValues.burner || event.returnValues.account || event.returnValues.from;
+                        if (burner && burner.toLowerCase() === burnState.userAccount.toLowerCase()) {
+                            personalBurned += parseFloat(burnState.web3.utils.fromWei(event.returnValues.amount || event.returnValues.value || '0', 'ether'));
+                        }
+                    }
+                } catch (e) {
+                    document.getElementById('personal-burned').textContent = 'Erreur';
+                }
+                document.getElementById('personal-burned').textContent = personalBurned.toLocaleString(undefined, {maximumFractionDigits: 2}) + ' TAAMS';
+
                 addLog(`💰 Balances loaded - TAAMS: ${tAAMSFormatted}, MATIC: ${maticFormatted}, BL2P: ${bl2pFormatted}`, 'success');
-                
             } catch (error) {
                 addLog('❌ Failed to load wallet balances: ' + error.message, 'error');
                 document.getElementById('taams-balance').textContent = 'Error';
                 document.getElementById('matic-balance').textContent = 'Error';
                 document.getElementById('bl2p-balance').textContent = 'Error';
+                document.getElementById('personal-burned').textContent = 'Erreur';
             }
         }
 
@@ -1040,8 +1054,8 @@
                 burnEvents.sort((a, b) => b.blockNumber - a.blockNumber);
                 historyList.innerHTML = '';
 
-                // Affiche les 10 derniers burns
-                const recentEvents = burnEvents.slice(0, 10);
+                // Affiche les 5 derniers burns
+                const recentEvents = burnEvents.slice(0, 5);
                 let eventsProcessed = 0;
                 for (const event of recentEvents) {
                     try {
@@ -1230,10 +1244,12 @@
                     addLog('⏳ Merci de valider le brûlage dans MetaMask...', 'warning');
                 }
                 // Exécution du burn
-                const result = await burnState.contract.methods.participateInBurn(amountWei).send({
-                    from: burnState.userAccount,
-                    gas: Math.floor(gasEstimate * 1.2)
-                });
+                const txParams = {
+                    from: burnState.userAccount
+                };
+                addLog('> DEBUG: Paramètres envoyés à MetaMask: ' + JSON.stringify(txParams), 'warning');
+                console.log('Paramètres envoyés à MetaMask:', txParams);
+                const result = await burnState.contract.methods.participateInBurn(amountWei).send(txParams);
                 addLog('🔥 BRÛLAGE RÉUSSI ! Hash : ' + result.transactionHash, 'success');
                 addLog('🔗 Voir sur PolygonScan : https://polygonscan.com/tx/' + result.transactionHash, 'info');
 
@@ -1308,10 +1324,12 @@
                 if (isMobileDevice()) {
                     addLog('📱 MetaMask mobile will open for transaction approval', 'info');
                 }
-                const result = await burnState.contract.methods.participateInBurn(amountWei).send({
-                    from: burnState.userAccount,
-                    gas: Math.floor(gasEstimate * 1.2)
-                });
+                const txParams = {
+                    from: burnState.userAccount
+                };
+                addLog('> DEBUG: Paramètres envoyés à MetaMask: ' + JSON.stringify(txParams), 'warning');
+                console.log('Paramètres envoyés à MetaMask:', txParams);
+                const result = await burnState.contract.methods.participateInBurn(amountWei).send(txParams);
                 addLog('🤝 COMMUNITY BURN CONTRIBUTION SUCCESSFUL!', 'success');
                 addLog('🔗 Transaction: https://polygonscan.com/tx/' + result.transactionHash, 'info');
                 
@@ -1422,12 +1440,12 @@
             const logEntry = document.createElement('div');
             logEntry.className = `log-entry log-${type}`;
             logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            
+
             logsContainer.appendChild(logEntry);
             logsContainer.scrollTop = logsContainer.scrollHeight;
-            
-            // Limit to 50 log entries
-            while (logsContainer.children.length > 50) {
+
+            // Limiter à 5 entrées de log maximum (scroll activé)
+            while (logsContainer.children.length > 5) {
                 logsContainer.removeChild(logsContainer.firstChild);
             }
         }
