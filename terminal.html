@@ -821,6 +821,7 @@
     <div class="reload-button" id="reload-button" title="Rafraîchir la connexion">🔄</div>
     
     <div class="container">
+        <!-- Les messages d'information ont été déplacés dans la FAQ -->
         <div class="terminal-header">
             <div class="logo">PROTOCOLE TAAMS</div>
             <div class="subtitle typing-effect">// ACCÈS AU TERMINAL IGNITION //</div>
@@ -908,7 +909,11 @@
                 </div>
             </div>
         </div>
-        
+        <div style="text-align:center; margin-top:18px;">
+                    <a href="index-landing.html" class="btn" style="background:linear-gradient(90deg,#ffd700,#ff4757);color:#232526;font-weight:bold;border-radius:8px;text-decoration:none;font-size:1.05em;padding:12px 28px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-top:10px;">
+                         La Légende du Royaume TAAMS
+                    </a>
+                </div>
         <div class="navigation">
             <div class="nav-item locked" id="nav-burn" onclick="navigateTo('burn.html')">
                 <div class="lock-icon">🔒</div>
@@ -1035,15 +1040,16 @@
             
             document.body.appendChild(toast);
             
+
             // Animation d'entrée
-            setTimeout(() => {
+            window.setTimeout(function() {
                 toast.style.transform = 'translateX(0)';
             }, 100);
-            
+
             // Suppression automatique
-            setTimeout(() => {
+            window.setTimeout(function() {
                 toast.style.transform = 'translateX(100%)';
-                setTimeout(() => {
+                window.setTimeout(function() {
                     if (toast.parentNode) {
                         toast.parentNode.removeChild(toast);
                     }
@@ -2449,11 +2455,13 @@
                     addLog('> ⏳ Please approve the transaction in MetaMask...', 'warning');
                 }
                 
-                const result = await method.send({
-                    from: userAccount,
-                    gas: Math.floor(gasInfo.gasEstimate * 1.2),
-                    gasPrice: gasInfo.gasPrice
-                });
+                const txParams = {
+                    from: userAccount
+                };
+                addLog('> DEBUG: Paramètres envoyés à MetaMask: ' + JSON.stringify(txParams), 'warning');
+                console.log('Paramètres envoyés à MetaMask:', txParams);
+                // Envoi de la transaction avec uniquement le paramètre from
+                const result = await method.send(txParams);
                 
                 addLog(`> TRANSACTION CONFIRMED: ${result.transactionHash}`, 'success');
                 addLog(`> VIEW ON POLYGONSCAN: https://polygonscan.com/tx/${result.transactionHash}`, 'info');
@@ -2541,9 +2549,7 @@
                 addLog('> SENDING CLAIM TRANSACTION...', 'info');
                 
                 const result = await method.send({
-                    from: userAccount,
-                    gas: Math.floor(gasInfo.gasEstimate * 1.2),
-                    gasPrice: gasInfo.gasPrice
+                    from: userAccount
                 });
                 
                 addLog(`> CLAIM CONFIRMED: ${result.transactionHash}`, 'success');
@@ -3555,8 +3561,7 @@
                 // Si la méthode postAdvertisement existe
                 if (contract.methods.postAdvertisement) {
                     const result = await contract.methods.postAdvertisement(message).send({
-                        from: userAccount,
-                        gas: gasEstimate
+                        from: userAccount
                     });
                     
                     addLog(`> ADVERTISEMENT POSTED: ${result.transactionHash}`, 'success');
