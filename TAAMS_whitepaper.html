@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>TAAMS Protocol — Guide Utilisateur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #181824 0%, #23243a 50%, #16213e 100%);
+            color: #ffd700;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.7);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(255,215,0,0.08);
+            padding: 32px 18px;
+            margin-top: 32px;
+            margin-bottom: 32px;
+        }
+        h1, h2, h3 {
+            color: #ffd700;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.3em;
+            margin-bottom: 18px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+        h3 {
+            font-size: 1.15em;
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+        ul, ol {
+            color: #fff8dc;
+            margin-left: 24px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        .section {
+            margin-bottom: 32px;
+        }
+        .highlight {
+            background: rgba(255,215,0,0.09);
+            border-left: 4px solid #ffd700;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            color: #fff8dc;
+        }
+        .ref {
+            color: #ffd700;
+            text-decoration: underline;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+        }
+        .table th, .table td {
+            border: 1px solid #ffd700;
+            padding: 8px;
+            text-align: left;
+            background: rgba(0,0,0,0.5);
+        }
+        .table th {
+            background: #ffd700;
+            color: #232526;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 8px; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.15em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TAAMS Protocol — Guide Utilisateur</h1>
+        <div class="highlight">
+            TAAMS est un protocole ERC20 avancé conçu pour la gouvernance décentralisée, la mécanique de burn, le staking et l'évolution communautaire.<br>
+            <strong>Note :</strong> <span style="color:#ff4757;">Le owner a renoncé à la propriété du contrat. Toutes les décisions et évolutions sont désormais gérées par la gouvernance communautaire.</span>
+        </div>
+        <div style="text-align:center; margin-bottom:24px;">
+            <a href="index.html" style="color:#ffd700; font-weight:bold; text-decoration:underline; font-size:1.1em;">
+                ← Retour à l'index
+            </a>
+        </div>
+
+        <div class="section">
+            <h2>1. Tokenomics</h2>
+            <ul>
+                <li><strong>Nom du token :</strong> TAAMS</li>
+                <li><strong>Symbole :</strong> TAAMS</li>
+                <li><strong>Décimales :</strong> 18</li>
+                <li><strong>Max Supply :</strong> 10 000 000 000 TAAMS</li>
+            </ul>
+            <h3>Distribution Initiale</h3>
+            <ul>
+                <li>Réserve du contrat : 8 000 000 000 TAAMS</li>
+                <li>Deployer : 1 000 000 000 TAAMS</li>
+                <li>Destinataire initial : 1 000 000 000 TAAMS</li>
+            </ul>
+            <h3>Réserve verrouillée</h3>
+            <ul>
+                <li>7 000 000 000 TAAMS (débloquable uniquement par la gouvernance après renoncement du owner)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>2. Phases du protocole</h2>
+            <h3>Activation</h3>
+            <ul>
+                <li>Seuil d'activation : 1 000 000 000 TAAMS doivent être en circulation.</li>
+                <li>Déclenche la phase de burn.</li>
+            </ul>
+            <h3>Burn</h3>
+            <ul>
+                <li>Objectif : brûler 1 000 000 000 TAAMS</li>
+                <li>Burn annuel : 100 000 000 TAAMS (modifiable par gouvernance)</li>
+                <li>Cycle de burn : 1 an</li>
+                <li>Participation : tout utilisateur peut brûler des TAAMS</li>
+                <li>Bonus BL2P : +5% si l'utilisateur a du BL2P valide</li>
+            </ul>
+            <h3>BL2P Reveal & Claim</h3>
+            <ul>
+                <li>Révélation BL2P : quand l'objectif de burn est atteint</li>
+                <li>Réclamation BL2P : proportionnelle à la contribution au burn</li>
+                <li>Formule : (burn utilisateur * BL2P_MAX_SUPPLY) / BURN_TARGET</li>
+                <li>Bonus early adopter : +10% pour les 1000 premiers</li>
+                <li>Bonus referral : +5% pour le parrain</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>3. BL2P (Burn-Locked 2nd Phase)</h2>
+            <ul>
+                <li>Supply : 1 000 000 000 TAAMS</li>
+                <li>Réclamation : après burn target atteint et BL2P révélé</li>
+                <li>Maturité : après 10 000 blocks (modifiable)</li>
+                <li>Durée de vie : expire après 100 000 blocks (modifiable)</li>
+                <li>Burn d'inactivité : BL2P diminue si inactif (1% par période)</li>
+                <li>Délégation : max 20% par délégué</li>
+                <li>Transfert : BL2P mature peut être transféré</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>4. Staking</h2>
+            <ul>
+                <li>Montant minimum : 1 000 TAAMS</li>
+                <li>Période de staking : 30 jours</li>
+                <li>Taux de récompense : 5% (modifiable)</li>
+                <li>Boost BL2P : jusqu'à 10% du montant staké</li>
+                <li>Unstake : possible après la période, avec récompenses</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>5. Gouvernance</h2>
+            <ul>
+                <li>Contrat de gouvernance : configurable, puis contrôlé par la communauté</li>
+                <li>Propositions : nécessite 100 000 BL2P, cooldown 30 jours</li>
+                <li>Vote : commit-reveal, période de 7 jours</li>
+                <li>Quorum : 10 000 000 BL2P</li>
+                <li>Seuil de vote : 50%</li>
+                <li>Exécution : si quorum et seuil atteints</li>
+                <li>Paramètres modifiables : burn, rewards, etc.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>6. Sécurité & Urgence</h2>
+            <ul>
+                <li>Pause d'urgence : via gouvernance</li>
+                <li>Protection reentrancy : toutes les fonctions critiques</li>
+                <li>Restriction EOA : la plupart des fonctions sont réservées aux comptes externes</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>7. Airdrop Ignition</h2>
+            <ul>
+                <li>Pool : 500 000 000 TAAMS</li>
+                <li>Participants max : 1 000</li>
+                <li>Inscription : ouverte jusqu'à déclenchement ou max atteint</li>
+                <li>Déclenchement : après activation</li>
+                <li>Distribution : pro-rata, bonus pour les 200 premiers</li>
+                <li>Réclamation : après déclenchement</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>8. Publicité On-chain</h2>
+            <ul>
+                <li>La gouvernance peut poster des messages sur la blockchain</li>
+                <li>Période : 3 jours par message</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>9. Délégation & Vote</h2>
+            <ul>
+                <li>Délégation : possible, max 20% par délégué</li>
+                <li>Révocation : possible à tout moment</li>
+                <li>Top délégués : suivi pour la transparence</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>10. Évolution sans Owner</h2>
+            <ul>
+                <li>Le owner peut renoncer à la propriété</li>
+                <li>La gouvernance prend le contrôle</li>
+                <li>Toutes les actions critiques nécessitent des propositions et des votes</li>
+                <li>Le protocole devient entièrement décentralisé</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>11. Événements & Transparence</h2>
+            <ul>
+                <li>Toutes les actions majeures émettent des événements pour le suivi</li>
+                <li>Burn, BL2P, staking, propositions, votes, airdrop, délégation, etc.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>12. Résumé</h2>
+            <div class="highlight">
+                TAAMS est un protocole ERC20 déflationniste et gouverné par la communauté, avec des mécaniques avancées de burn, staking, BL2P et airdrop. Après la phase initiale, la gestion est entièrement communautaire via la gouvernance on-chain.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>13. Références</h2>
+            <ul>
+                <li><a href="https://docs.openzeppelin.com/contracts/4.x/api/token/erc20" target="_blank" class="ref">OpenZeppelin ERC20</a></li>
+                <li><a href="https://docs.uniswap.org/" target="_blank" class="ref">Uniswap Governance</a></li>
+                <li><a href="./TAAMS.sol.txt" target="_blank" class="ref">Documentation du contrat TAAMS</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
